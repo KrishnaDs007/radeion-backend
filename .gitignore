@@ -33,3 +33,5 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Local planning notes
+.project-notes/
