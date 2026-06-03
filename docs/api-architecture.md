@@ -57,6 +57,15 @@ can({ user, action, scope })
 
 The ACL service currently has the base shape only. It allows platform roles such as `developer` and `superAdmin`, and it contains the first scoped-access comparison logic. Role loading from the database will be added in the next implementation step.
 
+## User Context Loading
+
+Protected requests now resolve user context in two stages:
+
+1. Supabase validates the bearer access token.
+2. Prisma loads the matching application profile and active role assignments.
+
+Only `active` application profiles are allowed through protected routes. Pending, invited, rejected, and disabled users need dedicated onboarding or admin flows before they can access protected APIs.
+
 ## Why This Structure
 
 - Controllers own HTTP routing.
@@ -66,4 +75,3 @@ The ACL service currently has the base shape only. It allows platform roles such
 - Services own business logic and external integrations.
 
 This keeps the API scalable without mixing routing, auth, and business logic in one place.
-

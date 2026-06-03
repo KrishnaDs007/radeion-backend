@@ -8,13 +8,13 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../common/decorators/public.decorator';
 import { RequestWithContext } from '../common/types/request-context.type';
-import { SupabaseService } from '../supabase/supabase.service';
+import { AuthContextService } from './auth-context.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly supabaseService: SupabaseService,
+    private readonly authContextService: AuthContextService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -34,7 +34,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Missing bearer token');
     }
 
-    request.user = await this.supabaseService.getUserContextFromToken(token);
+    request.user = await this.authContextService.getUserContextFromToken(token);
 
     return true;
   }

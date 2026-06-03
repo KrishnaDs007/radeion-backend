@@ -6,7 +6,9 @@ export type UserRoleContext = {
 };
 
 export type UserContext = {
+  profileId: string;
   authUserId: string;
   email?: string;
+  status: string;
   roles: UserRoleContext[];
 };

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { User } from '@supabase/supabase-js';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { UserContext } from '../auth/auth.types';
 
 type SupabaseDatabase = {
   public: {
@@ -37,7 +37,7 @@ export class SupabaseService {
     });
   }
 
-  async getUserContextFromToken(accessToken: string): Promise<UserContext> {
+  async getUserFromToken(accessToken: string): Promise<User> {
     const {
       data: { user },
       error,
@@ -47,10 +47,6 @@ export class SupabaseService {
       throw error ?? new Error('Unable to resolve Supabase user');
     }
 
-    return {
-      authUserId: user.id,
-      email: user.email,
-      roles: [],
-    };
+    return user;
   }
 }
