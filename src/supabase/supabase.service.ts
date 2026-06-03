@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { UserContext } from '../auth/auth.types';
 
 type SupabaseDatabase = {
   public: {
@@ -34,5 +35,22 @@ export class SupabaseService {
         persistSession: false,
       },
     });
+  }
+
+  async getUserContextFromToken(accessToken: string): Promise<UserContext> {
+    const {
+      data: { user },
+      error,
+    } = await this.adminClient.auth.getUser(accessToken);
+
+    if (error || !user) {
+      throw error ?? new Error('Unable to resolve Supabase user');
+    }
+
+    return {
+      authUserId: user.id,
+      email: user.email,
+      roles: [],
+    };
   }
 }
