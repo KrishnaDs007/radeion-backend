@@ -2,10 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
+type SupabaseDatabase = {
+  public: {
+    Tables: Record<string, never>;
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
+  };
+};
+
 @Injectable()
 export class SupabaseService {
-  readonly adminClient: SupabaseClient;
-  readonly publicClient: SupabaseClient;
+  readonly adminClient: SupabaseClient<SupabaseDatabase>;
+  readonly publicClient: SupabaseClient<SupabaseDatabase>;
 
   constructor(configService: ConfigService) {
     const supabaseUrl = configService.getOrThrow<string>('SUPABASE_URL');
@@ -14,8 +24,11 @@ export class SupabaseService {
     );
     const secretKey = configService.getOrThrow<string>('SUPABASE_SECRET_KEY');
 
-    this.publicClient = createClient(supabaseUrl, publishableKey);
-    this.adminClient = createClient(supabaseUrl, secretKey, {
+    this.publicClient = createClient<SupabaseDatabase>(
+      supabaseUrl,
+      publishableKey,
+    );
+    this.adminClient = createClient<SupabaseDatabase>(supabaseUrl, secretKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,

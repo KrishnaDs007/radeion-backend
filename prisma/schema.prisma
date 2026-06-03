@@ -62,16 +62,16 @@ enum ReferenceSource {
 }
 
 model Profile {
-  id           String     @id @default(uuid()) @db.Uuid
-  authUserId   String     @unique @map("auth_user_id") @db.Uuid
-  email        String     @unique
-  firstName    String?    @map("first_name")
-  lastName     String?    @map("last_name")
-  status       UserStatus @default(PENDING)
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
+  id         String     @id @default(uuid()) @db.Uuid
+  authUserId String     @unique @map("auth_user_id") @db.Uuid
+  email      String     @unique
+  firstName  String?    @map("first_name")
+  lastName   String?    @map("last_name")
+  status     UserStatus @default(PENDING)
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
 
-  createdOrganizations        Organization[]              @relation("OrganizationCreator")
+  createdOrganizations         Organization[]                @relation("OrganizationCreator")
   reviewedOrganizationRequests OrganizationApprovalRequest[] @relation("OrganizationRequestReviewer")
   reviewedUserRequests         UserApprovalRequest[]         @relation("UserRequestReviewer")
   sentInvites                  Invite[]                      @relation("InviteSender")
@@ -147,7 +147,7 @@ model UserApprovalRequest {
   updatedAt      DateTime      @updatedAt @map("updated_at")
 
   organization Organization? @relation(fields: [organizationId], references: [id])
-  reviewedBy   Profile?     @relation("UserRequestReviewer", fields: [reviewedById], references: [id])
+  reviewedBy   Profile?      @relation("UserRequestReviewer", fields: [reviewedById], references: [id])
 
   @@index([email])
   @@index([status])
@@ -169,7 +169,7 @@ model Invite {
   updatedAt      DateTime     @updatedAt @map("updated_at")
 
   organization Organization? @relation(fields: [organizationId], references: [id])
-  invitedBy    Profile      @relation("InviteSender", fields: [invitedById], references: [id])
+  invitedBy    Profile       @relation("InviteSender", fields: [invitedById], references: [id])
 
   @@index([email])
   @@index([status])
