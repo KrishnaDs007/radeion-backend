@@ -1,0 +1,301 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserStatus {
+  PENDING  @map("pending")
+  INVITED  @map("invited")
+  ACTIVE   @map("active")
+  REJECTED @map("rejected")
+  DISABLED @map("disabled")
+}
+
+enum RequestStatus {
+  PENDING  @map("pending")
+  APPROVED @map("approved")
+  REJECTED @map("rejected")
+  DECLINED @map("declined")
+  FAILED   @map("failed")
+}
+
+enum OrganizationStatus {
+  PENDING  @map("pending")
+  ACTIVE   @map("active")
+  REJECTED @map("rejected")
+  DISABLED @map("disabled")
+}
+
+enum InviteStatus {
+  PENDING  @map("pending")
+  ACCEPTED @map("accepted")
+  EXPIRED  @map("expired")
+  REVOKED  @map("revoked")
+}
+
+enum RoleName {
+  PROVIDER         @map("provider")
+  PRACTICE         @map("practice")
+  CARE_COORDINATOR @map("careCoordinator")
+  ACO_ADMIN        @map("acoAdmin")
+  CLIENT_ADMIN     @map("clientAdmin")
+  SUPER_ADMIN      @map("superAdmin")
+  DEVELOPER        @map("developer")
+}
+
+enum ScopeType {
+  GLOBAL       @map("global")
+  ORGANIZATION @map("organization")
+  ACO          @map("aco")
+  PRACTICE     @map("practice")
+  PROVIDER     @map("provider")
+}
+
+enum ReferenceSource {
+  MANUAL     @map("manual")
+  DATABRICKS @map("databricks")
+}
+
+model Profile {
+  id           String     @id @default(uuid()) @db.Uuid
+  authUserId   String     @unique @map("auth_user_id") @db.Uuid
+  email        String     @unique
+  firstName    String?    @map("first_name")
+  lastName     String?    @map("last_name")
+  status       UserStatus @default(PENDING)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  createdOrganizations        Organization[]              @relation("OrganizationCreator")
+  reviewedOrganizationRequests OrganizationApprovalRequest[] @relation("OrganizationRequestReviewer")
+  reviewedUserRequests         UserApprovalRequest[]         @relation("UserRequestReviewer")
+  sentInvites                  Invite[]                      @relation("InviteSender")
+  roleAssignments              UserRoleAssignment[]          @relation("ProfileRoleAssignments")
+  assignedRoles                UserRoleAssignment[]          @relation("RoleAssigner")
+  careCoordinatorAssignments   CareCoordinatorAssignment[]   @relation("CareCoordinatorProfile")
+  assignedCareCoordinators     CareCoordinatorAssignment[]   @relation("CareCoordinatorAssigner")
+  auditLogs                    AuditLog[]                    @relation("AuditActor")
+
+  @@map("profiles")
+}
+
+model Organization {
+  id            String             @id @default(uuid()) @db.Uuid
+  name          String
+  type          String
+  website       String?
+  contactEmail  String             @map("contact_email")
+  contactNumber String?            @map("contact_number")
+  status        OrganizationStatus @default(PENDING)
+  address       String?
+  companyBio    String?            @map("company_bio")
+  startedYear   Int?               @map("started_year")
+  createdById   String?            @map("created_by") @db.Uuid
+  createdAt     DateTime           @default(now()) @map("created_at")
+  updatedAt     DateTime           @updatedAt @map("updated_at")
+
+  createdBy        Profile?                    @relation("OrganizationCreator", fields: [createdById], references: [id])
+  userRequests     UserApprovalRequest[]
+  invites          Invite[]
+  roleAssignments  UserRoleAssignment[]
+  practices        Practice[]
+  providers        Provider[]
+  coordinatorLinks CareCoordinatorAssignment[]
+  auditLogs        AuditLog[]
+
+  @@index([status])
+  @@map("organizations")
+}
+
+model OrganizationApprovalRequest {
+  id                    String        @id @default(uuid()) @db.Uuid
+  organizationName      String        @map("organization_name")
+  requestedByEmail      String        @map("requested_by_email")
+  requestedByAuthUserId String?       @map("requested_by_auth_user_id") @db.Uuid
+  requestedPayload      Json          @map("requested_payload")
+  status                RequestStatus @default(PENDING)
+  reviewedById          String?       @map("reviewed_by") @db.Uuid
+  reviewedAt            DateTime?     @map("reviewed_at")
+  reviewNotes           String?       @map("review_notes")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+
+  reviewedBy Profile? @relation("OrganizationRequestReviewer", fields: [reviewedById], references: [id])
+
+  @@index([status])
+  @@index([requestedByEmail])
+  @@map("organization_approval_requests")
+}
+
+model UserApprovalRequest {
+  id             String        @id @default(uuid()) @db.Uuid
+  authUserId     String?       @map("auth_user_id") @db.Uuid
+  email          String
+  organizationId String?       @map("organization_id") @db.Uuid
+  requestedRoles Json          @map("requested_roles")
+  requestedScope Json          @map("requested_scope")
+  status         RequestStatus @default(PENDING)
+  reviewedById   String?       @map("reviewed_by") @db.Uuid
+  reviewedAt     DateTime?     @map("reviewed_at")
+  reviewNotes    String?       @map("review_notes")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  reviewedBy   Profile?     @relation("UserRequestReviewer", fields: [reviewedById], references: [id])
+
+  @@index([email])
+  @@index([status])
+  @@index([organizationId])
+  @@map("user_approval_requests")
+}
+
+model Invite {
+  id             String       @id @default(uuid()) @db.Uuid
+  email          String
+  organizationId String?      @map("organization_id") @db.Uuid
+  invitedById    String       @map("invited_by") @db.Uuid
+  assignedRoles  Json         @map("assigned_roles")
+  assignedScope  Json         @map("assigned_scope")
+  status         InviteStatus @default(PENDING)
+  expiresAt      DateTime?    @map("expires_at")
+  acceptedAt     DateTime?    @map("accepted_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  invitedBy    Profile      @relation("InviteSender", fields: [invitedById], references: [id])
+
+  @@index([email])
+  @@index([status])
+  @@index([organizationId])
+  @@map("invites")
+}
+
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        RoleName @unique
+  displayName String   @map("display_name")
+  description String?
+  isGlobal    Boolean  @default(false) @map("is_global")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  assignments UserRoleAssignment[]
+
+  @@map("roles")
+}
+
+model UserRoleAssignment {
+  id             String    @id @default(uuid()) @db.Uuid
+  profileId      String    @map("profile_id") @db.Uuid
+  roleId         String    @map("role_id") @db.Uuid
+  scopeType      ScopeType @map("scope_type")
+  scopeId        String?   @map("scope_id") @db.Uuid
+  organizationId String?   @map("organization_id") @db.Uuid
+  assignedById   String?   @map("assigned_by") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at")
+  revokedAt      DateTime? @map("revoked_at")
+
+  profile      Profile       @relation("ProfileRoleAssignments", fields: [profileId], references: [id])
+  role         Role          @relation(fields: [roleId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  assignedBy   Profile?      @relation("RoleAssigner", fields: [assignedById], references: [id])
+
+  @@index([profileId])
+  @@index([roleId])
+  @@index([scopeType, scopeId])
+  @@index([organizationId])
+  @@map("user_role_assignments")
+}
+
+model Practice {
+  id                  String             @id @default(uuid()) @db.Uuid
+  organizationId      String             @map("organization_id") @db.Uuid
+  name                String
+  externalReferenceId String?            @map("external_reference_id")
+  source              ReferenceSource    @default(MANUAL)
+  status              OrganizationStatus @default(ACTIVE)
+  createdAt           DateTime           @default(now()) @map("created_at")
+  updatedAt           DateTime           @updatedAt @map("updated_at")
+
+  organization     Organization                @relation(fields: [organizationId], references: [id])
+  providers        Provider[]
+  coordinatorLinks CareCoordinatorAssignment[]
+
+  @@index([organizationId])
+  @@index([externalReferenceId])
+  @@map("practices")
+}
+
+model Provider {
+  id                  String             @id @default(uuid()) @db.Uuid
+  organizationId      String             @map("organization_id") @db.Uuid
+  practiceId          String?            @map("practice_id") @db.Uuid
+  name                String
+  npi                 String?
+  externalReferenceId String?            @map("external_reference_id")
+  source              ReferenceSource    @default(MANUAL)
+  status              OrganizationStatus @default(ACTIVE)
+  createdAt           DateTime           @default(now()) @map("created_at")
+  updatedAt           DateTime           @updatedAt @map("updated_at")
+
+  organization     Organization                @relation(fields: [organizationId], references: [id])
+  practice         Practice?                   @relation(fields: [practiceId], references: [id])
+  coordinatorLinks CareCoordinatorAssignment[]
+
+  @@index([organizationId])
+  @@index([practiceId])
+  @@index([npi])
+  @@index([externalReferenceId])
+  @@map("providers")
+}
+
+model CareCoordinatorAssignment {
+  id             String    @id @default(uuid()) @db.Uuid
+  profileId      String    @map("profile_id") @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  practiceId     String?   @map("practice_id") @db.Uuid
+  providerId     String?   @map("provider_id") @db.Uuid
+  assignedById   String?   @map("assigned_by") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at")
+  revokedAt      DateTime? @map("revoked_at")
+
+  profile      Profile      @relation("CareCoordinatorProfile", fields: [profileId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id])
+  practice     Practice?    @relation(fields: [practiceId], references: [id])
+  provider     Provider?    @relation(fields: [providerId], references: [id])
+  assignedBy   Profile?     @relation("CareCoordinatorAssigner", fields: [assignedById], references: [id])
+
+  @@index([profileId])
+  @@index([organizationId])
+  @@index([practiceId])
+  @@index([providerId])
+  @@map("care_coordinator_assignments")
+}
+
+model AuditLog {
+  id             String   @id @default(uuid()) @db.Uuid
+  actorProfileId String?  @map("actor_profile_id") @db.Uuid
+  action         String
+  targetType     String   @map("target_type")
+  targetId       String?  @map("target_id") @db.Uuid
+  organizationId String?  @map("organization_id") @db.Uuid
+  metadata       Json?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  actor        Profile?      @relation("AuditActor", fields: [actorProfileId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
+
+  @@index([actorProfileId])
+  @@index([action])
+  @@index([targetType, targetId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
