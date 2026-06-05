@@ -32,6 +32,11 @@ Use Supabase connection strings for Prisma:
 - `DATABASE_URL` for normal Prisma database access.
 - `DIRECT_URL` for direct migration access.
 
+Typical Supabase username shapes:
+
+- Pooler URL: `postgres.<project-ref>`
+- Direct URL: `postgres`
+
 If the database password contains special URL characters such as `@`, encode them before using the value in a connection URL. For example, `@` becomes `%40`.
 
 ## Security Note
@@ -39,4 +44,3 @@ If the database password contains special URL characters such as `@`, encode the
 If a database password or secret key is ever pasted into chat, logs, screenshots, or a public place, rotate it in Supabase before treating the project as secure.
 
 Use fake or development data only until healthcare compliance requirements are confirmed.
-
