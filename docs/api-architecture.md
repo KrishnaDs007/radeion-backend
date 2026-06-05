@@ -22,6 +22,12 @@ Current route groups:
 - `GET /invites` protected invite list
 - `POST /invites` protected invite creation
 - `POST /invites/:id/revoke` protected invite revocation
+- `GET /reference/practices` protected practice reference list
+- `POST /reference/practices` protected practice reference creation
+- `PATCH /reference/practices/:id` protected practice reference update
+- `GET /reference/providers` protected provider reference list
+- `POST /reference/providers` protected provider reference creation
+- `PATCH /reference/providers/:id` protected provider reference update
 - `GET /roles` protected role list
 - `GET /users` protected placeholder
 - `GET /organizations` protected placeholder

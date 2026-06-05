@@ -1,0 +1,76 @@
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import type { UserContext } from '../auth/auth.types';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { RequirePermission } from '../common/decorators/require-permission.decorator';
+import { CreatePracticeDto } from './dto/create-practice.dto';
+import { CreateProviderDto } from './dto/create-provider.dto';
+import { UpdatePracticeDto } from './dto/update-practice.dto';
+import { UpdateProviderDto } from './dto/update-provider.dto';
+import { ReferenceDataService } from './reference-data.service';
+
+@Controller('reference')
+export class ReferenceDataController {
+  constructor(private readonly referenceDataService: ReferenceDataService) {}
+
+  @RequirePermission('organization.read')
+  @Get('practices')
+  async listPractices() {
+    return {
+      data: await this.referenceDataService.listPractices(),
+    };
+  }
+
+  @RequirePermission('organization.update')
+  @Post('practices')
+  async createPractice(
+    @Body() body: CreatePracticeDto,
+    @CurrentUser() user: UserContext,
+  ) {
+    return {
+      data: await this.referenceDataService.createPractice(body, user),
+    };
+  }
+
+  @RequirePermission('organization.update')
+  @Patch('practices/:id')
+  async updatePractice(
+    @Param('id') id: string,
+    @Body() body: UpdatePracticeDto,
+    @CurrentUser() user: UserContext,
+  ) {
+    return {
+      data: await this.referenceDataService.updatePractice(id, body, user),
+    };
+  }
+
+  @RequirePermission('providers.read')
+  @Get('providers')
+  async listProviders() {
+    return {
+      data: await this.referenceDataService.listProviders(),
+    };
+  }
+
+  @RequirePermission('organization.update')
+  @Post('providers')
+  async createProvider(
+    @Body() body: CreateProviderDto,
+    @CurrentUser() user: UserContext,
+  ) {
+    return {
+      data: await this.referenceDataService.createProvider(body, user),
+    };
+  }
+
+  @RequirePermission('organization.update')
+  @Patch('providers/:id')
+  async updateProvider(
+    @Param('id') id: string,
+    @Body() body: UpdateProviderDto,
+    @CurrentUser() user: UserContext,
+  ) {
+    return {
+      data: await this.referenceDataService.updateProvider(id, body, user),
+    };
+  }
+}

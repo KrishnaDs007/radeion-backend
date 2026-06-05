@@ -13,6 +13,7 @@ import { HealthModule } from './health/health.module';
 import { InvitesModule } from './invites/invites.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { ReferenceDataModule } from './reference-data/reference-data.module';
 import { RolesModule } from './roles/roles.module';
 import { SupabaseModule } from './supabase/supabase.module';
 import { UsersModule } from './users/users.module';
@@ -31,6 +32,7 @@ import { UsersModule } from './users/users.module';
     CacheModule,
     HealthModule,
     InvitesModule,
+    ReferenceDataModule,
     RolesModule,
     UsersModule,
     OrganizationsModule,
