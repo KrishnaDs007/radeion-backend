@@ -13,6 +13,7 @@ Last updated: 2026-06-05
 - First Prisma migration applied to Supabase.
 - Initial roles seeded into Supabase.
 - First developer bootstrap script added.
+- First verified developer user created and bootstrapped.
 - Supabase Auth helper service added.
 - Prisma service/module added.
 - Global request context middleware added.
@@ -50,8 +51,6 @@ Protected:
 
 ## Pending
 
-- Create a verified Supabase Auth user.
-- Run first developer bootstrap script.
 - Add signup request APIs. Done for initial request capture; pending approval/activation flow remains.
 - Add approval APIs.
 - Add invite APIs.
