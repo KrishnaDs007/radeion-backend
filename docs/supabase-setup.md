@@ -25,6 +25,18 @@ Initial auth method:
 
 Application profile records should be created only after email verification. Signup and approval request records should still track pending, rejected, declined, and failed requests.
 
+## First Developer Bootstrap
+
+After creating and verifying the first Supabase Auth user, run:
+
+```powershell
+npm run bootstrap:developer -- user@example.com
+```
+
+If exactly one verified Supabase Auth user exists, the email argument can be omitted.
+
+The script creates or updates an active `profiles` record and adds a global `developer` role assignment.
+
 ## Database URLs
 
 Use Supabase connection strings for Prisma:

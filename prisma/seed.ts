@@ -70,5 +70,5 @@ main()
   .catch(async (error: unknown) => {
     console.error(error);
     await prisma.$disconnect();
-    process.exit(1);
+    process.exitCode = 1;
   });
