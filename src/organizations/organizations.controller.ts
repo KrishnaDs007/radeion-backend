@@ -1,14 +1,16 @@
 import { Controller, Get } from '@nestjs/common';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
+import { OrganizationsService } from './organizations.service';
 
 @Controller('organizations')
 @RequirePermission('organization.read')
 export class OrganizationsController {
+  constructor(private readonly organizationsService: OrganizationsService) {}
+
   @Get()
-  listOrganizations() {
+  async listOrganizations() {
     return {
-      data: [],
-      message: 'Organization management API placeholder',
+      data: await this.organizationsService.listOrganizations(),
     };
   }
 }

@@ -10,6 +10,7 @@ import { DataModule } from './data/data.module';
 import { HealthModule } from './health/health.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { RolesModule } from './roles/roles.module';
 import { SupabaseModule } from './supabase/supabase.module';
 import { UsersModule } from './users/users.module';
 
@@ -24,6 +25,7 @@ import { UsersModule } from './users/users.module';
     AclModule,
     CacheModule,
     HealthModule,
+    RolesModule,
     UsersModule,
     OrganizationsModule,
     DataModule,
