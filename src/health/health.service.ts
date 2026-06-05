@@ -1,10 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ConfigurationStatus, HealthStatus } from './health.types';
+import { PrismaService } from '../prisma/prisma.service';
+import {
+  ConfigurationStatus,
+  DatabaseHealthStatus,
+  HealthStatus,
+} from './health.types';
 
 @Injectable()
 export class HealthService {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly prismaService: PrismaService,
+  ) {}
 
   getHealth(): HealthStatus {
     return {
@@ -34,6 +42,14 @@ export class HealthService {
       cache: {
         driver: this.configService.get<string>('CACHE_DRIVER') ?? 'memory',
       },
+    };
+  }
+
+  async getDatabaseHealth(): Promise<DatabaseHealthStatus> {
+    await this.prismaService.$queryRaw`SELECT 1`;
+
+    return {
+      connected: true,
     };
   }
 

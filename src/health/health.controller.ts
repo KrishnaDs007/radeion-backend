@@ -17,4 +17,10 @@ export class HealthController {
   getConfigurationStatus() {
     return this.healthService.getConfigurationStatus();
   }
+
+  @Public()
+  @Get('database')
+  getDatabaseHealth() {
+    return this.healthService.getDatabaseHealth();
+  }
 }

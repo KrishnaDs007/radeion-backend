@@ -24,3 +24,7 @@ export type ConfigurationStatus = {
     driver: string;
   };
 };
+
+export type DatabaseHealthStatus = {
+  connected: boolean;
+};

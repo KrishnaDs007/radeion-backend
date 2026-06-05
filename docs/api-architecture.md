@@ -11,6 +11,7 @@ Current route groups:
 - `GET /` public health-style root
 - `GET /health` public health status
 - `GET /health/config` public config-presence status without secret values
+- `GET /health/database` public database connectivity status
 - `GET /auth/methods` public auth configuration
 - `GET /roles` protected role list
 - `GET /users` protected placeholder

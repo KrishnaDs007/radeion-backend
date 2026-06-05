@@ -21,6 +21,7 @@ Last updated: 2026-06-05
 - Central ACL service added with scoped-access rules.
 - Database-backed auth context loading added.
 - Public health endpoints added.
+- Public database health endpoint added.
 - Protected role, user, and organization read endpoints added.
 - Databricks service foundation added.
 - In-memory cache foundation added.
