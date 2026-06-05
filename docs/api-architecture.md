@@ -19,6 +19,9 @@ Current route groups:
 - `POST /access-requests/organizations/:id/approve` protected organization approval
 - `POST /access-requests/users/:id/reject` protected user rejection
 - `POST /access-requests/organizations/:id/reject` protected organization rejection
+- `GET /invites` protected invite list
+- `POST /invites` protected invite creation
+- `POST /invites/:id/revoke` protected invite revocation
 - `GET /roles` protected role list
 - `GET /users` protected placeholder
 - `GET /organizations` protected placeholder

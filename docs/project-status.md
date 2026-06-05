@@ -25,6 +25,7 @@ Last updated: 2026-06-05
 - Public database health endpoint added.
 - Public user and organization access request APIs added.
 - Protected user and organization approval APIs added.
+- Protected invite list, create, and revoke APIs added.
 - Protected role, user, and organization read endpoints added.
 - Databricks service foundation added.
 - In-memory cache foundation added.
@@ -54,7 +55,7 @@ Protected:
 
 - Add signup request APIs. Done for initial request capture; pending approval/activation flow remains.
 - Add approval APIs. Done for initial organization/user approve and reject flow.
-- Add invite APIs.
+- Add invite APIs. Done for initial list/create/revoke; accept/password setup flow remains.
 - Add organization creation and approval APIs.
 - Add practice and provider admin APIs.
 - Add scoped Databricks query builders for `/claims`, `/providers`, and `/patient-metrics`.
