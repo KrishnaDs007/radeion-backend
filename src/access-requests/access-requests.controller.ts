@@ -8,6 +8,7 @@ import { ApproveOrganizationRequestDto } from './dto/approve-organization-reques
 import { ApproveUserRequestDto } from './dto/approve-user-request.dto';
 import { CreateOrganizationAccessRequestDto } from './dto/create-organization-access-request.dto';
 import { CreateUserAccessRequestDto } from './dto/create-user-access-request.dto';
+import { RejectAccessRequestDto } from './dto/reject-access-request.dto';
 
 @Controller('access-requests')
 export class AccessRequestsController {
@@ -47,6 +48,22 @@ export class AccessRequestsController {
     };
   }
 
+  @RequirePermission('organization.approve')
+  @Post('organizations/:id/reject')
+  async rejectOrganizationRequest(
+    @Param('id') id: string,
+    @Body() body: RejectAccessRequestDto,
+    @CurrentUser() user: UserContext,
+  ) {
+    return {
+      data: await this.accessRequestsService.rejectOrganizationRequest(
+        id,
+        body,
+        user,
+      ),
+    };
+  }
+
   @RequirePermission('user.approve')
   @Post('users/:id/approve')
   async approveUserRequest(
@@ -56,6 +73,18 @@ export class AccessRequestsController {
   ) {
     return {
       data: await this.accessRequestsService.approveUserRequest(id, body, user),
+    };
+  }
+
+  @RequirePermission('user.approve')
+  @Post('users/:id/reject')
+  async rejectUserRequest(
+    @Param('id') id: string,
+    @Body() body: RejectAccessRequestDto,
+    @CurrentUser() user: UserContext,
+  ) {
+    return {
+      data: await this.accessRequestsService.rejectUserRequest(id, body, user),
     };
   }
 }

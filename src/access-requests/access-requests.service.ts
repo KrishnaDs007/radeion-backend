@@ -18,6 +18,7 @@ import { ApproveOrganizationRequestDto } from './dto/approve-organization-reques
 import { ApproveUserRequestDto } from './dto/approve-user-request.dto';
 import { CreateOrganizationAccessRequestDto } from './dto/create-organization-access-request.dto';
 import { CreateUserAccessRequestDto } from './dto/create-user-access-request.dto';
+import { RejectAccessRequestDto } from './dto/reject-access-request.dto';
 
 const REQUESTED_ROLE_MAP: Record<string, RoleName> = {
   provider: RoleName.PROVIDER,
@@ -259,6 +260,107 @@ export class AccessRequestsService {
     });
 
     return profile;
+  }
+
+  async rejectOrganizationRequest(
+    id: string,
+    input: RejectAccessRequestDto,
+    actor: UserContext,
+  ) {
+    const request =
+      await this.prismaService.organizationApprovalRequest.findUnique({
+        where: { id },
+      });
+
+    if (!request) {
+      throw new NotFoundException('Organization approval request not found');
+    }
+
+    if (request.status !== RequestStatus.PENDING) {
+      throw new BadRequestException('Organization request is not pending');
+    }
+
+    const updatedRequest =
+      await this.prismaService.organizationApprovalRequest.update({
+        where: { id },
+        data: {
+          status: RequestStatus.REJECTED,
+          reviewedById: actor.profileId,
+          reviewedAt: new Date(),
+          reviewNotes: input.reviewNotes,
+        },
+        select: {
+          id: true,
+          organizationName: true,
+          requestedByEmail: true,
+          status: true,
+          reviewedAt: true,
+          reviewNotes: true,
+        },
+      });
+
+    await this.auditService.record({
+      actorProfileId: actor.profileId,
+      action: 'organization.rejected',
+      targetType: 'organization',
+      metadata: {
+        requestId: request.id,
+        organizationName: request.organizationName,
+        reviewNotes: input.reviewNotes,
+      },
+    });
+
+    return updatedRequest;
+  }
+
+  async rejectUserRequest(
+    id: string,
+    input: RejectAccessRequestDto,
+    actor: UserContext,
+  ) {
+    const request = await this.prismaService.userApprovalRequest.findUnique({
+      where: { id },
+    });
+
+    if (!request) {
+      throw new NotFoundException('User approval request not found');
+    }
+
+    if (request.status !== RequestStatus.PENDING) {
+      throw new BadRequestException('User request is not pending');
+    }
+
+    const updatedRequest = await this.prismaService.userApprovalRequest.update({
+      where: { id },
+      data: {
+        status: RequestStatus.REJECTED,
+        reviewedById: actor.profileId,
+        reviewedAt: new Date(),
+        reviewNotes: input.reviewNotes,
+      },
+      select: {
+        id: true,
+        email: true,
+        organizationId: true,
+        status: true,
+        reviewedAt: true,
+        reviewNotes: true,
+      },
+    });
+
+    await this.auditService.record({
+      actorProfileId: actor.profileId,
+      action: 'user.rejected',
+      targetType: 'user',
+      organizationId: request.organizationId ?? undefined,
+      metadata: {
+        requestId: request.id,
+        email: request.email,
+        reviewNotes: input.reviewNotes,
+      },
+    });
+
+    return updatedRequest;
   }
 
   private buildOrganizationPayload(

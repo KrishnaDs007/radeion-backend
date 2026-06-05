@@ -53,7 +53,7 @@ Protected:
 ## Pending
 
 - Add signup request APIs. Done for initial request capture; pending approval/activation flow remains.
-- Add approval APIs. Done for initial organization/user approval; rejection flow remains.
+- Add approval APIs. Done for initial organization/user approve and reject flow.
 - Add invite APIs.
 - Add organization creation and approval APIs.
 - Add practice and provider admin APIs.
