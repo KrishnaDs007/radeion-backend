@@ -17,10 +17,16 @@ describe('AccessRequestsService', () => {
         create,
       },
     };
+    const auditService = {
+      record: jest.fn(),
+    };
     const service = new AccessRequestsService(
       prismaService as unknown as ConstructorParameters<
         typeof AccessRequestsService
       >[0],
+      auditService as unknown as ConstructorParameters<
+        typeof AccessRequestsService
+      >[1],
     );
 
     await expect(
@@ -60,10 +66,16 @@ describe('AccessRequestsService', () => {
         create,
       },
     };
+    const auditService = {
+      record: jest.fn(),
+    };
     const service = new AccessRequestsService(
       prismaService as unknown as ConstructorParameters<
         typeof AccessRequestsService
       >[0],
+      auditService as unknown as ConstructorParameters<
+        typeof AccessRequestsService
+      >[1],
     );
 
     await expect(

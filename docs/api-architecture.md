@@ -15,6 +15,8 @@ Current route groups:
 - `GET /auth/methods` public auth configuration
 - `POST /access-requests/users` public user access request
 - `POST /access-requests/organizations` public organization access request
+- `POST /access-requests/users/:id/approve` protected user approval
+- `POST /access-requests/organizations/:id/approve` protected organization approval
 - `GET /roles` protected role list
 - `GET /users` protected placeholder
 - `GET /organizations` protected placeholder
