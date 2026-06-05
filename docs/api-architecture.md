@@ -18,6 +18,18 @@ Current route groups:
 
 The Databricks module is service-only for now. It will be consumed by the data controllers once ACL-scoped query building is implemented.
 
+## Cache Layer
+
+The cache layer starts with an in-memory driver and a small `CacheService` wrapper.
+
+Current intent:
+
+- cache temporary Databricks statement results
+- keep controllers/services independent of the concrete cache driver
+- allow Redis to replace the in-memory driver later
+
+The first Databricks statement cache TTL is 60 seconds.
+
 ## Middleware
 
 `RequestContextMiddleware` runs for every route.

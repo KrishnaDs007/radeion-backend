@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { createHash } from 'crypto';
+import { CacheService } from '../cache/cache.service';
 import {
   DatabricksStatementRequest,
   DatabricksStatementResponse,
@@ -11,7 +13,10 @@ export class DatabricksService {
   private readonly token: string;
   private readonly warehouseId: string;
 
-  constructor(configService: ConfigService) {
+  constructor(
+    configService: ConfigService,
+    private readonly cacheService: CacheService,
+  ) {
     this.host = this.normalizeHost(
       configService.getOrThrow<string>('DATABRICKS_HOST'),
     );
@@ -24,6 +29,18 @@ export class DatabricksService {
   }
 
   async executeStatement(
+    request: DatabricksStatementRequest,
+  ): Promise<DatabricksStatementResponse> {
+    const cacheKey = this.createStatementCacheKey(request);
+
+    return this.cacheService.remember(
+      cacheKey,
+      () => this.executeUncachedStatement(request),
+      { ttlSeconds: 60 },
+    );
+  }
+
+  private async executeUncachedStatement(
     request: DatabricksStatementRequest,
   ): Promise<DatabricksStatementResponse> {
     const response = await fetch(`${this.host}/api/2.0/sql/statements`, {
@@ -49,6 +66,19 @@ export class DatabricksService {
     }
 
     return body;
+  }
+
+  private createStatementCacheKey(request: DatabricksStatementRequest): string {
+    const hash = createHash('sha256')
+      .update(
+        JSON.stringify({
+          statement: request.statement,
+          warehouseId: this.warehouseId,
+        }),
+      )
+      .digest('hex');
+
+    return `databricks:statement:${hash}`;
   }
 
   parseWarehouseId(httpPath: string): string {

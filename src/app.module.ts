@@ -4,6 +4,7 @@ import { AclModule } from './acl/acl.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { CacheModule } from './cache/cache.module';
 import { RequestContextMiddleware } from './common/middleware/request-context.middleware';
 import { DataModule } from './data/data.module';
 import { OrganizationsModule } from './organizations/organizations.module';
@@ -20,6 +21,7 @@ import { UsersModule } from './users/users.module';
     SupabaseModule,
     AuthModule,
     AclModule,
+    CacheModule,
     UsersModule,
     OrganizationsModule,
     DataModule,
