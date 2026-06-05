@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { CacheModule } from './cache/cache.module';
 import { RequestContextMiddleware } from './common/middleware/request-context.middleware';
 import { DataModule } from './data/data.module';
+import { HealthModule } from './health/health.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { SupabaseModule } from './supabase/supabase.module';
@@ -22,6 +23,7 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     AclModule,
     CacheModule,
+    HealthModule,
     UsersModule,
     OrganizationsModule,
     DataModule,
