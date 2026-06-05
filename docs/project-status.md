@@ -10,6 +10,8 @@ Last updated: 2026-06-05
 - Supabase project connected through local `.env`.
 - Prisma schema drafted for the access model.
 - Prisma seed setup added for initial roles.
+- First Prisma migration applied to Supabase.
+- Initial roles seeded into Supabase.
 - Supabase Auth helper service added.
 - Prisma service/module added.
 - Global request context middleware added.
@@ -43,33 +45,8 @@ Protected:
 - `GET /providers`
 - `GET /patient-metrics`
 
-## Blocked
-
-Database migration is blocked by the current Supabase `DIRECT_URL` shape.
-
-Current sanitized shape shows:
-
-```text
-DIRECT_URL user=postgres.<project-ref> direct db host
-```
-
-For Supabase direct migrations, the direct host usually needs user:
-
-```text
-postgres
-```
-
-Also encode password special characters in DB URLs. For example:
-
-```text
-@ -> %40
-```
-
 ## Pending
 
-- Fix `DIRECT_URL`.
-- Run first Prisma migration.
-- Seed initial roles.
 - Create first developer profile and role assignment.
 - Add signup request APIs.
 - Add approval APIs.
@@ -80,4 +57,3 @@ Also encode password special characters in DB URLs. For example:
 - Add Redis driver behind the existing cache service later.
 - Add audit calls inside admin mutation APIs once those APIs exist.
 - Add e2e tests after the migration and seed are working.
-
