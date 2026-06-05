@@ -29,6 +29,7 @@ Last updated: 2026-06-05
 - Protected practice and provider reference APIs added.
 - Protected role, user, and organization read endpoints added.
 - Databricks service foundation added.
+- Scoped Databricks query builder added for first read APIs.
 - In-memory cache foundation added.
 - Databricks statement-result cache added with 60 second TTL.
 - Audit log service foundation added.
@@ -65,7 +66,7 @@ Protected:
 - Add invite APIs. Done for initial list/create/revoke; accept/password setup flow remains.
 - Add organization creation and approval APIs.
 - Add practice and provider admin APIs. Done for initial list/create/update.
-- Add scoped Databricks query builders for `/claims`, `/providers`, and `/patient-metrics`.
+- Add scoped Databricks query builders for `/claims`, `/providers`, and `/patient-metrics`. Done for initial standard columns and env-configured tables.
 - Add Redis driver behind the existing cache service later.
 - Add audit calls inside admin mutation APIs once those APIs exist.
 - Add e2e tests after the migration and seed are working.

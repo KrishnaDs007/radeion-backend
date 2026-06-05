@@ -31,13 +31,30 @@ Current route groups:
 - `GET /roles` protected role list
 - `GET /users` protected placeholder
 - `GET /organizations` protected placeholder
-- `GET /claims` protected placeholder
-- `GET /providers` protected placeholder
-- `GET /patient-metrics` protected placeholder
+- `GET /claims` protected Databricks read API
+- `GET /providers` protected Databricks read API
+- `GET /patient-metrics` protected Databricks read API
 
-The Databricks module is service-only for now. It will be consumed by the data controllers once ACL-scoped query building is implemented.
+The Databricks module is consumed by the data controllers through a query service. The first read routes support these optional query parameters:
 
-The audit module is service-only for now. It will be called by admin mutation APIs when approval, invite, organization, role assignment, practice, and provider write flows are implemented.
+- `organizationId`
+- `practiceId`
+- `providerId`
+- `patientId`
+- `fromDate`
+- `toDate`
+- `limit`
+- `offset`
+
+Databricks table names are configured with:
+
+- `DATABRICKS_CLAIMS_TABLE`
+- `DATABRICKS_PROVIDERS_TABLE`
+- `DATABRICKS_PATIENT_METRICS_TABLE`
+
+For non-platform roles, the data query service adds SQL filters from the authenticated user's role assignments before request filters are added. `developer` and `superAdmin` are platform roles and can query without role-scope SQL constraints.
+
+The audit module is service-only. It is now called by approval, invite, practice, and provider write flows.
 
 ## Cache Layer
 
