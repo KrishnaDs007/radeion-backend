@@ -22,6 +22,7 @@ Last updated: 2026-06-05
 - Database-backed auth context loading added.
 - Public health endpoints added.
 - Public database health endpoint added.
+- Public user and organization access request APIs added.
 - Protected role, user, and organization read endpoints added.
 - Databricks service foundation added.
 - In-memory cache foundation added.
@@ -51,7 +52,7 @@ Protected:
 
 - Create a verified Supabase Auth user.
 - Run first developer bootstrap script.
-- Add signup request APIs.
+- Add signup request APIs. Done for initial request capture; pending approval/activation flow remains.
 - Add approval APIs.
 - Add invite APIs.
 - Add organization creation and approval APIs.

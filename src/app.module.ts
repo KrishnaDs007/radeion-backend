@@ -1,6 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AclModule } from './acl/acl.module';
+import { AccessRequestsModule } from './access-requests/access-requests.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuditModule } from './audit/audit.module';
@@ -22,6 +23,7 @@ import { UsersModule } from './users/users.module';
     }),
     PrismaModule,
     SupabaseModule,
+    AccessRequestsModule,
     AuditModule,
     AuthModule,
     AclModule,
