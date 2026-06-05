@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AclModule } from './acl/acl.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuditModule } from './audit/audit.module';
 import { AuthModule } from './auth/auth.module';
 import { CacheModule } from './cache/cache.module';
 import { RequestContextMiddleware } from './common/middleware/request-context.middleware';
@@ -21,6 +22,7 @@ import { UsersModule } from './users/users.module';
     }),
     PrismaModule,
     SupabaseModule,
+    AuditModule,
     AuthModule,
     AclModule,
     CacheModule,

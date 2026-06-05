@@ -21,6 +21,8 @@ Current route groups:
 
 The Databricks module is service-only for now. It will be consumed by the data controllers once ACL-scoped query building is implemented.
 
+The audit module is service-only for now. It will be called by admin mutation APIs when approval, invite, organization, role assignment, practice, and provider write flows are implemented.
+
 ## Cache Layer
 
 The cache layer starts with an in-memory driver and a small `CacheService` wrapper.
