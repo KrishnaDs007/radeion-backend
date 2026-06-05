@@ -44,3 +44,14 @@ If the database password contains special URL characters such as `@`, encode the
 If a database password or secret key is ever pasted into chat, logs, screenshots, or a public place, rotate it in Supabase before treating the project as secure.
 
 Use fake or development data only until healthcare compliance requirements are confirmed.
+
+## Databricks Environment
+
+Databricks values are read from `.env`:
+
+- `DATABRICKS_HOST`
+- `DATABRICKS_TOKEN`
+- `DATABRICKS_HTTP_PATH`
+- `DATABRICKS_WAREHOUSE_ID` optional
+
+If `DATABRICKS_WAREHOUSE_ID` is omitted, the backend attempts to parse it from `DATABRICKS_HTTP_PATH`, such as `/sql/1.0/warehouses/<warehouse-id>`.

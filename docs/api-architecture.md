@@ -16,6 +16,8 @@ Current route groups:
 - `GET /providers` protected placeholder
 - `GET /patient-metrics` protected placeholder
 
+The Databricks module is service-only for now. It will be consumed by the data controllers once ACL-scoped query building is implemented.
+
 ## Middleware
 
 `RequestContextMiddleware` runs for every route.
