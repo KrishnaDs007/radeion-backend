@@ -30,6 +30,9 @@ Current route groups:
 - `POST /reference/providers` protected provider reference creation
 - `PATCH /reference/providers/:id` protected provider reference update
 - `GET /roles` protected role list
+- `GET /roles/assignments` protected active role assignment list
+- `POST /roles/assignments` protected role assignment creation
+- `POST /roles/assignments/:id/revoke` protected role assignment revocation
 - `GET /users` protected placeholder
 - `GET /organizations` protected placeholder
 - `GET /claims` protected Databricks read API
