@@ -26,6 +26,7 @@ Last updated: 2026-06-05
 - Public user and organization access request APIs added.
 - Protected user and organization approval APIs added.
 - Protected invite list, create, and revoke APIs added.
+- Public invite accept API added.
 - Protected practice and provider reference APIs added.
 - Protected role, user, and organization read endpoints added.
 - Databricks service foundation added.
@@ -63,7 +64,7 @@ Protected:
 
 - Add signup request APIs. Done for initial request capture; pending approval/activation flow remains.
 - Add approval APIs. Done for initial organization/user approve and reject flow.
-- Add invite APIs. Done for initial list/create/revoke; accept/password setup flow remains.
+- Add invite APIs. Done for list/create/revoke and backend accept flow; frontend password setup/email delivery remains.
 - Add organization creation and approval APIs.
 - Add practice and provider admin APIs. Done for initial list/create/update.
 - Add scoped Databricks query builders for `/claims`, `/providers`, and `/patient-metrics`. Done for initial standard columns and env-configured tables.

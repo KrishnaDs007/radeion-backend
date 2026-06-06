@@ -21,6 +21,7 @@ Current route groups:
 - `POST /access-requests/organizations/:id/reject` protected organization rejection
 - `GET /invites` protected invite list
 - `POST /invites` protected invite creation
+- `POST /invites/accept` public invite acceptance after Supabase password/session setup
 - `POST /invites/:id/revoke` protected invite revocation
 - `GET /reference/practices` protected practice reference list
 - `POST /reference/practices` protected practice reference creation
@@ -55,6 +56,17 @@ Databricks table names are configured with:
 For non-platform roles, the data query service adds SQL filters from the authenticated user's role assignments before request filters are added. `developer` and `superAdmin` are platform roles and can query without role-scope SQL constraints.
 
 The audit module is service-only. It is now called by approval, invite, practice, and provider write flows.
+
+## Invite Acceptance Flow
+
+Invite creation stores only a hashed invite token. The raw `inviteToken` is returned once from `POST /invites` so the UI or email layer can send it to the invited user.
+
+Acceptance uses:
+
+- `inviteToken`
+- `accessToken`
+
+The `accessToken` is the Supabase access token produced after the invited user signs in or completes password setup. `POST /invites/accept` verifies that token with Supabase, checks that the Supabase email matches the invite email, activates or creates the application profile, assigns the invite roles, marks the invite as accepted, and records an audit log.
 
 ## Cache Layer
 

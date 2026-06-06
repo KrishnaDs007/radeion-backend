@@ -16,6 +16,9 @@ describe('InvitesService', () => {
     const auditService = {
       record: jest.fn().mockResolvedValue(undefined),
     };
+    const supabaseService = {
+      getUserFromToken: jest.fn(),
+    };
     const service = new InvitesService(
       prismaService as unknown as ConstructorParameters<
         typeof InvitesService
@@ -23,31 +26,126 @@ describe('InvitesService', () => {
       auditService as unknown as ConstructorParameters<
         typeof InvitesService
       >[1],
+      supabaseService as unknown as ConstructorParameters<
+        typeof InvitesService
+      >[2],
     );
 
-    await expect(
-      service.createInvite(
-        {
-          email: 'USER@EXAMPLE.COM',
-          assignedRoles: ['provider'],
-          assignedScope: {
-            type: 'organization',
-          },
+    const result = await service.createInvite(
+      {
+        email: 'USER@EXAMPLE.COM',
+        assignedRoles: ['provider'],
+        assignedScope: {
+          type: 'organization',
         },
-        {
-          profileId: 'profile-1',
-          authUserId: 'auth-user-1',
-          status: 'ACTIVE',
-          roles: [],
-        },
-      ),
-    ).resolves.toEqual(invite);
+      },
+      {
+        profileId: 'profile-1',
+        authUserId: 'auth-user-1',
+        status: 'ACTIVE',
+        roles: [],
+      },
+    );
 
+    expect(result).toEqual({
+      ...invite,
+      inviteToken: expect.any(String) as string,
+    });
     expect(prismaService.invite.create).toHaveBeenCalled();
     expect(auditService.record).toHaveBeenCalledWith(
       expect.objectContaining({
         action: 'invite.created',
         targetId: 'invite-1',
+      }),
+    );
+  });
+
+  it('accepts an invite and activates a profile', async () => {
+    const now = new Date();
+    const invite = {
+      id: 'invite-1',
+      email: 'user@example.com',
+      tokenHash: 'hashed-token',
+      organizationId: 'organization-1',
+      invitedById: 'profile-admin',
+      assignedRoles: ['provider'],
+      assignedScope: {
+        type: 'organization',
+        organizationId: 'organization-1',
+      },
+      status: 'PENDING',
+      expiresAt: new Date(now.getTime() + 60_000),
+      acceptedAt: null,
+      createdAt: now,
+      updatedAt: now,
+    };
+    const acceptedInvite = {
+      id: 'invite-1',
+      email: 'user@example.com',
+      status: 'ACCEPTED',
+    };
+    const profile = {
+      id: 'profile-1',
+      authUserId: 'auth-user-1',
+      email: 'user@example.com',
+      status: 'ACTIVE',
+    };
+    const prismaService = {
+      invite: {
+        findUnique: jest.fn().mockResolvedValue(invite),
+        update: jest.fn().mockResolvedValue(acceptedInvite),
+      },
+      profile: {
+        upsert: jest.fn().mockResolvedValue(profile),
+      },
+      role: {
+        findUnique: jest.fn().mockResolvedValue({
+          id: 'role-1',
+          name: 'PROVIDER',
+        }),
+      },
+      userRoleAssignment: {
+        findFirst: jest.fn().mockResolvedValue(null),
+        create: jest.fn().mockResolvedValue({ id: 'assignment-1' }),
+      },
+    };
+    const auditService = {
+      record: jest.fn().mockResolvedValue(undefined),
+    };
+    const supabaseService = {
+      getUserFromToken: jest.fn().mockResolvedValue({
+        id: 'auth-user-1',
+        email: 'user@example.com',
+      }),
+    };
+    const service = new InvitesService(
+      prismaService as unknown as ConstructorParameters<
+        typeof InvitesService
+      >[0],
+      auditService as unknown as ConstructorParameters<
+        typeof InvitesService
+      >[1],
+      supabaseService as unknown as ConstructorParameters<
+        typeof InvitesService
+      >[2],
+    );
+
+    await expect(
+      service.acceptInvite({
+        inviteToken: 'valid-invite-token-value-with-enough-length',
+        accessToken: 'valid-access-token-value-with-enough-length',
+      }),
+    ).resolves.toEqual({
+      invite: acceptedInvite,
+      profile,
+    });
+
+    expect(prismaService.profile.upsert).toHaveBeenCalled();
+    expect(prismaService.userRoleAssignment.create).toHaveBeenCalled();
+    expect(auditService.record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'invite.accepted',
+        actorProfileId: 'profile-1',
       }),
     );
   });

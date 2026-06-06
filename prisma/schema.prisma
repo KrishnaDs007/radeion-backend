@@ -158,6 +158,7 @@ model UserApprovalRequest {
 model Invite {
   id             String       @id @default(uuid()) @db.Uuid
   email          String
+  tokenHash      String?      @unique @map("token_hash")
   organizationId String?      @map("organization_id") @db.Uuid
   invitedById    String       @map("invited_by") @db.Uuid
   assignedRoles  Json         @map("assigned_roles")

@@ -8,6 +8,7 @@ export type AuditAction =
   | 'organization.approved'
   | 'organization.rejected'
   | 'invite.created'
+  | 'invite.accepted'
   | 'invite.revoked'
   | 'practice.changed'
   | 'provider.changed';
