@@ -30,6 +30,7 @@ Last updated: 2026-06-05
 - Protected practice and provider reference APIs added.
 - Protected role assignment list, create, and revoke APIs added.
 - Protected user detail, disable, and reactivate APIs added.
+- Protected organization detail, create, update, and status APIs added.
 - Protected role, user, and organization read endpoints added.
 - Databricks service foundation added.
 - Scoped Databricks query builder added for first read APIs.
@@ -58,6 +59,10 @@ Protected:
 - `PATCH /users/:id/disable`
 - `PATCH /users/:id/reactivate`
 - `GET /organizations`
+- `GET /organizations/:id`
+- `POST /organizations`
+- `PATCH /organizations/:id`
+- `PATCH /organizations/:id/status`
 - `GET /reference/practices`
 - `POST /reference/practices`
 - `PATCH /reference/practices/:id`
@@ -73,7 +78,7 @@ Protected:
 - Add signup request APIs. Done for initial request capture; pending approval/activation flow remains.
 - Add approval APIs. Done for initial organization/user approve and reject flow.
 - Add invite APIs. Done for list/create/revoke and backend accept flow; frontend password setup/email delivery remains.
-- Add organization creation and approval APIs.
+- Add organization creation and approval APIs. Done for approval flow and direct admin create/update/status.
 - Add direct role assignment/revocation APIs. Done for list/create/revoke.
 - Add user lifecycle admin APIs. Done for detail/disable/reactivate.
 - Add practice and provider admin APIs. Done for initial list/create/update.

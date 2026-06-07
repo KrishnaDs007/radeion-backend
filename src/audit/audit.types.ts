@@ -6,6 +6,8 @@ export type AuditAction =
   | 'role.assigned'
   | 'role.revoked'
   | 'organization.created'
+  | 'organization.updated'
+  | 'organization.statusChanged'
   | 'organization.approved'
   | 'organization.rejected'
   | 'invite.created'

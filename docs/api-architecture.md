@@ -37,7 +37,11 @@ Current route groups:
 - `GET /users/:id` protected user detail
 - `PATCH /users/:id/disable` protected user disable
 - `PATCH /users/:id/reactivate` protected user reactivation
-- `GET /organizations` protected placeholder
+- `GET /organizations` protected organization list
+- `GET /organizations/:id` protected organization detail
+- `POST /organizations` protected organization creation
+- `PATCH /organizations/:id` protected organization update
+- `PATCH /organizations/:id/status` protected organization status update
 - `GET /claims` protected Databricks read API
 - `GET /providers` protected Databricks read API
 - `GET /patient-metrics` protected Databricks read API
