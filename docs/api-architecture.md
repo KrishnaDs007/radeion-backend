@@ -33,7 +33,10 @@ Current route groups:
 - `GET /roles/assignments` protected active role assignment list
 - `POST /roles/assignments` protected role assignment creation
 - `POST /roles/assignments/:id/revoke` protected role assignment revocation
-- `GET /users` protected placeholder
+- `GET /users` protected user list
+- `GET /users/:id` protected user detail
+- `PATCH /users/:id/disable` protected user disable
+- `PATCH /users/:id/reactivate` protected user reactivation
 - `GET /organizations` protected placeholder
 - `GET /claims` protected Databricks read API
 - `GET /providers` protected Databricks read API

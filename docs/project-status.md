@@ -29,6 +29,7 @@ Last updated: 2026-06-05
 - Public invite accept API added.
 - Protected practice and provider reference APIs added.
 - Protected role assignment list, create, and revoke APIs added.
+- Protected user detail, disable, and reactivate APIs added.
 - Protected role, user, and organization read endpoints added.
 - Databricks service foundation added.
 - Scoped Databricks query builder added for first read APIs.
@@ -53,6 +54,9 @@ Protected:
 - `POST /roles/assignments`
 - `POST /roles/assignments/:id/revoke`
 - `GET /users`
+- `GET /users/:id`
+- `PATCH /users/:id/disable`
+- `PATCH /users/:id/reactivate`
 - `GET /organizations`
 - `GET /reference/practices`
 - `POST /reference/practices`
@@ -71,6 +75,7 @@ Protected:
 - Add invite APIs. Done for list/create/revoke and backend accept flow; frontend password setup/email delivery remains.
 - Add organization creation and approval APIs.
 - Add direct role assignment/revocation APIs. Done for list/create/revoke.
+- Add user lifecycle admin APIs. Done for detail/disable/reactivate.
 - Add practice and provider admin APIs. Done for initial list/create/update.
 - Add scoped Databricks query builders for `/claims`, `/providers`, and `/patient-metrics`. Done for initial standard columns and env-configured tables.
 - Add Redis driver behind the existing cache service later.

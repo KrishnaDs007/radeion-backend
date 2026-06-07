@@ -2,6 +2,7 @@ export type AuditAction =
   | 'user.approved'
   | 'user.rejected'
   | 'user.disabled'
+  | 'user.reactivated'
   | 'role.assigned'
   | 'role.revoked'
   | 'organization.created'
