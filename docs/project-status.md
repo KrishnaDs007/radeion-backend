@@ -36,6 +36,7 @@ Last updated: 2026-06-08
 - Databricks service foundation added.
 - Scoped Databricks query builder added for first read APIs.
 - In-memory cache foundation added.
+- Redis cache driver added behind the cache abstraction.
 - Databricks statement-result cache added with 60 second TTL.
 - Audit log service foundation added.
 - Schema, API, and Supabase setup docs added.
@@ -105,7 +106,7 @@ Data and integrations:
 - Real Databricks table/column mapping from production schemas. Pending.
 - Databricks async statement polling. Done with safe polling limits.
 - Databricks result chunk fetching. Done as an optional service capability; pending API-level pagination UX.
-- Redis driver behind the existing cache service. Pending.
+- Redis driver behind the existing cache service. Done; pending runtime Redis provisioning/deployment config.
 
 Quality and operations:
 

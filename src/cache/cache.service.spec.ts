@@ -8,10 +8,12 @@ describe('CacheService', () => {
     service = new CacheService(new InMemoryCacheService());
   });
 
-  it('stores and returns cached values', () => {
-    service.set('key', { value: 'cached' });
+  it('stores and returns cached values', async () => {
+    await service.set('key', { value: 'cached' });
 
-    expect(service.get<{ value: string }>('key')).toEqual({ value: 'cached' });
+    await expect(service.get<{ value: string }>('key')).resolves.toEqual({
+      value: 'cached',
+    });
   });
 
   it('uses the factory only when a value is missing', async () => {

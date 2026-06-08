@@ -10,35 +10,38 @@ type CacheEntry<T> = {
 export class InMemoryCacheService implements CacheDriver {
   private readonly store = new Map<string, CacheEntry<unknown>>();
 
-  get<T>(key: string): T | undefined {
+  get<T>(key: string): Promise<T | undefined> {
     const entry = this.store.get(key);
 
     if (!entry) {
-      return undefined;
+      return Promise.resolve(undefined);
     }
 
     if (entry.expiresAt && entry.expiresAt <= Date.now()) {
       this.store.delete(key);
-      return undefined;
+      return Promise.resolve(undefined);
     }
 
-    return entry.value as T;
+    return Promise.resolve(entry.value as T);
   }
 
-  set<T>(key: string, value: T, options?: CacheSetOptions): void {
+  set<T>(key: string, value: T, options?: CacheSetOptions): Promise<void> {
     this.store.set(key, {
       value,
       expiresAt: options?.ttlSeconds
         ? Date.now() + options.ttlSeconds * 1000
         : undefined,
     });
+    return Promise.resolve();
   }
 
-  delete(key: string): void {
+  delete(key: string): Promise<void> {
     this.store.delete(key);
+    return Promise.resolve();
   }
 
-  clear(): void {
+  clear(): Promise<void> {
     this.store.clear();
+    return Promise.resolve();
   }
 }

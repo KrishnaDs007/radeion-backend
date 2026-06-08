@@ -1,25 +1,31 @@
-import { Injectable } from '@nestjs/common';
-import { InMemoryCacheService } from './in-memory-cache.service';
-import { CacheSetOptions } from './cache.types';
+import { Inject, Injectable } from '@nestjs/common';
+import { CACHE_DRIVER } from './cache.types';
+import type { CacheDriver, CacheSetOptions } from './cache.types';
 
 @Injectable()
 export class CacheService {
-  constructor(private readonly cacheDriver: InMemoryCacheService) {}
+  constructor(
+    @Inject(CACHE_DRIVER) private readonly cacheDriver: CacheDriver,
+  ) {}
 
-  get<T>(key: string): T | undefined {
+  async get<T>(key: string): Promise<T | undefined> {
     return this.cacheDriver.get<T>(key);
   }
 
-  set<T>(key: string, value: T, options?: CacheSetOptions): void {
-    this.cacheDriver.set(key, value, options);
+  async set<T>(
+    key: string,
+    value: T,
+    options?: CacheSetOptions,
+  ): Promise<void> {
+    await this.cacheDriver.set(key, value, options);
   }
 
-  delete(key: string): void {
-    this.cacheDriver.delete(key);
+  async delete(key: string): Promise<void> {
+    await this.cacheDriver.delete(key);
   }
 
-  clear(): void {
-    this.cacheDriver.clear();
+  async clear(): Promise<void> {
+    await this.cacheDriver.clear();
   }
 
   async remember<T>(
@@ -27,14 +33,14 @@ export class CacheService {
     factory: () => Promise<T>,
     options?: CacheSetOptions,
   ): Promise<T> {
-    const cached = this.get<T>(key);
+    const cached = await this.get<T>(key);
 
     if (cached !== undefined) {
       return cached;
     }
 
     const value = await factory();
-    this.set(key, value, options);
+    await this.set(key, value, options);
 
     return value;
   }

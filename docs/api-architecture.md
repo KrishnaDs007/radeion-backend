@@ -89,13 +89,14 @@ The `accessToken` is the Supabase access token produced after the invited user s
 
 ## Cache Layer
 
-The cache layer starts with an in-memory driver and a small `CacheService` wrapper.
+The cache layer has an in-memory driver, a Redis driver, and a small `CacheService` wrapper.
 
 Current intent:
 
 - cache temporary Databricks statement results
 - keep controllers/services independent of the concrete cache driver
-- allow Redis to replace the in-memory driver later
+- use in-memory cache by default
+- use Redis when `CACHE_DRIVER=redis` and `REDIS_URL` are configured
 
 The first Databricks statement cache TTL is 60 seconds.
 
