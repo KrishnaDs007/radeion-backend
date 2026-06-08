@@ -111,7 +111,7 @@ Quality and operations:
 
 - Audit calls inside admin mutation APIs. Done for current admin mutations; continue adding with new mutations.
 - E2E tests after the migration and seed are stable. Pending.
-- API request examples/Postman collection. Pending.
+- API request examples. Done in `docs/api-examples.md`; Postman collection pending.
 - Deployment configuration and CI. Pending.
 - GitHub push/PR workflow for current local commits. Pending when ready.
 
