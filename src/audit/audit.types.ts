@@ -13,6 +13,8 @@ export type AuditAction =
   | 'invite.created'
   | 'invite.accepted'
   | 'invite.revoked'
+  | 'careCoordinator.assigned'
+  | 'careCoordinator.revoked'
   | 'practice.changed'
   | 'provider.changed';
 
@@ -21,6 +23,7 @@ export type AuditTargetType =
   | 'roleAssignment'
   | 'organization'
   | 'invite'
+  | 'careCoordinatorAssignment'
   | 'practice'
   | 'provider';
 

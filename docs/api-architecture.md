@@ -42,6 +42,9 @@ Current route groups:
 - `POST /organizations` protected organization creation
 - `PATCH /organizations/:id` protected organization update
 - `PATCH /organizations/:id/status` protected organization status update
+- `GET /care-coordinators/assignments` protected active care coordinator assignment list
+- `POST /care-coordinators/assignments` protected care coordinator assignment creation
+- `POST /care-coordinators/assignments/:id/revoke` protected care coordinator assignment revocation
 - `GET /claims` protected Databricks read API
 - `GET /providers` protected Databricks read API
 - `GET /patient-metrics` protected Databricks read API
