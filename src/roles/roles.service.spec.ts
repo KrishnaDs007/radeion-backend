@@ -9,6 +9,65 @@ describe('RolesService', () => {
     roles: [],
   };
 
+  it('scopes assignment lists for non-platform admins', async () => {
+    const prismaService = {
+      userRoleAssignment: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+    };
+    const service = new RolesService(
+      prismaService as unknown as ConstructorParameters<typeof RolesService>[0],
+      {} as ConstructorParameters<typeof RolesService>[1],
+    );
+
+    await service.listAssignments({
+      ...actor,
+      roles: [
+        {
+          name: 'clientAdmin',
+          scopeType: 'organization',
+          organizationId: 'organization-1',
+        },
+      ],
+    });
+
+    expect(prismaService.userRoleAssignment.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          revokedAt: null,
+          organizationId: {
+            in: ['organization-1'],
+          },
+        },
+      }),
+    );
+  });
+
+  it('does not scope assignment lists for platform admins', async () => {
+    const prismaService = {
+      userRoleAssignment: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+    };
+    const service = new RolesService(
+      prismaService as unknown as ConstructorParameters<typeof RolesService>[0],
+      {} as ConstructorParameters<typeof RolesService>[1],
+    );
+
+    await service.listAssignments({
+      ...actor,
+      roles: [{ name: 'superAdmin', scopeType: 'global' }],
+    });
+
+    expect(prismaService.userRoleAssignment.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          revokedAt: null,
+        },
+      }),
+    );
+  });
+
   it('assigns a role and records an audit log', async () => {
     const assignment = {
       id: 'assignment-1',

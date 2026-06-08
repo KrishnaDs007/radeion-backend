@@ -4,6 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { RoleName } from '@prisma/client';
+import {
+  getAccessibleOrganizationIds,
+  hasPlatformAccess,
+} from '../auth/auth-scope.util';
 import type { UserContext } from '../auth/auth.types';
 import { AuditService } from '../audit/audit.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -17,10 +21,11 @@ export class CareCoordinatorsService {
     private readonly auditService: AuditService,
   ) {}
 
-  async listAssignments() {
+  async listAssignments(actor: UserContext) {
     return this.prismaService.careCoordinatorAssignment.findMany({
       where: {
         revokedAt: null,
+        ...this.organizationScopedWhere(actor),
       },
       orderBy: {
         createdAt: 'desc',
@@ -186,6 +191,18 @@ export class CareCoordinatorsService {
         input.practiceId,
       );
     }
+  }
+
+  private organizationScopedWhere(actor: UserContext) {
+    if (hasPlatformAccess(actor)) {
+      return {};
+    }
+
+    return {
+      organizationId: {
+        in: getAccessibleOrganizationIds(actor),
+      },
+    };
   }
 
   private async validatePractice(practiceId: string, organizationId: string) {

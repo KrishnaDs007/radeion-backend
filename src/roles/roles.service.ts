@@ -4,6 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { RoleName, ScopeType } from '@prisma/client';
+import {
+  getAccessibleOrganizationIds,
+  hasPlatformAccess,
+} from '../auth/auth-scope.util';
 import type { UserContext } from '../auth/auth.types';
 import { AuditService } from '../audit/audit.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -52,10 +56,11 @@ export class RolesService {
     });
   }
 
-  async listAssignments() {
+  async listAssignments(actor: UserContext) {
     return this.prismaService.userRoleAssignment.findMany({
       where: {
         revokedAt: null,
+        ...this.organizationScopedWhere(actor),
       },
       orderBy: {
         createdAt: 'desc',
@@ -213,6 +218,18 @@ export class RolesService {
         'ACO, practice, and provider scopes require scopeId',
       );
     }
+  }
+
+  private organizationScopedWhere(actor: UserContext) {
+    if (hasPlatformAccess(actor)) {
+      return {};
+    }
+
+    return {
+      organizationId: {
+        in: getAccessibleOrganizationIds(actor),
+      },
+    };
   }
 
   private assignmentSelect() {

@@ -14,9 +14,9 @@ export class CareCoordinatorsController {
 
   @RequirePermission('organization.read')
   @Get('assignments')
-  async listAssignments() {
+  async listAssignments(@CurrentUser() user: UserContext) {
     return {
-      data: await this.careCoordinatorsService.listAssignments(),
+      data: await this.careCoordinatorsService.listAssignments(user),
     };
   }
 

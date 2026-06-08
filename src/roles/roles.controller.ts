@@ -20,9 +20,9 @@ export class RolesController {
 
   @RequirePermission('role.read')
   @Get('assignments')
-  async listAssignments() {
+  async listAssignments(@CurrentUser() user: UserContext) {
     return {
-      data: await this.rolesService.listAssignments(),
+      data: await this.rolesService.listAssignments(user),
     };
   }
 

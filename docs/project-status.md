@@ -97,7 +97,7 @@ Admin management:
 - User lifecycle admin APIs. Done for detail/disable/reactivate.
 - Care coordinator assignment APIs. Done for list/create/revoke.
 - Practice and provider admin APIs. Done for initial list/create/update.
-- Scoped admin read filters. Done for top-level user and organization reads; pending for reference and assignment lists.
+- Scoped admin read filters. Done for top-level user, organization, reference, and assignment reads.
 
 Data and integrations:
 

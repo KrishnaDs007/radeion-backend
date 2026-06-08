@@ -14,9 +14,9 @@ export class ReferenceDataController {
 
   @RequirePermission('organization.read')
   @Get('practices')
-  async listPractices() {
+  async listPractices(@CurrentUser() user: UserContext) {
     return {
-      data: await this.referenceDataService.listPractices(),
+      data: await this.referenceDataService.listPractices(user),
     };
   }
 
@@ -45,9 +45,9 @@ export class ReferenceDataController {
 
   @RequirePermission('providers.read')
   @Get('providers')
-  async listProviders() {
+  async listProviders(@CurrentUser() user: UserContext) {
     return {
-      data: await this.referenceDataService.listProviders(),
+      data: await this.referenceDataService.listProviders(user),
     };
   }
 

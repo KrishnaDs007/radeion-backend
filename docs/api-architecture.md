@@ -145,7 +145,7 @@ Only `active` application profiles are allowed through protected routes. Pending
 
 ## Scoped Admin Reads
 
-Top-level user and organization reads now use the authenticated user's role assignments:
+Top-level user, organization, reference, role-assignment, and care-coordinator-assignment reads now use the authenticated user's role assignments:
 
 - `developer` and `superAdmin` can read across the platform.
 - Other roles read only records tied to their assigned `organizationId`.

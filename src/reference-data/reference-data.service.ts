@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { OrganizationStatus, ReferenceSource } from '@prisma/client';
+import {
+  getAccessibleOrganizationIds,
+  hasPlatformAccess,
+} from '../auth/auth-scope.util';
 import { UserContext } from '../auth/auth.types';
 import { AuditService } from '../audit/audit.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -15,8 +19,9 @@ export class ReferenceDataService {
     private readonly auditService: AuditService,
   ) {}
 
-  async listPractices() {
+  async listPractices(actor: UserContext) {
     return this.prismaService.practice.findMany({
+      where: this.organizationScopedWhere(actor),
       orderBy: {
         createdAt: 'desc',
       },
@@ -91,8 +96,9 @@ export class ReferenceDataService {
     return practice;
   }
 
-  async listProviders() {
+  async listProviders(actor: UserContext) {
     return this.prismaService.provider.findMany({
+      where: this.organizationScopedWhere(actor),
       orderBy: {
         createdAt: 'desc',
       },
@@ -182,6 +188,18 @@ export class ReferenceDataService {
     return status === 'active'
       ? OrganizationStatus.ACTIVE
       : OrganizationStatus.DISABLED;
+  }
+
+  private organizationScopedWhere(actor: UserContext) {
+    if (hasPlatformAccess(actor)) {
+      return {};
+    }
+
+    return {
+      organizationId: {
+        in: getAccessibleOrganizationIds(actor),
+      },
+    };
   }
 
   private removeUndefined<T extends Record<string, unknown>>(
