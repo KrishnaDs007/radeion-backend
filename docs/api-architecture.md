@@ -143,6 +143,14 @@ Protected requests now resolve user context in two stages:
 
 Only `active` application profiles are allowed through protected routes. Pending, invited, rejected, and disabled users need dedicated onboarding or admin flows before they can access protected APIs.
 
+## Scoped Admin Reads
+
+Top-level user and organization reads now use the authenticated user's role assignments:
+
+- `developer` and `superAdmin` can read across the platform.
+- Other roles read only records tied to their assigned `organizationId`.
+- User reads also include the caller's own profile.
+
 ## Why This Structure
 
 - Controllers own HTTP routing.

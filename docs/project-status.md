@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-06-05
+Last updated: 2026-06-08
 
 ## Completed
 
@@ -79,15 +79,42 @@ Protected:
 
 ## Pending
 
-- Add signup request APIs. Done for initial request capture; pending approval/activation flow remains.
-- Add approval APIs. Done for initial organization/user approve and reject flow.
-- Add invite APIs. Done for list/create/revoke and backend accept flow; frontend password setup/email delivery remains.
-- Add organization creation and approval APIs. Done for approval flow and direct admin create/update/status.
-- Add direct role assignment/revocation APIs. Done for list/create/revoke.
-- Add user lifecycle admin APIs. Done for detail/disable/reactivate.
-- Add care coordinator assignment APIs. Done for list/create/revoke.
-- Add practice and provider admin APIs. Done for initial list/create/update.
-- Add scoped Databricks query builders for `/claims`, `/providers`, and `/patient-metrics`. Done for initial standard columns and env-configured tables.
-- Add Redis driver behind the existing cache service later.
-- Add audit calls inside admin mutation APIs once those APIs exist.
-- Add e2e tests after the migration and seed are working.
+Current focus:
+
+- Add scoped top-level admin reads so non-platform admins see only their organization data. Done for user and organization reads.
+
+Auth and onboarding:
+
+- Signup request APIs. Done for initial request capture; pending frontend stepper and failed/declined retry UX.
+- Approval APIs. Done for initial organization/user approve and reject flow.
+- Invite APIs. Done for list/create/revoke and backend accept flow; pending frontend password setup/email delivery.
+- Supabase password reset/recovery UX. Pending frontend integration.
+
+Admin management:
+
+- Organization creation and approval APIs. Done for approval flow and direct admin create/update/status.
+- Direct role assignment/revocation APIs. Done for list/create/revoke.
+- User lifecycle admin APIs. Done for detail/disable/reactivate.
+- Care coordinator assignment APIs. Done for list/create/revoke.
+- Practice and provider admin APIs. Done for initial list/create/update.
+- Scoped admin read filters. Done for top-level user and organization reads; pending for reference and assignment lists.
+
+Data and integrations:
+
+- Scoped Databricks query builders for `/claims`, `/providers`, and `/patient-metrics`. Done for initial standard columns and env-configured tables.
+- Real Databricks table/column mapping from production schemas. Pending.
+- Databricks pagination/async statement polling. Pending.
+- Redis driver behind the existing cache service. Pending.
+
+Quality and operations:
+
+- Audit calls inside admin mutation APIs. Done for current admin mutations; continue adding with new mutations.
+- E2E tests after the migration and seed are stable. Pending.
+- API request examples/Postman collection. Pending.
+- Deployment configuration and CI. Pending.
+- GitHub push/PR workflow for current local commits. Pending when ready.
+
+Future route depth:
+
+- Nested organization routes such as `/organizations/:id/practices` and `/organizations/:id/users`. Pending after top-level APIs are stable.
+- Nested practice/provider-specific care coordinator views. Pending after top-level assignment APIs are stable.

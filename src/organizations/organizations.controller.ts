@@ -13,16 +13,19 @@ export class OrganizationsController {
   constructor(private readonly organizationsService: OrganizationsService) {}
 
   @Get()
-  async listOrganizations() {
+  async listOrganizations(@CurrentUser() user: UserContext) {
     return {
-      data: await this.organizationsService.listOrganizations(),
+      data: await this.organizationsService.listOrganizations(user),
     };
   }
 
   @Get(':id')
-  async getOrganization(@Param('id') id: string) {
+  async getOrganization(
+    @Param('id') id: string,
+    @CurrentUser() user: UserContext,
+  ) {
     return {
-      data: await this.organizationsService.getOrganization(id),
+      data: await this.organizationsService.getOrganization(id, user),
     };
   }
 

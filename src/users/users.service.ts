@@ -4,6 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UserStatus } from '@prisma/client';
+import {
+  getAccessibleOrganizationIds,
+  hasPlatformAccess,
+} from '../auth/auth-scope.util';
 import type { UserContext } from '../auth/auth.types';
 import { AuditService } from '../audit/audit.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -16,8 +20,9 @@ export class UsersService {
     private readonly auditService: AuditService,
   ) {}
 
-  async listUsers() {
+  async listUsers(actor: UserContext) {
     return this.prismaService.profile.findMany({
+      where: this.userReadWhere(actor),
       orderBy: {
         createdAt: 'desc',
       },
@@ -25,9 +30,12 @@ export class UsersService {
     });
   }
 
-  async getUser(id: string) {
-    const user = await this.prismaService.profile.findUnique({
-      where: { id },
+  async getUser(id: string, actor: UserContext) {
+    const user = await this.prismaService.profile.findFirst({
+      where: {
+        id,
+        ...this.userReadWhere(actor),
+      },
       select: this.userSelect(),
     });
 
@@ -36,6 +44,32 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  private userReadWhere(actor: UserContext) {
+    if (hasPlatformAccess(actor)) {
+      return {};
+    }
+
+    const organizationIds = getAccessibleOrganizationIds(actor);
+
+    return {
+      OR: [
+        {
+          id: actor.profileId,
+        },
+        {
+          roleAssignments: {
+            some: {
+              organizationId: {
+                in: organizationIds,
+              },
+              revokedAt: null,
+            },
+          },
+        },
+      ],
+    };
   }
 
   async disableUser(

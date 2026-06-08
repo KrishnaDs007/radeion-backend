@@ -4,6 +4,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { OrganizationStatus } from '@prisma/client';
+import {
+  getAccessibleOrganizationIds,
+  hasPlatformAccess,
+} from '../auth/auth-scope.util';
 import type { UserContext } from '../auth/auth.types';
 import { AuditService } from '../audit/audit.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -28,8 +32,9 @@ export class OrganizationsService {
     private readonly auditService: AuditService,
   ) {}
 
-  async listOrganizations() {
+  async listOrganizations(actor: UserContext) {
     return this.prismaService.organization.findMany({
+      where: this.organizationReadWhere(actor),
       orderBy: {
         createdAt: 'desc',
       },
@@ -37,9 +42,12 @@ export class OrganizationsService {
     });
   }
 
-  async getOrganization(id: string) {
-    const organization = await this.prismaService.organization.findUnique({
-      where: { id },
+  async getOrganization(id: string, actor: UserContext) {
+    const organization = await this.prismaService.organization.findFirst({
+      where: {
+        id,
+        ...this.organizationReadWhere(actor),
+      },
       select: this.organizationSelect(),
     });
 
@@ -48,6 +56,18 @@ export class OrganizationsService {
     }
 
     return organization;
+  }
+
+  private organizationReadWhere(actor: UserContext) {
+    if (hasPlatformAccess(actor)) {
+      return {};
+    }
+
+    return {
+      id: {
+        in: getAccessibleOrganizationIds(actor),
+      },
+    };
   }
 
   async createOrganization(input: CreateOrganizationDto, actor: UserContext) {

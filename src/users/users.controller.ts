@@ -11,16 +11,16 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  async listUsers() {
+  async listUsers(@CurrentUser() user: UserContext) {
     return {
-      data: await this.usersService.listUsers(),
+      data: await this.usersService.listUsers(user),
     };
   }
 
   @Get(':id')
-  async getUser(@Param('id') id: string) {
+  async getUser(@Param('id') id: string, @CurrentUser() user: UserContext) {
     return {
-      data: await this.usersService.getUser(id),
+      data: await this.usersService.getUser(id, user),
     };
   }
 

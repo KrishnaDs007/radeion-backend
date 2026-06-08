@@ -13,7 +13,7 @@ describe('OrganizationsService', () => {
   it('throws when organization detail is missing', async () => {
     const prismaService = {
       organization: {
-        findUnique: jest.fn().mockResolvedValue(null),
+        findFirst: jest.fn().mockResolvedValue(null),
       },
     };
     const service = new OrganizationsService(
@@ -23,8 +23,68 @@ describe('OrganizationsService', () => {
       {} as ConstructorParameters<typeof OrganizationsService>[1],
     );
 
-    await expect(service.getOrganization('org-1')).rejects.toBeInstanceOf(
-      NotFoundException,
+    await expect(
+      service.getOrganization('org-1', actor),
+    ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('scopes organization list for non-platform admins', async () => {
+    const prismaService = {
+      organization: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+    };
+    const service = new OrganizationsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof OrganizationsService
+      >[0],
+      {} as ConstructorParameters<typeof OrganizationsService>[1],
+    );
+
+    await service.listOrganizations({
+      ...actor,
+      roles: [
+        {
+          name: 'clientAdmin',
+          scopeType: 'organization',
+          organizationId: 'organization-1',
+        },
+      ],
+    });
+
+    expect(prismaService.organization.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          id: {
+            in: ['organization-1'],
+          },
+        },
+      }),
+    );
+  });
+
+  it('does not scope organization list for platform admins', async () => {
+    const prismaService = {
+      organization: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+    };
+    const service = new OrganizationsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof OrganizationsService
+      >[0],
+      {} as ConstructorParameters<typeof OrganizationsService>[1],
+    );
+
+    await service.listOrganizations({
+      ...actor,
+      roles: [{ name: 'superAdmin', scopeType: 'global' }],
+    });
+
+    expect(prismaService.organization.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {},
+      }),
     );
   });
 
