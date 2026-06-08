@@ -103,7 +103,8 @@ Data and integrations:
 
 - Scoped Databricks query builders for `/claims`, `/providers`, and `/patient-metrics`. Done for initial standard columns and env-configured tables.
 - Real Databricks table/column mapping from production schemas. Pending.
-- Databricks pagination/async statement polling. Pending.
+- Databricks async statement polling. Done with safe polling limits.
+- Databricks result chunk fetching. Done as an optional service capability; pending API-level pagination UX.
 - Redis driver behind the existing cache service. Pending.
 
 Quality and operations:

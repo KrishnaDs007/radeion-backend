@@ -66,6 +66,12 @@ Databricks table names are configured with:
 - `DATABRICKS_PROVIDERS_TABLE`
 - `DATABRICKS_PATIENT_METRICS_TABLE`
 
+Databricks statement execution now polls `PENDING` and `RUNNING` statements until a terminal state is reached or `DATABRICKS_POLL_MAX_ATTEMPTS` is exceeded. Polling and optional chunk fetching are configured with:
+
+- `DATABRICKS_POLL_MAX_ATTEMPTS`
+- `DATABRICKS_POLL_INTERVAL_MS`
+- `DATABRICKS_MAX_RESULT_CHUNKS`
+
 For non-platform roles, the data query service adds SQL filters from the authenticated user's role assignments before request filters are added. `developer` and `superAdmin` are platform roles and can query without role-scope SQL constraints.
 
 The audit module is service-only. It is now called by approval, invite, practice, and provider write flows.
