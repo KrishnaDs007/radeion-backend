@@ -133,6 +133,12 @@ curl "$API_BASE_URL/organizations" \
 
 curl "$API_BASE_URL/organizations/<organizationId>" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+curl "$API_BASE_URL/organizations/<organizationId>/practices" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+curl "$API_BASE_URL/organizations/<organizationId>/users" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 
 Create an organization directly:

@@ -88,6 +88,107 @@ describe('OrganizationsService', () => {
     );
   });
 
+  it('lists practices for a readable organization', async () => {
+    const prismaService = {
+      organization: {
+        findFirst: jest.fn().mockResolvedValue({ id: 'organization-1' }),
+      },
+      practice: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+    };
+    const service = new OrganizationsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof OrganizationsService
+      >[0],
+      {} as ConstructorParameters<typeof OrganizationsService>[1],
+    );
+
+    await service.listOrganizationPractices('organization-1', {
+      ...actor,
+      roles: [
+        {
+          name: 'clientAdmin',
+          scopeType: 'organization',
+          organizationId: 'organization-1',
+        },
+      ],
+    });
+
+    expect(prismaService.organization.findFirst).toHaveBeenCalledWith({
+      where: {
+        AND: [
+          {
+            id: 'organization-1',
+          },
+          {
+            id: {
+              in: ['organization-1'],
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+      },
+    });
+    expect(prismaService.practice.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          organizationId: 'organization-1',
+        },
+      }),
+    );
+  });
+
+  it('lists users assigned to a readable organization', async () => {
+    const prismaService = {
+      organization: {
+        findFirst: jest.fn().mockResolvedValue({ id: 'organization-1' }),
+      },
+      profile: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+    };
+    const service = new OrganizationsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof OrganizationsService
+      >[0],
+      {} as ConstructorParameters<typeof OrganizationsService>[1],
+    );
+
+    await service.listOrganizationUsers('organization-1', {
+      ...actor,
+      roles: [{ name: 'superAdmin', scopeType: 'global' }],
+    });
+
+    expect(prismaService.organization.findFirst).toHaveBeenCalledWith({
+      where: {
+        AND: [
+          {
+            id: 'organization-1',
+          },
+          {},
+        ],
+      },
+      select: {
+        id: true,
+      },
+    });
+    expect(prismaService.profile.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          roleAssignments: {
+            some: {
+              organizationId: 'organization-1',
+              revokedAt: null,
+            },
+          },
+        },
+      }),
+    );
+  });
+
   it('creates an organization and records an audit log', async () => {
     const organization = {
       id: 'org-1',

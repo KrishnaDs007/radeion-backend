@@ -244,6 +244,32 @@
           }
         },
         {
+          "name": "List Organization Practices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/organizations/{{organizationId}}/practices"
+          }
+        },
+        {
+          "name": "List Organization Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/organizations/{{organizationId}}/users"
+          }
+        },
+        {
           "name": "Create Organization",
           "request": {
             "method": "POST",

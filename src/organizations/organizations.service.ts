@@ -44,10 +44,7 @@ export class OrganizationsService {
 
   async getOrganization(id: string, actor: UserContext) {
     const organization = await this.prismaService.organization.findFirst({
-      where: {
-        id,
-        ...this.organizationReadWhere(actor),
-      },
+      where: this.organizationDetailWhere(id, actor),
       select: this.organizationSelect(),
     });
 
@@ -56,6 +53,45 @@ export class OrganizationsService {
     }
 
     return organization;
+  }
+
+  async listOrganizationPractices(id: string, actor: UserContext) {
+    await this.ensureOrganizationReadable(id, actor);
+
+    return this.prismaService.practice.findMany({
+      where: {
+        organizationId: id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        _count: {
+          select: {
+            providers: true,
+          },
+        },
+      },
+    });
+  }
+
+  async listOrganizationUsers(id: string, actor: UserContext) {
+    await this.ensureOrganizationReadable(id, actor);
+
+    return this.prismaService.profile.findMany({
+      where: {
+        roleAssignments: {
+          some: {
+            organizationId: id,
+            revokedAt: null,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: this.organizationUserSelect(),
+    });
   }
 
   private organizationReadWhere(actor: UserContext) {
@@ -67,6 +103,17 @@ export class OrganizationsService {
       id: {
         in: getAccessibleOrganizationIds(actor),
       },
+    };
+  }
+
+  private organizationDetailWhere(id: string, actor: UserContext) {
+    return {
+      AND: [
+        {
+          id,
+        },
+        this.organizationReadWhere(actor),
+      ],
     };
   }
 
@@ -201,6 +248,19 @@ export class OrganizationsService {
     return organization;
   }
 
+  private async ensureOrganizationReadable(id: string, actor: UserContext) {
+    const organization = await this.prismaService.organization.findFirst({
+      where: this.organizationDetailWhere(id, actor),
+      select: {
+        id: true,
+      },
+    });
+
+    if (!organization) {
+      throw new NotFoundException('Organization not found');
+    }
+  }
+
   private removeUndefined<T extends Record<string, unknown>>(
     input: T,
   ): Partial<T> {
@@ -234,6 +294,37 @@ export class OrganizationsService {
           practices: true,
           providers: true,
           roleAssignments: true,
+        },
+      },
+    };
+  }
+
+  private organizationUserSelect() {
+    return {
+      id: true,
+      authUserId: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      status: true,
+      createdAt: true,
+      updatedAt: true,
+      roleAssignments: {
+        where: {
+          revokedAt: null,
+        },
+        select: {
+          id: true,
+          scopeType: true,
+          scopeId: true,
+          organizationId: true,
+          createdAt: true,
+          role: {
+            select: {
+              name: true,
+              displayName: true,
+            },
+          },
         },
       },
     };

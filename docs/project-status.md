@@ -40,6 +40,7 @@ Admin management:
 - Protected role assignment list, create, and revoke APIs added.
 - Protected user detail, disable, and reactivate APIs added.
 - Protected organization detail, create, update, and status APIs added.
+- Protected nested organization practice and user read APIs added.
 - Protected practice and provider reference APIs added.
 - Protected care coordinator assignment list, create, and revoke APIs added.
 - Protected role, user, and organization read endpoints added.
@@ -103,6 +104,8 @@ Protected:
 - `PATCH /users/:id/reactivate`
 - `GET /organizations`
 - `GET /organizations/:id`
+- `GET /organizations/:id/practices`
+- `GET /organizations/:id/users`
 - `POST /organizations`
 - `PATCH /organizations/:id`
 - `PATCH /organizations/:id/status`
@@ -139,5 +142,4 @@ Quality and operations:
 
 Future route depth:
 
-- Add nested organization routes such as `/organizations/:id/practices` and `/organizations/:id/users`.
 - Add nested practice/provider-specific care coordinator views.

@@ -29,6 +29,27 @@ export class OrganizationsController {
     };
   }
 
+  @Get(':id/practices')
+  async listOrganizationPractices(
+    @Param('id') id: string,
+    @CurrentUser() user: UserContext,
+  ) {
+    return {
+      data: await this.organizationsService.listOrganizationPractices(id, user),
+    };
+  }
+
+  @RequirePermission('user.read')
+  @Get(':id/users')
+  async listOrganizationUsers(
+    @Param('id') id: string,
+    @CurrentUser() user: UserContext,
+  ) {
+    return {
+      data: await this.organizationsService.listOrganizationUsers(id, user),
+    };
+  }
+
   @RequirePermission('organization.create')
   @Post()
   async createOrganization(

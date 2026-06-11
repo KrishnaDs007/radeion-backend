@@ -39,6 +39,8 @@ Current route groups:
 - `PATCH /users/:id/reactivate` protected user reactivation
 - `GET /organizations` protected organization list
 - `GET /organizations/:id` protected organization detail
+- `GET /organizations/:id/practices` protected organization practice list
+- `GET /organizations/:id/users` protected organization user list
 - `POST /organizations` protected organization creation
 - `PATCH /organizations/:id` protected organization update
 - `PATCH /organizations/:id/status` protected organization status update
