@@ -55,7 +55,15 @@ The project will start with in-memory caching for learning and simplicity. The s
 
 ## Development Status
 
-This repository is in initial setup.
+This repository now has the first backend foundation in place:
+
+- NestJS API modules for auth, onboarding, admin management, reference data, and Databricks reads
+- Supabase Auth and Supabase Postgres integration through Prisma
+- In-memory cache by default, with Redis available through the cache abstraction
+- Docker and Docker Compose scaffolding for local Redis runtime testing
+- GitHub Actions validation for Prisma, TypeScript, lint, build, tests, e2e tests, and audit
+
+See `docs/project-status.md` for the detailed progress tracker and `docs/deployment.md` for the first deployment guide.
 
 ## Creator
 

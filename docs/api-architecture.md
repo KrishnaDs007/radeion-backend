@@ -103,6 +103,8 @@ Current intent:
 
 The first Databricks statement cache TTL is 60 seconds.
 
+Local Redis runtime testing is documented in `docs/deployment.md`. Docker Compose runs the API with `CACHE_DRIVER=redis` and `REDIS_URL=redis://redis:6379` while leaving normal local development free to use in-memory caching.
+
 ## Middleware
 
 `RequestContextMiddleware` runs for every route.

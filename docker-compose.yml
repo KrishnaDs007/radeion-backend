@@ -1,0 +1,33 @@
+services:
+  api:
+    build:
+      context: .
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      CACHE_DRIVER: redis
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3000:3000"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  redis:
+    image: redis:8-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis-data:
+
