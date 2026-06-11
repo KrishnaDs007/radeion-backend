@@ -15,8 +15,6 @@ export class ProvidersController {
     @Query() query: DataQueryDto,
     @CurrentUser() user: UserContext,
   ) {
-    return {
-      data: await this.dataQueryService.listProviders(query, user),
-    };
+    return this.dataQueryService.listProviders(query, user);
   }
 }

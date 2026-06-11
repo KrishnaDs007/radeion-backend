@@ -13,6 +13,22 @@ type DataSetConfig = {
   dateColumn?: string;
 };
 
+type DataPageMetadata = {
+  limit: number;
+  offset: number;
+  returnedRowCount: number;
+  nextOffset: number | null;
+  hasNextPage: boolean;
+  includedResultChunks: boolean;
+  resultChunkCount: number;
+  hasMoreResultChunks: boolean;
+};
+
+export type DataQueryResponse = {
+  data: DatabricksStatementResponse;
+  page: DataPageMetadata;
+};
+
 const DATA_SET_CONFIG: Record<DataSet, DataSetConfig> = {
   claims: {
     tableEnv: 'DATABRICKS_CLAIMS_TABLE',
@@ -42,38 +58,43 @@ export class DataQueryService {
   async listClaims(
     query: DataQueryDto,
     user: UserContext,
-  ): Promise<DatabricksStatementResponse> {
+  ): Promise<DataQueryResponse> {
     return this.executeDataSet('claims', query, user);
   }
 
   async listProviders(
     query: DataQueryDto,
     user: UserContext,
-  ): Promise<DatabricksStatementResponse> {
+  ): Promise<DataQueryResponse> {
     return this.executeDataSet('providers', query, user);
   }
 
   async listPatientMetrics(
     query: DataQueryDto,
     user: UserContext,
-  ): Promise<DatabricksStatementResponse> {
+  ): Promise<DataQueryResponse> {
     return this.executeDataSet('patientMetrics', query, user);
   }
 
-  private executeDataSet(
+  private async executeDataSet(
     dataSet: DataSet,
     query: DataQueryDto,
     user: UserContext,
-  ) {
+  ): Promise<DataQueryResponse> {
     const config = DATA_SET_CONFIG[dataSet];
     const tableName = this.getTableName(config);
     const statement = this.buildStatement(tableName, config, query, user);
-
-    return this.databricksService.executeStatement({
+    const data = await this.databricksService.executeStatement({
       statement,
       waitTimeout: '10s',
       onWaitTimeout: 'CONTINUE',
+      fetchAllResultChunks: query.includeResultChunks ?? false,
     });
+
+    return {
+      data,
+      page: this.buildPageMetadata(query, data),
+    };
   }
 
   buildStatement(
@@ -183,5 +204,40 @@ export class DataQueryService {
 
   private escapeSqlLiteral(value: string): string {
     return value.replaceAll("'", "''");
+  }
+
+  private buildPageMetadata(
+    query: DataQueryDto,
+    response: DatabricksStatementResponse,
+  ): DataPageMetadata {
+    const limit = query.limit ?? 100;
+    const offset = query.offset ?? 0;
+    const resultChunks = response.result_chunks ?? [];
+    const returnedRowCount =
+      this.countRows(response.result) +
+      resultChunks.reduce((total, chunk) => total + this.countRows(chunk), 0);
+    const lastFetchedChunk = resultChunks.at(-1);
+    const hasMoreResultChunks = Boolean(
+      lastFetchedChunk?.next_chunk_internal_link ??
+      response.result?.next_chunk_internal_link,
+    );
+    const hasNextPage = returnedRowCount >= limit;
+
+    return {
+      limit,
+      offset,
+      returnedRowCount,
+      nextOffset: hasNextPage ? offset + limit : null,
+      hasNextPage,
+      includedResultChunks: query.includeResultChunks ?? false,
+      resultChunkCount: resultChunks.length,
+      hasMoreResultChunks,
+    };
+  }
+
+  private countRows(result?: DatabricksStatementResponse['result']): number {
+    const rows = result?.data_array;
+
+    return Array.isArray(rows) ? rows.length : 0;
   }
 }

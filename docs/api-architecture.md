@@ -59,6 +59,9 @@ The Databricks module is consumed by the data controllers through a query servic
 - `toDate`
 - `limit`
 - `offset`
+- `includeResultChunks`
+
+The data routes return the raw Databricks statement payload under `data` and API pagination metadata under `page`. `limit` and `offset` control SQL-level pagination. `includeResultChunks=true` asks the backend to hydrate additional Databricks result chunks up to `DATABRICKS_MAX_RESULT_CHUNKS`; `page.hasMoreResultChunks` tells the client when Databricks still reported another internal chunk.
 
 Databricks table names are configured with:
 

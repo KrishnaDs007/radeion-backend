@@ -15,8 +15,6 @@ export class PatientMetricsController {
     @Query() query: DataQueryDto,
     @CurrentUser() user: UserContext,
   ) {
-    return {
-      data: await this.dataQueryService.listPatientMetrics(query, user),
-    };
+    return this.dataQueryService.listPatientMetrics(query, user);
   }
 }

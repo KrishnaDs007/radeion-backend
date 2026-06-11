@@ -50,6 +50,7 @@ Data and integrations:
 - Scoped Databricks query builder added for first read APIs.
 - Databricks async statement polling added with safe limits.
 - Databricks optional result chunk fetching added at service level.
+- API-level pagination metadata and result chunk hydration added for Databricks read routes.
 - In-memory cache foundation added.
 - Redis cache driver added behind the cache abstraction.
 - Databricks statement-result cache added with 60 second TTL.
@@ -126,7 +127,6 @@ Auth and onboarding:
 Data and integrations:
 
 - Add real Databricks table/column mapping from production schemas.
-- Add API-level pagination UX for Databricks result chunks.
 - Add runtime Redis provisioning/deployment config.
 
 Quality and operations:

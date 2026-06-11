@@ -262,3 +262,35 @@ curl "$API_BASE_URL/providers?practiceId=<practiceId>&limit=50" \
 curl "$API_BASE_URL/patient-metrics?providerId=<providerId>&fromDate=2026-01-01&toDate=2026-01-31" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
+
+Ask the backend to fetch Databricks result chunks and return page metadata:
+
+```bash
+curl "$API_BASE_URL/claims?limit=100&offset=0&includeResultChunks=true" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
+The response shape is:
+
+```json
+{
+  "data": {
+    "statement_id": "databricks-statement-id",
+    "status": {
+      "state": "SUCCEEDED"
+    },
+    "result": {},
+    "result_chunks": []
+  },
+  "page": {
+    "limit": 100,
+    "offset": 0,
+    "returnedRowCount": 0,
+    "nextOffset": null,
+    "hasNextPage": false,
+    "includedResultChunks": true,
+    "resultChunkCount": 0,
+    "hasMoreResultChunks": false
+  }
+}
+```

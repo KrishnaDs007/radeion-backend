@@ -13,6 +13,10 @@ describe('DataQueryService', () => {
     >[1],
   );
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('does not scope platform users', () => {
     const user: UserContext = {
       profileId: 'profile-1',
@@ -72,6 +76,93 @@ describe('DataQueryService', () => {
 
     expect(service.buildStatement('providers', {}, {}, user)).toBe(
       'SELECT * FROM providers WHERE 1 = 0 LIMIT 100 OFFSET 0',
+    );
+  });
+
+  it('returns page metadata for Databricks reads', async () => {
+    const user: UserContext = {
+      profileId: 'profile-1',
+      authUserId: 'auth-user-1',
+      status: 'ACTIVE',
+      roles: [{ name: 'developer', scopeType: 'global' }],
+    };
+    databricksService.executeStatement.mockResolvedValueOnce({
+      status: { state: 'SUCCEEDED' },
+      result: {
+        data_array: [['claim-1'], ['claim-2']],
+      },
+    });
+
+    await expect(
+      service.listClaims({ limit: 2, offset: 4 }, user),
+    ).resolves.toEqual({
+      data: {
+        status: { state: 'SUCCEEDED' },
+        result: {
+          data_array: [['claim-1'], ['claim-2']],
+        },
+      },
+      page: {
+        limit: 2,
+        offset: 4,
+        returnedRowCount: 2,
+        nextOffset: 6,
+        hasNextPage: true,
+        includedResultChunks: false,
+        resultChunkCount: 0,
+        hasMoreResultChunks: false,
+      },
+    });
+
+    expect(databricksService.executeStatement).toHaveBeenCalledWith({
+      statement: 'SELECT * FROM claims LIMIT 2 OFFSET 4',
+      waitTimeout: '10s',
+      onWaitTimeout: 'CONTINUE',
+      fetchAllResultChunks: false,
+    });
+  });
+
+  it('requests and counts Databricks result chunks when included', async () => {
+    const user: UserContext = {
+      profileId: 'profile-1',
+      authUserId: 'auth-user-1',
+      status: 'ACTIVE',
+      roles: [{ name: 'developer', scopeType: 'global' }],
+    };
+    databricksService.executeStatement.mockResolvedValueOnce({
+      status: { state: 'SUCCEEDED' },
+      result: {
+        data_array: [['provider-1']],
+      },
+      result_chunks: [
+        {
+          data_array: [['provider-2']],
+          next_chunk_internal_link: '/next',
+        },
+      ],
+    });
+
+    await expect(
+      service.listProviders({ limit: 5, includeResultChunks: true }, user),
+    ).resolves.toEqual(
+      expect.objectContaining({
+        page: {
+          limit: 5,
+          offset: 0,
+          returnedRowCount: 2,
+          nextOffset: null,
+          hasNextPage: false,
+          includedResultChunks: true,
+          resultChunkCount: 1,
+          hasMoreResultChunks: true,
+        },
+      }),
+    );
+
+    expect(databricksService.executeStatement).toHaveBeenCalledWith(
+      expect.objectContaining({
+        fetchAllResultChunks: true,
+      }),
     );
   });
 });

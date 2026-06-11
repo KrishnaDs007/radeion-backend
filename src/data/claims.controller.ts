@@ -15,8 +15,6 @@ export class ClaimsController {
     @Query() query: DataQueryDto,
     @CurrentUser() user: UserContext,
   ) {
-    return {
-      data: await this.dataQueryService.listClaims(query, user),
-    };
+    return this.dataQueryService.listClaims(query, user);
   }
 }
