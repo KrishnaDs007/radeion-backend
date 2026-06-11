@@ -70,6 +70,7 @@ Quality and operations:
 
 - GitHub Actions CI added for Prisma validation, typecheck, lint, build, tests, and dependency audit.
 - Public-route e2e smoke tests added and wired into CI.
+- Authenticated-route e2e tests added with mocked auth context and Prisma.
 - CI action pins updated to Node 24-compatible GitHub action runtimes.
 - CI Prisma generate/validate now uses dummy database URLs instead of requiring real secrets.
 - Dockerfile, Docker Compose Redis runtime, and deployment guide added.
@@ -140,7 +141,6 @@ Data and integrations:
 
 Quality and operations:
 
-- Add authenticated e2e tests after a stable test-auth strategy is chosen.
 - Push current local commits and create a GitHub PR when ready.
 
 Future route depth:
