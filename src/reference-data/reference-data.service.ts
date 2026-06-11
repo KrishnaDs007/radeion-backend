@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { OrganizationStatus, ReferenceSource } from '@prisma/client';
 import {
   getAccessibleOrganizationIds,
@@ -25,19 +25,39 @@ export class ReferenceDataService {
       orderBy: {
         createdAt: 'desc',
       },
-      include: {
-        organization: {
-          select: {
-            id: true,
-            name: true,
+      include: this.practiceInclude(),
+    });
+  }
+
+  async getPractice(id: string, actor: UserContext) {
+    const practice = await this.prismaService.practice.findFirst({
+      where: this.scopedRecordWhere(id, actor),
+      include: this.practiceInclude(),
+    });
+
+    if (!practice) {
+      throw new NotFoundException('Practice not found');
+    }
+
+    return practice;
+  }
+
+  async listPracticeProviders(practiceId: string, actor: UserContext) {
+    await this.getPractice(practiceId, actor);
+
+    return this.prismaService.provider.findMany({
+      where: {
+        AND: [
+          {
+            practiceId,
           },
-        },
-        _count: {
-          select: {
-            providers: true,
-          },
-        },
+          this.organizationScopedWhere(actor),
+        ],
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: this.providerInclude(),
     });
   }
 
@@ -102,21 +122,21 @@ export class ReferenceDataService {
       orderBy: {
         createdAt: 'desc',
       },
-      include: {
-        organization: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        practice: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-      },
+      include: this.providerInclude(),
     });
+  }
+
+  async getProvider(id: string, actor: UserContext) {
+    const provider = await this.prismaService.provider.findFirst({
+      where: this.scopedRecordWhere(id, actor),
+      include: this.providerInclude(),
+    });
+
+    if (!provider) {
+      throw new NotFoundException('Provider not found');
+    }
+
+    return provider;
   }
 
   async createProvider(input: CreateProviderDto, actor: UserContext) {
@@ -198,6 +218,50 @@ export class ReferenceDataService {
     return {
       organizationId: {
         in: getAccessibleOrganizationIds(actor),
+      },
+    };
+  }
+
+  private scopedRecordWhere(id: string, actor: UserContext) {
+    return {
+      AND: [
+        {
+          id,
+        },
+        this.organizationScopedWhere(actor),
+      ],
+    };
+  }
+
+  private practiceInclude() {
+    return {
+      organization: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      _count: {
+        select: {
+          providers: true,
+        },
+      },
+    };
+  }
+
+  private providerInclude() {
+    return {
+      organization: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      practice: {
+        select: {
+          id: true,
+          name: true,
+        },
       },
     };
   }

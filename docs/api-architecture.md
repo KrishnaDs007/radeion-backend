@@ -24,9 +24,12 @@ Current route groups:
 - `POST /invites/accept` public invite acceptance after Supabase password/session setup
 - `POST /invites/:id/revoke` protected invite revocation
 - `GET /reference/practices` protected practice reference list
+- `GET /reference/practices/:id` protected practice reference detail
+- `GET /reference/practices/:id/providers` protected providers inside one practice
 - `POST /reference/practices` protected practice reference creation
 - `PATCH /reference/practices/:id` protected practice reference update
 - `GET /reference/providers` protected provider reference list
+- `GET /reference/providers/:id` protected provider reference detail
 - `POST /reference/providers` protected provider reference creation
 - `PATCH /reference/providers/:id` protected provider reference update
 - `GET /roles` protected role list

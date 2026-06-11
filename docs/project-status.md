@@ -43,6 +43,7 @@ Admin management:
 - Protected organization detail, create, update, and status APIs added.
 - Protected nested organization practice and user read APIs added.
 - Protected practice and provider reference APIs added.
+- Protected reference detail and practice-provider nested reads added.
 - Protected care coordinator assignment list, create, and revoke APIs added.
 - Protected nested care coordinator assignment reads added for practices and providers.
 - Protected role, user, and organization read endpoints added.
@@ -120,9 +121,12 @@ Protected:
 - `POST /care-coordinators/assignments`
 - `POST /care-coordinators/assignments/:id/revoke`
 - `GET /reference/practices`
+- `GET /reference/practices/:id`
+- `GET /reference/practices/:id/providers`
 - `POST /reference/practices`
 - `PATCH /reference/practices/:id`
 - `GET /reference/providers`
+- `GET /reference/providers/:id`
 - `POST /reference/providers`
 - `PATCH /reference/providers/:id`
 - `GET /claims`
@@ -146,4 +150,4 @@ Quality and operations:
 
 Future route depth:
 
-- Add deeper practice/provider child views as frontend workflows require them.
+- Add deeper child views as frontend workflows require them.

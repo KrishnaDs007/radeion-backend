@@ -212,6 +212,25 @@ curl -X PATCH "$API_BASE_URL/users/<profileId>/disable" \
 
 ## Reference Data
 
+Read practice and provider reference data:
+
+```bash
+curl "$API_BASE_URL/reference/practices" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+curl "$API_BASE_URL/reference/practices/<practiceId>" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+curl "$API_BASE_URL/reference/practices/<practiceId>/providers" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+curl "$API_BASE_URL/reference/providers" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+curl "$API_BASE_URL/reference/providers/<providerId>" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
 Create a practice:
 
 ```bash

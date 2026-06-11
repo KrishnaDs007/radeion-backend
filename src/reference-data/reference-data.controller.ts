@@ -20,6 +20,25 @@ export class ReferenceDataController {
     };
   }
 
+  @RequirePermission('organization.read')
+  @Get('practices/:id/providers')
+  async listPracticeProviders(
+    @Param('id') id: string,
+    @CurrentUser() user: UserContext,
+  ) {
+    return {
+      data: await this.referenceDataService.listPracticeProviders(id, user),
+    };
+  }
+
+  @RequirePermission('organization.read')
+  @Get('practices/:id')
+  async getPractice(@Param('id') id: string, @CurrentUser() user: UserContext) {
+    return {
+      data: await this.referenceDataService.getPractice(id, user),
+    };
+  }
+
   @RequirePermission('organization.update')
   @Post('practices')
   async createPractice(
@@ -48,6 +67,14 @@ export class ReferenceDataController {
   async listProviders(@CurrentUser() user: UserContext) {
     return {
       data: await this.referenceDataService.listProviders(user),
+    };
+  }
+
+  @RequirePermission('providers.read')
+  @Get('providers/:id')
+  async getProvider(@Param('id') id: string, @CurrentUser() user: UserContext) {
+    return {
+      data: await this.referenceDataService.getProvider(id, user),
     };
   }
 
