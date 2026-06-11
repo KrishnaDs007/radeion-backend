@@ -62,6 +62,10 @@ Developer experience:
 - Postman collection added in `docs/postman/radeion-backend.postman_collection.json`.
 - Local learning guide created in gitignored `learning-notes/`.
 
+Quality and operations:
+
+- GitHub Actions CI added for Prisma validation, typecheck, lint, build, tests, and dependency audit.
+
 ## Current API Shape
 
 Public:
@@ -126,7 +130,7 @@ Data and integrations:
 Quality and operations:
 
 - Add e2e tests after migration and seed flow is stable.
-- Add deployment configuration and CI.
+- Add deployment configuration.
 - Push current local commits and create a GitHub PR when ready.
 
 Future route depth:
