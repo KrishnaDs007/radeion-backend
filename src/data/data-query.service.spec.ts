@@ -27,8 +27,16 @@ describe('DataQueryService', () => {
 
     expect(
       service.buildStatement(
-        'claims',
-        { dateColumn: 'service_date' },
+        {
+          tableName: 'claims',
+          columns: {
+            organizationId: 'organization_id',
+            practiceId: 'practice_id',
+            providerId: 'provider_id',
+            patientId: 'patient_id',
+            date: 'service_date',
+          },
+        },
         { limit: 25, offset: 10 },
         user,
       ),
@@ -52,8 +60,16 @@ describe('DataQueryService', () => {
 
     expect(
       service.buildStatement(
-        'claims',
-        { dateColumn: 'service_date' },
+        {
+          tableName: 'claims',
+          columns: {
+            organizationId: 'org_id',
+            practiceId: 'practice_ref',
+            providerId: 'provider_ref',
+            patientId: 'member_ref',
+            date: 'service_dt',
+          },
+        },
         {
           patientId: "patient-'1",
           fromDate: '2026-01-01',
@@ -62,7 +78,7 @@ describe('DataQueryService', () => {
         user,
       ),
     ).toBe(
-      "SELECT * FROM claims WHERE (organization_id IN ('organization-1') OR practice_id IN ('practice-1')) AND patient_id = 'patient-''1' AND service_date >= DATE '2026-01-01' AND service_date <= DATE '2026-01-31' LIMIT 100 OFFSET 0",
+      "SELECT * FROM claims WHERE (org_id IN ('organization-1') OR practice_ref IN ('practice-1')) AND member_ref = 'patient-''1' AND service_dt >= DATE '2026-01-01' AND service_dt <= DATE '2026-01-31' LIMIT 100 OFFSET 0",
     );
   });
 
@@ -74,8 +90,62 @@ describe('DataQueryService', () => {
       roles: [{ name: 'provider' }],
     };
 
-    expect(service.buildStatement('providers', {}, {}, user)).toBe(
-      'SELECT * FROM providers WHERE 1 = 0 LIMIT 100 OFFSET 0',
+    expect(
+      service.buildStatement(
+        {
+          tableName: 'providers',
+          columns: {
+            organizationId: 'organization_id',
+            practiceId: 'practice_id',
+            providerId: 'provider_id',
+            patientId: 'patient_id',
+          },
+        },
+        {},
+        user,
+      ),
+    ).toBe('SELECT * FROM providers WHERE 1 = 0 LIMIT 100 OFFSET 0');
+  });
+
+  it('uses configured table and column names for dataset execution', async () => {
+    const mappedService = new DataQueryService(
+      new ConfigService({
+        DATABRICKS_CLAIMS_TABLE: 'prod.catalog.claims_view',
+        DATABRICKS_CLAIMS_ORGANIZATION_ID_COLUMN: 'org_ref',
+        DATABRICKS_CLAIMS_PATIENT_ID_COLUMN: 'member_ref',
+        DATABRICKS_CLAIMS_DATE_COLUMN: 'service_dt',
+      }),
+      databricksService as unknown as ConstructorParameters<
+        typeof DataQueryService
+      >[1],
+    );
+    const user: UserContext = {
+      profileId: 'profile-1',
+      authUserId: 'auth-user-1',
+      status: 'ACTIVE',
+      roles: [{ name: 'developer', scopeType: 'global' }],
+    };
+    databricksService.executeStatement.mockResolvedValueOnce({
+      status: { state: 'SUCCEEDED' },
+      result: {
+        data_array: [],
+      },
+    });
+
+    await mappedService.listClaims(
+      {
+        organizationId: 'organization-1',
+        patientId: 'patient-1',
+        fromDate: '2026-01-01',
+      },
+      user,
+    );
+
+    expect(databricksService.executeStatement).toHaveBeenCalledWith(
+      expect.objectContaining({
+        statement:
+          "SELECT * FROM prod.catalog.claims_view WHERE org_ref = 'organization-1' AND member_ref = 'patient-1' AND service_dt >= DATE '2026-01-01' LIMIT 100 OFFSET 0",
+      }),
     );
   });
 

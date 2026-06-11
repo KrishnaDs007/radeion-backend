@@ -51,6 +51,7 @@ Data and integrations:
 
 - Databricks service foundation added.
 - Scoped Databricks query builder added for first read APIs.
+- Configurable Databricks table and filter-column mapping added for production schemas.
 - Databricks async statement polling added with safe limits.
 - Databricks optional result chunk fetching added at service level.
 - API-level pagination metadata and result chunk hydration added for Databricks read routes.
@@ -137,7 +138,7 @@ Auth and onboarding:
 
 Data and integrations:
 
-- Add real Databricks table/column mapping from production schemas.
+- Fill production Databricks table/column environment values when final schemas are available.
 
 Quality and operations:
 

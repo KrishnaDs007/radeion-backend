@@ -73,6 +73,8 @@ Databricks table names are configured with:
 - `DATABRICKS_PROVIDERS_TABLE`
 - `DATABRICKS_PATIENT_METRICS_TABLE`
 
+Databricks filter column names are also configurable per dataset. Use the matching `*_ORGANIZATION_ID_COLUMN`, `*_PRACTICE_ID_COLUMN`, `*_PROVIDER_ID_COLUMN`, `*_PATIENT_ID_COLUMN`, and dataset date column variables from `.env.example` when production schemas differ from the local defaults.
+
 Databricks statement execution now polls `PENDING` and `RUNNING` statements until a terminal state is reached or `DATABRICKS_POLL_MAX_ATTEMPTS` is exceeded. Polling and optional chunk fetching are configured with:
 
 - `DATABRICKS_POLL_MAX_ATTEMPTS`

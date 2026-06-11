@@ -89,4 +89,24 @@ describe('validateEnvironment', () => {
       }),
     ).toThrow('DATABRICKS_POLL_INTERVAL_MS must be a non-negative integer');
   });
+
+  it('rejects unsafe Databricks table and column identifiers', () => {
+    expect(() =>
+      validateEnvironment({
+        ...validEnvironment,
+        DATABRICKS_CLAIMS_TABLE: 'claims; DROP TABLE claims',
+      }),
+    ).toThrow(
+      'DATABRICKS_CLAIMS_TABLE must be a safe SQL identifier or identifier path',
+    );
+
+    expect(() =>
+      validateEnvironment({
+        ...validEnvironment,
+        DATABRICKS_CLAIMS_PATIENT_ID_COLUMN: 'patient id',
+      }),
+    ).toThrow(
+      'DATABRICKS_CLAIMS_PATIENT_ID_COLUMN must be a safe SQL identifier or identifier path',
+    );
+  });
 });

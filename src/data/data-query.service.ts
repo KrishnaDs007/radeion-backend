@@ -10,7 +10,33 @@ type DataSet = 'claims' | 'providers' | 'patientMetrics';
 type DataSetConfig = {
   tableEnv: string;
   defaultTable: string;
-  dateColumn?: string;
+  columns: DataSetColumns;
+};
+
+type DataSetColumns = {
+  organizationId: ColumnConfig;
+  practiceId: ColumnConfig;
+  providerId: ColumnConfig;
+  patientId: ColumnConfig;
+  date?: ColumnConfig;
+};
+
+type ColumnConfig = {
+  env: string;
+  defaultName: string;
+};
+
+type ResolvedDataSetConfig = {
+  tableName: string;
+  columns: ResolvedDataSetColumns;
+};
+
+type ResolvedDataSetColumns = {
+  organizationId: string;
+  practiceId: string;
+  providerId: string;
+  patientId: string;
+  date?: string;
 };
 
 type DataPageMetadata = {
@@ -33,16 +59,76 @@ const DATA_SET_CONFIG: Record<DataSet, DataSetConfig> = {
   claims: {
     tableEnv: 'DATABRICKS_CLAIMS_TABLE',
     defaultTable: 'claims',
-    dateColumn: 'service_date',
+    columns: {
+      organizationId: {
+        env: 'DATABRICKS_CLAIMS_ORGANIZATION_ID_COLUMN',
+        defaultName: 'organization_id',
+      },
+      practiceId: {
+        env: 'DATABRICKS_CLAIMS_PRACTICE_ID_COLUMN',
+        defaultName: 'practice_id',
+      },
+      providerId: {
+        env: 'DATABRICKS_CLAIMS_PROVIDER_ID_COLUMN',
+        defaultName: 'provider_id',
+      },
+      patientId: {
+        env: 'DATABRICKS_CLAIMS_PATIENT_ID_COLUMN',
+        defaultName: 'patient_id',
+      },
+      date: {
+        env: 'DATABRICKS_CLAIMS_DATE_COLUMN',
+        defaultName: 'service_date',
+      },
+    },
   },
   providers: {
     tableEnv: 'DATABRICKS_PROVIDERS_TABLE',
     defaultTable: 'providers',
+    columns: {
+      organizationId: {
+        env: 'DATABRICKS_PROVIDERS_ORGANIZATION_ID_COLUMN',
+        defaultName: 'organization_id',
+      },
+      practiceId: {
+        env: 'DATABRICKS_PROVIDERS_PRACTICE_ID_COLUMN',
+        defaultName: 'practice_id',
+      },
+      providerId: {
+        env: 'DATABRICKS_PROVIDERS_PROVIDER_ID_COLUMN',
+        defaultName: 'provider_id',
+      },
+      patientId: {
+        env: 'DATABRICKS_PROVIDERS_PATIENT_ID_COLUMN',
+        defaultName: 'patient_id',
+      },
+    },
   },
   patientMetrics: {
     tableEnv: 'DATABRICKS_PATIENT_METRICS_TABLE',
     defaultTable: 'patient_metrics',
-    dateColumn: 'measured_at',
+    columns: {
+      organizationId: {
+        env: 'DATABRICKS_PATIENT_METRICS_ORGANIZATION_ID_COLUMN',
+        defaultName: 'organization_id',
+      },
+      practiceId: {
+        env: 'DATABRICKS_PATIENT_METRICS_PRACTICE_ID_COLUMN',
+        defaultName: 'practice_id',
+      },
+      providerId: {
+        env: 'DATABRICKS_PATIENT_METRICS_PROVIDER_ID_COLUMN',
+        defaultName: 'provider_id',
+      },
+      patientId: {
+        env: 'DATABRICKS_PATIENT_METRICS_PATIENT_ID_COLUMN',
+        defaultName: 'patient_id',
+      },
+      date: {
+        env: 'DATABRICKS_PATIENT_METRICS_DATE_COLUMN',
+        defaultName: 'measured_at',
+      },
+    },
   },
 };
 
@@ -82,8 +168,8 @@ export class DataQueryService {
     user: UserContext,
   ): Promise<DataQueryResponse> {
     const config = DATA_SET_CONFIG[dataSet];
-    const tableName = this.getTableName(config);
-    const statement = this.buildStatement(tableName, config, query, user);
+    const resolvedConfig = this.resolveDataSetConfig(config);
+    const statement = this.buildStatement(resolvedConfig, query, user);
     const data = await this.databricksService.executeStatement({
       statement,
       waitTimeout: '10s',
@@ -98,13 +184,12 @@ export class DataQueryService {
   }
 
   buildStatement(
-    tableName: string,
-    config: Pick<DataSetConfig, 'dateColumn'>,
+    config: ResolvedDataSetConfig,
     query: DataQueryDto,
     user: UserContext,
   ): string {
     const conditions = [
-      ...this.buildUserScopeConditions(user),
+      ...this.buildUserScopeConditions(user, config.columns),
       ...this.buildQueryConditions(query, config),
     ];
     const whereClause =
@@ -112,21 +197,52 @@ export class DataQueryService {
     const limit = query.limit ?? 100;
     const offset = query.offset ?? 0;
 
-    return `SELECT * FROM ${tableName}${whereClause} LIMIT ${limit} OFFSET ${offset}`;
+    return `SELECT * FROM ${config.tableName}${whereClause} LIMIT ${limit} OFFSET ${offset}`;
   }
 
-  private getTableName(config: DataSetConfig): string {
+  private resolveDataSetConfig(config: DataSetConfig): ResolvedDataSetConfig {
+    return {
+      tableName: this.getTableName(config),
+      columns: {
+        organizationId: this.getColumnName(config.columns.organizationId),
+        practiceId: this.getColumnName(config.columns.practiceId),
+        providerId: this.getColumnName(config.columns.providerId),
+        patientId: this.getColumnName(config.columns.patientId),
+        date: config.columns.date
+          ? this.getColumnName(config.columns.date)
+          : undefined,
+      },
+    };
+  }
+
+  private getTableName(
+    config: Pick<DataSetConfig, 'tableEnv' | 'defaultTable'>,
+  ) {
     const tableName =
       this.configService.get<string>(config.tableEnv) ?? config.defaultTable;
 
-    if (!/^[A-Za-z0-9_.$`]+$/.test(tableName)) {
+    if (!this.isSafeSqlIdentifierPath(tableName)) {
       throw new Error(`Invalid Databricks table name for ${config.tableEnv}`);
     }
 
     return tableName;
   }
 
-  private buildUserScopeConditions(user: UserContext): string[] {
+  private getColumnName(config: ColumnConfig) {
+    const columnName =
+      this.configService.get<string>(config.env) ?? config.defaultName;
+
+    if (!this.isSafeSqlIdentifierPath(columnName)) {
+      throw new Error(`Invalid Databricks column name for ${config.env}`);
+    }
+
+    return columnName;
+  }
+
+  private buildUserScopeConditions(
+    user: UserContext,
+    columns: ResolvedDataSetColumns,
+  ): string[] {
     if (user.roles.some((role) => PLATFORM_ROLES.has(role.name))) {
       return [];
     }
@@ -150,9 +266,9 @@ export class DataQueryService {
     }
 
     const scopedConditions = [
-      this.inCondition('organization_id', organizationIds),
-      this.inCondition('practice_id', practiceIds),
-      this.inCondition('provider_id', providerIds),
+      this.inCondition(columns.organizationId, organizationIds),
+      this.inCondition(columns.practiceId, practiceIds),
+      this.inCondition(columns.providerId, providerIds),
     ].filter((condition): condition is string => Boolean(condition));
 
     if (scopedConditions.length === 0) {
@@ -164,24 +280,24 @@ export class DataQueryService {
 
   private buildQueryConditions(
     query: DataQueryDto,
-    config: Pick<DataSetConfig, 'dateColumn'>,
+    config: ResolvedDataSetConfig,
   ): string[] {
     const conditions = [
-      this.equalsCondition('organization_id', query.organizationId),
-      this.equalsCondition('practice_id', query.practiceId),
-      this.equalsCondition('provider_id', query.providerId),
-      this.equalsCondition('patient_id', query.patientId),
+      this.equalsCondition(config.columns.organizationId, query.organizationId),
+      this.equalsCondition(config.columns.practiceId, query.practiceId),
+      this.equalsCondition(config.columns.providerId, query.providerId),
+      this.equalsCondition(config.columns.patientId, query.patientId),
     ].filter((condition): condition is string => Boolean(condition));
 
-    if (config.dateColumn && query.fromDate) {
+    if (config.columns.date && query.fromDate) {
       conditions.push(
-        `${config.dateColumn} >= DATE '${this.escapeSqlLiteral(query.fromDate)}'`,
+        `${config.columns.date} >= DATE '${this.escapeSqlLiteral(query.fromDate)}'`,
       );
     }
 
-    if (config.dateColumn && query.toDate) {
+    if (config.columns.date && query.toDate) {
       conditions.push(
-        `${config.dateColumn} <= DATE '${this.escapeSqlLiteral(query.toDate)}'`,
+        `${config.columns.date} <= DATE '${this.escapeSqlLiteral(query.toDate)}'`,
       );
     }
 
@@ -204,6 +320,10 @@ export class DataQueryService {
 
   private escapeSqlLiteral(value: string): string {
     return value.replaceAll("'", "''");
+  }
+
+  private isSafeSqlIdentifierPath(value: string): boolean {
+    return /^[A-Za-z0-9_.$`]+$/.test(value);
   }
 
   private buildPageMetadata(

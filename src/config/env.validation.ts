@@ -18,6 +18,26 @@ const OPTIONAL_INTEGER_KEYS = [
   'DATABRICKS_MAX_RESULT_CHUNKS',
 ] as const;
 
+const OPTIONAL_DATABRICKS_IDENTIFIER_KEYS = [
+  'DATABRICKS_CLAIMS_TABLE',
+  'DATABRICKS_CLAIMS_ORGANIZATION_ID_COLUMN',
+  'DATABRICKS_CLAIMS_PRACTICE_ID_COLUMN',
+  'DATABRICKS_CLAIMS_PROVIDER_ID_COLUMN',
+  'DATABRICKS_CLAIMS_PATIENT_ID_COLUMN',
+  'DATABRICKS_CLAIMS_DATE_COLUMN',
+  'DATABRICKS_PROVIDERS_TABLE',
+  'DATABRICKS_PROVIDERS_ORGANIZATION_ID_COLUMN',
+  'DATABRICKS_PROVIDERS_PRACTICE_ID_COLUMN',
+  'DATABRICKS_PROVIDERS_PROVIDER_ID_COLUMN',
+  'DATABRICKS_PROVIDERS_PATIENT_ID_COLUMN',
+  'DATABRICKS_PATIENT_METRICS_TABLE',
+  'DATABRICKS_PATIENT_METRICS_ORGANIZATION_ID_COLUMN',
+  'DATABRICKS_PATIENT_METRICS_PRACTICE_ID_COLUMN',
+  'DATABRICKS_PATIENT_METRICS_PROVIDER_ID_COLUMN',
+  'DATABRICKS_PATIENT_METRICS_PATIENT_ID_COLUMN',
+  'DATABRICKS_PATIENT_METRICS_DATE_COLUMN',
+] as const;
+
 const CACHE_DRIVERS = new Set(['memory', 'redis']);
 const EMAIL_DRIVERS = new Set(['disabled', 'resend']);
 
@@ -69,6 +89,10 @@ export function validateEnvironment(
 
   for (const key of OPTIONAL_INTEGER_KEYS) {
     validateOptionalNonNegativeInteger(config[key], key, errors);
+  }
+
+  for (const key of OPTIONAL_DATABRICKS_IDENTIFIER_KEYS) {
+    validateOptionalSqlIdentifierPath(config[key], key, errors);
   }
 
   if (errors.length > 0) {
@@ -128,5 +152,19 @@ function validateOptionalNonNegativeInteger(
 
   if (!/^\d+$/.test(value)) {
     errors.push(`${key} must be a non-negative integer`);
+  }
+}
+
+function validateOptionalSqlIdentifierPath(
+  value: string | undefined,
+  key: string,
+  errors: string[],
+) {
+  if (!hasValue(value)) {
+    return;
+  }
+
+  if (!/^[A-Za-z0-9_.$`]+$/.test(value)) {
+    errors.push(`${key} must be a safe SQL identifier or identifier path`);
   }
 }
