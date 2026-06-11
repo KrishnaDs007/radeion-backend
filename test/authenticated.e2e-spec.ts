@@ -2,7 +2,6 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { App } from 'supertest/types';
-import { AppModule } from '../src/app.module';
 import { AuthContextService } from '../src/auth/auth-context.service';
 import { PrismaService } from '../src/prisma/prisma.service';
 
@@ -13,7 +12,7 @@ type UsersResponseBody = {
 };
 
 describe('Authenticated routes (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: INestApplication<App> | undefined;
   const originalEnv = { ...process.env };
   const authContextService = {
     getUserContextFromToken: jest.fn(),
@@ -39,6 +38,10 @@ describe('Authenticated routes (e2e)', () => {
       EMAIL_DRIVER: 'disabled',
     });
 
+    const { AppModule } =
+      jest.requireActual<typeof import('../src/app.module')>(
+        '../src/app.module',
+      );
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
@@ -54,7 +57,7 @@ describe('Authenticated routes (e2e)', () => {
 
   afterAll(async () => {
     process.env = originalEnv;
-    await app.close();
+    await app?.close();
   });
 
   beforeEach(() => {
@@ -74,8 +77,16 @@ describe('Authenticated routes (e2e)', () => {
     ]);
   });
 
+  function getHttpServer() {
+    if (!app) {
+      throw new Error('Test app was not initialized');
+    }
+
+    return app.getHttpServer();
+  }
+
   it('rejects protected routes without a bearer token', async () => {
-    await request(app.getHttpServer()).get('/users').expect(401);
+    await request(getHttpServer()).get('/users').expect(401);
   });
 
   it('allows a developer user to read protected users', async () => {
@@ -92,7 +103,7 @@ describe('Authenticated routes (e2e)', () => {
       ],
     });
 
-    const response = await request(app.getHttpServer())
+    const response = await request(getHttpServer())
       .get('/users')
       .set('Authorization', 'Bearer developer-token')
       .expect(200);
@@ -129,7 +140,7 @@ describe('Authenticated routes (e2e)', () => {
       ],
     });
 
-    await request(app.getHttpServer())
+    await request(getHttpServer())
       .get('/roles')
       .set('Authorization', 'Bearer provider-token')
       .expect(403);

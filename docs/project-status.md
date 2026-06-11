@@ -146,6 +146,7 @@ Data and integrations:
 
 Quality and operations:
 
+- Fix CI authenticated e2e setup so dummy environment values load before `AppModule`.
 - Push current local commits and create a GitHub PR when ready.
 
 Future route depth:
