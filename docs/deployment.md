@@ -106,6 +106,33 @@ docker run --env-file .env -p 3000:3000 radeion-backend
 
 When using the single container command above, set `CACHE_DRIVER=memory` unless you also provide a reachable Redis URL.
 
+## Production Docker Compose
+
+`docker-compose.prod.yml` is a small production-oriented Compose file for a Docker host or VM.
+
+It expects a production env file named:
+
+```text
+.env.production
+```
+
+That file should contain the same runtime keys described above. Do not commit it.
+
+Build or pull the image, then run:
+
+```powershell
+docker compose -f docker-compose.prod.yml up -d
+```
+
+To choose a specific image tag:
+
+```powershell
+$env:RADEION_API_IMAGE="radeion-backend:latest"
+docker compose -f docker-compose.prod.yml up -d
+```
+
+The production Compose file includes a container health check against `/health`. It does not start Redis for you; use a managed Redis URL or add a Redis service only in the deployment environment where that is intended.
+
 ## Cloud Deployment Notes
 
 For a first cloud deployment, the backend can run on any Node or container platform that supports environment variables.

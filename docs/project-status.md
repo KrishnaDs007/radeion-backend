@@ -74,6 +74,7 @@ Quality and operations:
 - CI Prisma generate/validate now uses dummy database URLs instead of requiring real secrets.
 - Dockerfile, Docker Compose Redis runtime, and deployment guide added.
 - Runtime environment validation added for required secrets, cache mode, URLs, and numeric config.
+- Production Docker Compose deployment config added with API health check.
 
 ## Current API Shape
 
@@ -140,7 +141,6 @@ Data and integrations:
 Quality and operations:
 
 - Add authenticated e2e tests after a stable test-auth strategy is chosen.
-- Add deployment configuration.
 - Push current local commits and create a GitHub PR when ready.
 
 Future route depth:
