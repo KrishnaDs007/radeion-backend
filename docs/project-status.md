@@ -34,6 +34,7 @@ Access and onboarding:
 - Protected user and organization approval/rejection APIs added.
 - Protected invite list, create, and revoke APIs added.
 - Public invite accept API added.
+- Optional Resend invite email delivery added with local disabled mode.
 
 Admin management:
 
@@ -43,6 +44,7 @@ Admin management:
 - Protected nested organization practice and user read APIs added.
 - Protected practice and provider reference APIs added.
 - Protected care coordinator assignment list, create, and revoke APIs added.
+- Protected nested care coordinator assignment reads added for practices and providers.
 - Protected role, user, and organization read endpoints added.
 
 Data and integrations:
@@ -110,6 +112,8 @@ Protected:
 - `PATCH /organizations/:id`
 - `PATCH /organizations/:id/status`
 - `GET /care-coordinators/assignments`
+- `GET /care-coordinators/practices/:practiceId/assignments`
+- `GET /care-coordinators/providers/:providerId/assignments`
 - `POST /care-coordinators/assignments`
 - `POST /care-coordinators/assignments/:id/revoke`
 - `GET /reference/practices`
@@ -128,7 +132,6 @@ Auth and onboarding:
 
 - Build frontend signup stepper and failed/declined retry UX.
 - Add frontend password setup/recovery flow for invites and Supabase recovery.
-- Add email delivery integration for invites.
 
 Data and integrations:
 
@@ -142,4 +145,4 @@ Quality and operations:
 
 Future route depth:
 
-- Add nested practice/provider-specific care coordinator views.
+- Add deeper practice/provider child views as frontend workflows require them.

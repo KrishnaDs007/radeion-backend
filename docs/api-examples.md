@@ -106,7 +106,7 @@ curl -X POST "$API_BASE_URL/invites" \
   }'
 ```
 
-The response returns `inviteToken` once. After the invitee signs in or sets a password through Supabase, accept the invite:
+The response returns `inviteToken` once and includes `emailDelivery.status`. Local development skips email delivery unless `EMAIL_DRIVER=resend` is configured. After the invitee signs in or sets a password through Supabase, accept the invite:
 
 ```bash
 curl -X POST "$API_BASE_URL/invites/accept" \
@@ -254,6 +254,16 @@ curl -X POST "$API_BASE_URL/care-coordinators/assignments" \
     "practiceId": "00000000-0000-0000-0000-000000000000",
     "providerId": "00000000-0000-0000-0000-000000000000"
   }'
+```
+
+List assignments for one practice or provider:
+
+```bash
+curl "$API_BASE_URL/care-coordinators/practices/<practiceId>/assignments" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+curl "$API_BASE_URL/care-coordinators/providers/<providerId>/assignments" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 
 ## Databricks Data Reads

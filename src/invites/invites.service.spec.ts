@@ -16,6 +16,12 @@ describe('InvitesService', () => {
     const auditService = {
       record: jest.fn().mockResolvedValue(undefined),
     };
+    const emailService = {
+      sendInviteEmail: jest.fn().mockResolvedValue({
+        status: 'skipped',
+        reason: 'EMAIL_DRIVER is disabled',
+      }),
+    };
     const supabaseService = {
       getUserFromToken: jest.fn(),
     };
@@ -26,9 +32,12 @@ describe('InvitesService', () => {
       auditService as unknown as ConstructorParameters<
         typeof InvitesService
       >[1],
-      supabaseService as unknown as ConstructorParameters<
+      emailService as unknown as ConstructorParameters<
         typeof InvitesService
       >[2],
+      supabaseService as unknown as ConstructorParameters<
+        typeof InvitesService
+      >[3],
     );
 
     const result = await service.createInvite(
@@ -50,8 +59,18 @@ describe('InvitesService', () => {
     expect(result).toEqual({
       ...invite,
       inviteToken: expect.any(String) as string,
+      emailDelivery: {
+        status: 'skipped',
+        reason: 'EMAIL_DRIVER is disabled',
+      },
     });
     expect(prismaService.invite.create).toHaveBeenCalled();
+    expect(emailService.sendInviteEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: 'user@example.com',
+        inviteToken: expect.any(String) as string,
+      }),
+    );
     expect(auditService.record).toHaveBeenCalledWith(
       expect.objectContaining({
         action: 'invite.created',
@@ -112,6 +131,9 @@ describe('InvitesService', () => {
     const auditService = {
       record: jest.fn().mockResolvedValue(undefined),
     };
+    const emailService = {
+      sendInviteEmail: jest.fn(),
+    };
     const supabaseService = {
       getUserFromToken: jest.fn().mockResolvedValue({
         id: 'auth-user-1',
@@ -125,9 +147,12 @@ describe('InvitesService', () => {
       auditService as unknown as ConstructorParameters<
         typeof InvitesService
       >[1],
-      supabaseService as unknown as ConstructorParameters<
+      emailService as unknown as ConstructorParameters<
         typeof InvitesService
       >[2],
+      supabaseService as unknown as ConstructorParameters<
+        typeof InvitesService
+      >[3],
     );
 
     await expect(

@@ -106,6 +106,118 @@ describe('CareCoordinatorsService', () => {
     );
   });
 
+  it('lists practice-specific assignments after checking scoped practice access', async () => {
+    const prismaService = {
+      practice: {
+        findFirst: jest.fn().mockResolvedValue({ id: 'practice-1' }),
+      },
+      careCoordinatorAssignment: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+    };
+    const service = new CareCoordinatorsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof CareCoordinatorsService
+      >[0],
+      {} as ConstructorParameters<typeof CareCoordinatorsService>[1],
+    );
+
+    await service.listPracticeAssignments('practice-1', {
+      ...actor,
+      roles: [
+        {
+          name: 'clientAdmin',
+          scopeType: 'organization',
+          organizationId: 'organization-1',
+        },
+      ],
+    });
+
+    expect(prismaService.practice.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          AND: [
+            { id: 'practice-1' },
+            {
+              organizationId: {
+                in: ['organization-1'],
+              },
+            },
+          ],
+        },
+      }),
+    );
+    expect(
+      prismaService.careCoordinatorAssignment.findMany,
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          revokedAt: null,
+          practiceId: 'practice-1',
+          organizationId: {
+            in: ['organization-1'],
+          },
+        },
+      }),
+    );
+  });
+
+  it('lists provider-specific assignments after checking scoped provider access', async () => {
+    const prismaService = {
+      provider: {
+        findFirst: jest.fn().mockResolvedValue({ id: 'provider-1' }),
+      },
+      careCoordinatorAssignment: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+    };
+    const service = new CareCoordinatorsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof CareCoordinatorsService
+      >[0],
+      {} as ConstructorParameters<typeof CareCoordinatorsService>[1],
+    );
+
+    await service.listProviderAssignments('provider-1', {
+      ...actor,
+      roles: [
+        {
+          name: 'clientAdmin',
+          scopeType: 'organization',
+          organizationId: 'organization-1',
+        },
+      ],
+    });
+
+    expect(prismaService.provider.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          AND: [
+            { id: 'provider-1' },
+            {
+              organizationId: {
+                in: ['organization-1'],
+              },
+            },
+          ],
+        },
+      }),
+    );
+    expect(
+      prismaService.careCoordinatorAssignment.findMany,
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          revokedAt: null,
+          providerId: 'provider-1',
+          organizationId: {
+            in: ['organization-1'],
+          },
+        },
+      }),
+    );
+  });
+
   it('creates an assignment and records an audit log', async () => {
     const prismaService = basePrismaService();
     const auditService = {

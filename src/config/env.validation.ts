@@ -19,6 +19,7 @@ const OPTIONAL_INTEGER_KEYS = [
 ] as const;
 
 const CACHE_DRIVERS = new Set(['memory', 'redis']);
+const EMAIL_DRIVERS = new Set(['disabled', 'resend']);
 
 export function validateEnvironment(
   config: EnvironmentVariables,
@@ -47,6 +48,24 @@ export function validateEnvironment(
       validateOptionalUrl(config.REDIS_URL, 'REDIS_URL', errors);
     }
   }
+
+  const emailDriver = config.EMAIL_DRIVER ?? 'disabled';
+  if (!EMAIL_DRIVERS.has(emailDriver)) {
+    errors.push('EMAIL_DRIVER must be disabled or resend');
+  }
+
+  if (emailDriver === 'resend') {
+    if (!hasValue(config.RESEND_API_KEY)) {
+      errors.push('RESEND_API_KEY is required when EMAIL_DRIVER=resend');
+    }
+
+    if (!hasValue(config.EMAIL_FROM)) {
+      errors.push('EMAIL_FROM is required when EMAIL_DRIVER=resend');
+    }
+  }
+
+  validateOptionalUrl(config.RESEND_API_URL, 'RESEND_API_URL', errors);
+  validateOptionalUrl(config.INVITE_ACCEPT_URL, 'INVITE_ACCEPT_URL', errors);
 
   for (const key of OPTIONAL_INTEGER_KEYS) {
     validateOptionalNonNegativeInteger(config[key], key, errors);

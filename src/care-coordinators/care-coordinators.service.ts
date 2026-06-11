@@ -34,6 +34,38 @@ export class CareCoordinatorsService {
     });
   }
 
+  async listPracticeAssignments(practiceId: string, actor: UserContext) {
+    await this.ensurePracticeReadable(practiceId, actor);
+
+    return this.prismaService.careCoordinatorAssignment.findMany({
+      where: {
+        revokedAt: null,
+        practiceId,
+        ...this.organizationScopedWhere(actor),
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: this.assignmentSelect(),
+    });
+  }
+
+  async listProviderAssignments(providerId: string, actor: UserContext) {
+    await this.ensureProviderReadable(providerId, actor);
+
+    return this.prismaService.careCoordinatorAssignment.findMany({
+      where: {
+        revokedAt: null,
+        providerId,
+        ...this.organizationScopedWhere(actor),
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: this.assignmentSelect(),
+    });
+  }
+
   async createAssignment(
     input: CreateCareCoordinatorAssignmentDto,
     actor: UserContext,
@@ -220,6 +252,36 @@ export class CareCoordinatorsService {
       throw new BadRequestException(
         'Practice does not belong to the organization',
       );
+    }
+  }
+
+  private async ensurePracticeReadable(practiceId: string, actor: UserContext) {
+    const practice = await this.prismaService.practice.findFirst({
+      where: {
+        AND: [{ id: practiceId }, this.organizationScopedWhere(actor)],
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!practice) {
+      throw new NotFoundException('Practice not found');
+    }
+  }
+
+  private async ensureProviderReadable(providerId: string, actor: UserContext) {
+    const provider = await this.prismaService.provider.findFirst({
+      where: {
+        AND: [{ id: providerId }, this.organizationScopedWhere(actor)],
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!provider) {
+      throw new NotFoundException('Provider not found');
     }
   }
 

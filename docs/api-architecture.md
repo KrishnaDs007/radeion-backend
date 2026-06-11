@@ -45,6 +45,8 @@ Current route groups:
 - `PATCH /organizations/:id` protected organization update
 - `PATCH /organizations/:id/status` protected organization status update
 - `GET /care-coordinators/assignments` protected active care coordinator assignment list
+- `GET /care-coordinators/practices/:practiceId/assignments` protected practice-specific care coordinator assignment list
+- `GET /care-coordinators/providers/:providerId/assignments` protected provider-specific care coordinator assignment list
 - `POST /care-coordinators/assignments` protected care coordinator assignment creation
 - `POST /care-coordinators/assignments/:id/revoke` protected care coordinator assignment revocation
 - `GET /claims` protected Databricks read API
@@ -83,7 +85,17 @@ The audit module is service-only. It is now called by approval, invite, practice
 
 ## Invite Acceptance Flow
 
-Invite creation stores only a hashed invite token. The raw `inviteToken` is returned once from `POST /invites` so the UI or email layer can send it to the invited user.
+Invite creation stores only a hashed invite token. The raw `inviteToken` is returned once from `POST /invites` so the UI or a fallback admin workflow can send it to the invited user.
+
+When `EMAIL_DRIVER=resend`, the API also attempts to deliver the invite email through the configured Resend endpoint. Local development defaults to `EMAIL_DRIVER=disabled`, which skips delivery and still returns the token. The invite creation response includes `emailDelivery.status` as `sent`, `skipped`, or `failed`.
+
+Invite email delivery is configured with:
+
+- `EMAIL_DRIVER`
+- `EMAIL_FROM`
+- `RESEND_API_KEY`
+- `RESEND_API_URL`
+- `INVITE_ACCEPT_URL`
 
 Acceptance uses:
 

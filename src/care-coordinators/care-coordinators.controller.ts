@@ -20,6 +20,34 @@ export class CareCoordinatorsController {
     };
   }
 
+  @RequirePermission('organization.read')
+  @Get('practices/:practiceId/assignments')
+  async listPracticeAssignments(
+    @Param('practiceId') practiceId: string,
+    @CurrentUser() user: UserContext,
+  ) {
+    return {
+      data: await this.careCoordinatorsService.listPracticeAssignments(
+        practiceId,
+        user,
+      ),
+    };
+  }
+
+  @RequirePermission('organization.read')
+  @Get('providers/:providerId/assignments')
+  async listProviderAssignments(
+    @Param('providerId') providerId: string,
+    @CurrentUser() user: UserContext,
+  ) {
+    return {
+      data: await this.careCoordinatorsService.listProviderAssignments(
+        providerId,
+        user,
+      ),
+    };
+  }
+
   @RequirePermission('organization.update')
   @Post('assignments')
   async createAssignment(

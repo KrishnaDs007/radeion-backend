@@ -11,6 +11,7 @@ describe('validateEnvironment', () => {
     DATABRICKS_TOKEN: 'token',
     DATABRICKS_HTTP_PATH: '/sql/1.0/warehouses/warehouse-id',
     CACHE_DRIVER: 'memory',
+    EMAIL_DRIVER: 'disabled',
     PORT: '3000',
     DATABRICKS_POLL_MAX_ATTEMPTS: '10',
     DATABRICKS_POLL_INTERVAL_MS: '500',
@@ -36,6 +37,23 @@ describe('validateEnvironment', () => {
     );
   });
 
+  it('accepts Resend email delivery when required values are present', () => {
+    expect(
+      validateEnvironment({
+        ...validEnvironment,
+        EMAIL_DRIVER: 'resend',
+        RESEND_API_KEY: 'resend-key',
+        EMAIL_FROM: 'Radeion <no-reply@example.com>',
+        INVITE_ACCEPT_URL: 'https://app.example.com/invites/accept',
+      }),
+    ).toEqual(
+      expect.objectContaining({
+        EMAIL_DRIVER: 'resend',
+        RESEND_API_KEY: 'resend-key',
+      }),
+    );
+  });
+
   it('rejects missing required keys', () => {
     expect(() =>
       validateEnvironment({
@@ -52,6 +70,15 @@ describe('validateEnvironment', () => {
         CACHE_DRIVER: 'redis',
       }),
     ).toThrow('REDIS_URL is required when CACHE_DRIVER=redis');
+  });
+
+  it('rejects Resend without required delivery settings', () => {
+    expect(() =>
+      validateEnvironment({
+        ...validEnvironment,
+        EMAIL_DRIVER: 'resend',
+      }),
+    ).toThrow('RESEND_API_KEY is required when EMAIL_DRIVER=resend');
   });
 
   it('rejects invalid numeric values', () => {

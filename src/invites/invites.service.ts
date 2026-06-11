@@ -14,6 +14,7 @@ import {
 import { createHash, randomBytes } from 'crypto';
 import { UserContext } from '../auth/auth.types';
 import { AuditService } from '../audit/audit.service';
+import { EmailService } from '../email/email.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { AcceptInviteDto } from './dto/accept-invite.dto';
@@ -44,6 +45,7 @@ export class InvitesService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly auditService: AuditService,
+    private readonly emailService: EmailService,
     private readonly supabaseService: SupabaseService,
   ) {}
 
@@ -74,9 +76,16 @@ export class InvitesService {
       },
     });
 
+    const emailDelivery = await this.emailService.sendInviteEmail({
+      to: invite.email,
+      inviteToken,
+      expiresAt: invite.expiresAt,
+    });
+
     return {
       ...invite,
       inviteToken,
+      emailDelivery,
     };
   }
 
