@@ -1,0 +1,507 @@
+{
+  "info": {
+    "name": "Radeion Backend API",
+    "description": "Postman collection for local Radeion backend development. Set baseUrl and supabaseAccessToken collection variables before running protected requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "supabaseAccessToken",
+      "value": "replace-with-supabase-access-token"
+    },
+    {
+      "key": "organizationId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "profileId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "practiceId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "providerId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health"
+          }
+        },
+        {
+          "name": "Config Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health/config"
+          }
+        },
+        {
+          "name": "Database Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health/database"
+          }
+        },
+        {
+          "name": "Auth Methods",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/auth/methods"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Access Requests",
+      "item": [
+        {
+          "name": "Create Organization Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"organizationName\": \"Example Health ACO\",\n  \"requestedByEmail\": \"admin@example.org\",\n  \"type\": \"aco\",\n  \"website\": \"https://example.org\",\n  \"contactEmail\": \"admin@example.org\",\n  \"contactNumber\": \"+15555550100\",\n  \"address\": \"100 Example Street\",\n  \"companyBio\": \"Example healthcare organization\",\n  \"startedYear\": 2015\n}"
+            },
+            "url": "{{baseUrl}}/access-requests/organizations"
+          }
+        },
+        {
+          "name": "Create User Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"provider@example.org\",\n  \"organizationId\": \"{{organizationId}}\",\n  \"requestedRoles\": [\"provider\"],\n  \"requestedScope\": {\n    \"type\": \"organization\",\n    \"organizationId\": \"{{organizationId}}\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/access-requests/users"
+          }
+        },
+        {
+          "name": "Approve Organization Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Example Health ACO\",\n  \"type\": \"aco\",\n  \"contactEmail\": \"admin@example.org\"\n}"
+            },
+            "url": "{{baseUrl}}/access-requests/organizations/{{organizationRequestId}}/approve"
+          }
+        },
+        {
+          "name": "Reject User Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reviewNotes\": \"Organization could not be verified\"\n}"
+            },
+            "url": "{{baseUrl}}/access-requests/users/{{userRequestId}}/reject"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invites",
+      "item": [
+        {
+          "name": "List Invites",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/invites"
+          }
+        },
+        {
+          "name": "Create Invite",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"care-coordinator@example.org\",\n  \"organizationId\": \"{{organizationId}}\",\n  \"assignedRoles\": [\"careCoordinator\"],\n  \"assignedScope\": {\n    \"type\": \"organization\",\n    \"organizationId\": \"{{organizationId}}\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/invites"
+          }
+        },
+        {
+          "name": "Accept Invite",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inviteToken\": \"replace-with-invite-token\",\n  \"accessToken\": \"replace-with-invitee-supabase-access-token\"\n}"
+            },
+            "url": "{{baseUrl}}/invites/accept"
+          }
+        },
+        {
+          "name": "Revoke Invite",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/invites/{{inviteId}}/revoke"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Organizations",
+      "item": [
+        {
+          "name": "List Organizations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/organizations"
+          }
+        },
+        {
+          "name": "Get Organization",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/organizations/{{organizationId}}"
+          }
+        },
+        {
+          "name": "Create Organization",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Example Client\",\n  \"type\": \"client\",\n  \"website\": \"https://client.example.org\",\n  \"contactEmail\": \"ops@client.example.org\",\n  \"startedYear\": 2020\n}"
+            },
+            "url": "{{baseUrl}}/organizations"
+          }
+        },
+        {
+          "name": "Update Organization Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"disabled\",\n  \"reason\": \"Contract ended\"\n}"
+            },
+            "url": "{{baseUrl}}/organizations/{{organizationId}}/status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users And Roles",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/users/{{profileId}}"
+          }
+        },
+        {
+          "name": "Disable User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"No longer with client\"\n}"
+            },
+            "url": "{{baseUrl}}/users/{{profileId}}/disable"
+          }
+        },
+        {
+          "name": "List Roles",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/roles"
+          }
+        },
+        {
+          "name": "Assign Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"profileId\": \"{{profileId}}\",\n  \"roleName\": \"provider\",\n  \"scopeType\": \"organization\",\n  \"organizationId\": \"{{organizationId}}\",\n  \"reason\": \"Provider onboarding\"\n}"
+            },
+            "url": "{{baseUrl}}/roles/assignments"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reference Data",
+      "item": [
+        {
+          "name": "Create Practice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"organizationId\": \"{{organizationId}}\",\n  \"name\": \"Example Practice\",\n  \"source\": \"manual\"\n}"
+            },
+            "url": "{{baseUrl}}/reference/practices"
+          }
+        },
+        {
+          "name": "Create Provider",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"organizationId\": \"{{organizationId}}\",\n  \"practiceId\": \"{{practiceId}}\",\n  \"name\": \"Dr. Example\",\n  \"npi\": \"1234567890\",\n  \"source\": \"manual\"\n}"
+            },
+            "url": "{{baseUrl}}/reference/providers"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Care Coordinators",
+      "item": [
+        {
+          "name": "List Assignments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/care-coordinators/assignments"
+          }
+        },
+        {
+          "name": "Create Assignment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"profileId\": \"{{profileId}}\",\n  \"organizationId\": \"{{organizationId}}\",\n  \"practiceId\": \"{{practiceId}}\",\n  \"providerId\": \"{{providerId}}\"\n}"
+            },
+            "url": "{{baseUrl}}/care-coordinators/assignments"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Databricks Reads",
+      "item": [
+        {
+          "name": "Claims",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/claims?organizationId={{organizationId}}&limit=50"
+          }
+        },
+        {
+          "name": "Providers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/providers?practiceId={{practiceId}}&limit=50"
+          }
+        },
+        {
+          "name": "Patient Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/patient-metrics?providerId={{providerId}}&fromDate=2026-01-01&toDate=2026-01-31"
+          }
+        }
+      ]
+    }
+  ]
+}

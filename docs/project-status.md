@@ -1,8 +1,10 @@
 # Project Status
 
-Last updated: 2026-06-08
+Last updated: 2026-06-11
 
 ## Completed
+
+Foundation:
 
 - Public GitHub repository connected locally.
 - Node.js project initialized.
@@ -14,32 +16,51 @@ Last updated: 2026-06-08
 - Initial roles seeded into Supabase.
 - First developer bootstrap script added.
 - First verified developer user created and bootstrapped.
+- Schema, API, Supabase setup, and request-example docs added.
+
+Auth and ACL:
+
 - Supabase Auth helper service added.
-- Prisma service/module added.
 - Global request context middleware added.
 - Global Supabase bearer-token auth guard added.
 - Global ACL guard added.
 - Central ACL service added with scoped-access rules.
 - Database-backed auth context loading added.
-- Public health endpoints added.
-- Public database health endpoint added.
+- Scoped admin read filters added for top-level user, organization, reference, and assignment reads.
+
+Access and onboarding:
+
 - Public user and organization access request APIs added.
-- Protected user and organization approval APIs added.
+- Protected user and organization approval/rejection APIs added.
 - Protected invite list, create, and revoke APIs added.
 - Public invite accept API added.
-- Protected practice and provider reference APIs added.
+
+Admin management:
+
 - Protected role assignment list, create, and revoke APIs added.
 - Protected user detail, disable, and reactivate APIs added.
 - Protected organization detail, create, update, and status APIs added.
+- Protected practice and provider reference APIs added.
 - Protected care coordinator assignment list, create, and revoke APIs added.
 - Protected role, user, and organization read endpoints added.
+
+Data and integrations:
+
 - Databricks service foundation added.
 - Scoped Databricks query builder added for first read APIs.
+- Databricks async statement polling added with safe limits.
+- Databricks optional result chunk fetching added at service level.
 - In-memory cache foundation added.
 - Redis cache driver added behind the cache abstraction.
 - Databricks statement-result cache added with 60 second TTL.
 - Audit log service foundation added.
-- Schema, API, and Supabase setup docs added.
+- Audit calls added for current admin mutations.
+
+Developer experience:
+
+- API request examples added in `docs/api-examples.md`.
+- Postman collection added in `docs/postman/radeion-backend.postman_collection.json`.
+- Local learning guide created in gitignored `learning-notes/`.
 
 ## Current API Shape
 
@@ -49,9 +70,19 @@ Public:
 - `GET /health`
 - `GET /health/config`
 - `GET /auth/methods`
+- `POST /access-requests/users`
+- `POST /access-requests/organizations`
+- `POST /invites/accept`
 
 Protected:
 
+- `POST /access-requests/users/:id/approve`
+- `POST /access-requests/users/:id/reject`
+- `POST /access-requests/organizations/:id/approve`
+- `POST /access-requests/organizations/:id/reject`
+- `GET /invites`
+- `POST /invites`
+- `POST /invites/:id/revoke`
 - `GET /roles`
 - `GET /roles/assignments`
 - `POST /roles/assignments`
@@ -78,45 +109,27 @@ Protected:
 - `GET /providers`
 - `GET /patient-metrics`
 
-## Pending
-
-Current focus:
-
-- Add scoped top-level admin reads so non-platform admins see only their organization data. Done for user and organization reads.
+## To Do
 
 Auth and onboarding:
 
-- Signup request APIs. Done for initial request capture; pending frontend stepper and failed/declined retry UX.
-- Approval APIs. Done for initial organization/user approve and reject flow.
-- Invite APIs. Done for list/create/revoke and backend accept flow; pending frontend password setup/email delivery.
-- Supabase password reset/recovery UX. Pending frontend integration.
-
-Admin management:
-
-- Organization creation and approval APIs. Done for approval flow and direct admin create/update/status.
-- Direct role assignment/revocation APIs. Done for list/create/revoke.
-- User lifecycle admin APIs. Done for detail/disable/reactivate.
-- Care coordinator assignment APIs. Done for list/create/revoke.
-- Practice and provider admin APIs. Done for initial list/create/update.
-- Scoped admin read filters. Done for top-level user, organization, reference, and assignment reads.
+- Build frontend signup stepper and failed/declined retry UX.
+- Add frontend password setup/recovery flow for invites and Supabase recovery.
+- Add email delivery integration for invites.
 
 Data and integrations:
 
-- Scoped Databricks query builders for `/claims`, `/providers`, and `/patient-metrics`. Done for initial standard columns and env-configured tables.
-- Real Databricks table/column mapping from production schemas. Pending.
-- Databricks async statement polling. Done with safe polling limits.
-- Databricks result chunk fetching. Done as an optional service capability; pending API-level pagination UX.
-- Redis driver behind the existing cache service. Done; pending runtime Redis provisioning/deployment config.
+- Add real Databricks table/column mapping from production schemas.
+- Add API-level pagination UX for Databricks result chunks.
+- Add runtime Redis provisioning/deployment config.
 
 Quality and operations:
 
-- Audit calls inside admin mutation APIs. Done for current admin mutations; continue adding with new mutations.
-- E2E tests after the migration and seed are stable. Pending.
-- API request examples. Done in `docs/api-examples.md`; Postman collection pending.
-- Deployment configuration and CI. Pending.
-- GitHub push/PR workflow for current local commits. Pending when ready.
+- Add e2e tests after migration and seed flow is stable.
+- Add deployment configuration and CI.
+- Push current local commits and create a GitHub PR when ready.
 
 Future route depth:
 
-- Nested organization routes such as `/organizations/:id/practices` and `/organizations/:id/users`. Pending after top-level APIs are stable.
-- Nested practice/provider-specific care coordinator views. Pending after top-level assignment APIs are stable.
+- Add nested organization routes such as `/organizations/:id/practices` and `/organizations/:id/users`.
+- Add nested practice/provider-specific care coordinator views.
