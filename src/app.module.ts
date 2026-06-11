@@ -18,11 +18,13 @@ import { ReferenceDataModule } from './reference-data/reference-data.module';
 import { RolesModule } from './roles/roles.module';
 import { SupabaseModule } from './supabase/supabase.module';
 import { UsersModule } from './users/users.module';
+import { validateEnvironment } from './config/env.validation';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validate: validateEnvironment,
     }),
     PrismaModule,
     SupabaseModule,

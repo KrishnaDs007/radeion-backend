@@ -39,6 +39,20 @@ Optional or environment-specific:
 - `CACHE_DRIVER`
 - `REDIS_URL`
 
+## Environment Validation
+
+The app validates important environment values during NestJS boot through `src/config/env.validation.ts`.
+
+Validation checks:
+
+- required Supabase, database, and Databricks keys are present
+- `SUPABASE_URL`, `DATABASE_URL`, `DIRECT_URL`, and `REDIS_URL` have valid URL shapes when set
+- `CACHE_DRIVER` is either `memory` or `redis`
+- `REDIS_URL` is present when `CACHE_DRIVER=redis`
+- `PORT` and Databricks numeric tuning values are non-negative integers when set
+
+This does not test live connectivity. Use `/health/database` for database connectivity and Databricks read routes for Databricks execution checks.
+
 ## Local Docker With Redis
 
 Create `.env` from `.env.example`, then fill in Supabase and Databricks values.
@@ -115,4 +129,3 @@ GET /health/database
 ```
 
 `/health/config` reports whether required secrets are present without exposing the secret values.
-

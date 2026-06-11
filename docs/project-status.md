@@ -70,6 +70,7 @@ Quality and operations:
 - CI action pins updated to Node 24-compatible GitHub action runtimes.
 - CI Prisma generate/validate now uses dummy database URLs instead of requiring real secrets.
 - Dockerfile, Docker Compose Redis runtime, and deployment guide added.
+- Runtime environment validation added for required secrets, cache mode, URLs, and numeric config.
 
 ## Current API Shape
 
