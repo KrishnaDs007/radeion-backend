@@ -44,5 +44,8 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: E2E Test
+        run: npm run test:e2e
+
       - name: Audit dependencies
         run: npm audit --audit-level=moderate

@@ -65,6 +65,7 @@ Developer experience:
 Quality and operations:
 
 - GitHub Actions CI added for Prisma validation, typecheck, lint, build, tests, and dependency audit.
+- Public-route e2e smoke tests added and wired into CI.
 
 ## Current API Shape
 
@@ -129,7 +130,7 @@ Data and integrations:
 
 Quality and operations:
 
-- Add e2e tests after migration and seed flow is stable.
+- Add authenticated e2e tests after a stable test-auth strategy is chosen.
 - Add deployment configuration.
 - Push current local commits and create a GitHub PR when ready.
 
