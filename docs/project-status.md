@@ -68,6 +68,7 @@ Quality and operations:
 - GitHub Actions CI added for Prisma validation, typecheck, lint, build, tests, and dependency audit.
 - Public-route e2e smoke tests added and wired into CI.
 - CI action pins updated to Node 24-compatible GitHub action runtimes.
+- CI Prisma generate/validate now uses dummy database URLs instead of requiring real secrets.
 - Dockerfile, Docker Compose Redis runtime, and deployment guide added.
 
 ## Current API Shape
