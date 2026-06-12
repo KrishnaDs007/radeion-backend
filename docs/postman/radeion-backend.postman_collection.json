@@ -463,6 +463,37 @@
       ]
     },
     {
+      "name": "Audit Logs",
+      "item": [
+        {
+          "name": "List Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/audit-logs?action=organization.created&limit=50"
+          }
+        },
+        {
+          "name": "List Organization Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/audit-logs?organizationId={{organizationId}}&limit=50"
+          }
+        }
+      ]
+    },
+    {
       "name": "Reference Data",
       "item": [
         {

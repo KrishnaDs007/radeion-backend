@@ -47,6 +47,7 @@ Admin management:
 - Protected care coordinator assignment list, create, and revoke APIs added.
 - Protected nested care coordinator assignment reads added for practices and providers.
 - Protected role, user, and organization read endpoints added.
+- Protected platform audit-log read endpoint added with filters and page metadata.
 
 Data and integrations:
 
@@ -114,6 +115,7 @@ Protected:
 - `GET /roles/assignments`
 - `POST /roles/assignments`
 - `POST /roles/assignments/:id/revoke`
+- `GET /audit-logs`
 - `GET /users`
 - `GET /users/:id`
 - `PATCH /users/:id/disable`
@@ -152,7 +154,6 @@ Auth and onboarding:
 
 Data and integrations:
 
-- Add admin audit-log read APIs with platform-only access.
 - Add saved data-query presets once frontend reporting workflows are known.
 - Fill production Databricks table/column environment values when final schemas are available.
 

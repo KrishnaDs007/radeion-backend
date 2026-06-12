@@ -78,4 +78,24 @@ describe('AclService', () => {
 
     expect(service.can(check)).toBe(false);
   });
+
+  it('denies audit reads to scoped non-platform users', () => {
+    const check: AclCheck = {
+      action: 'audit.read',
+      user: {
+        profileId: 'profile-1',
+        authUserId: 'auth-user-1',
+        status: 'ACTIVE',
+        roles: [
+          {
+            name: 'clientAdmin',
+            scopeType: 'organization',
+            organizationId: 'organization-1',
+          },
+        ],
+      },
+    };
+
+    expect(service.can(check)).toBe(false);
+  });
 });

@@ -36,6 +36,7 @@ Current route groups:
 - `GET /roles/assignments` protected active role assignment list
 - `POST /roles/assignments` protected role assignment creation
 - `POST /roles/assignments/:id/revoke` protected role assignment revocation
+- `GET /audit-logs` protected platform audit log list
 - `GET /users` protected user list
 - `GET /users/:id` protected user detail
 - `PATCH /users/:id/disable` protected user disable
@@ -88,7 +89,21 @@ Databricks statement execution now polls `PENDING` and `RUNNING` statements unti
 
 For non-platform roles, the data query service adds SQL filters from the authenticated user's role assignments before request filters are added. `developer` and `superAdmin` are platform roles and can query without role-scope SQL constraints.
 
-The audit module is service-only. It is now called by approval, invite, practice, provider, and Databricks read flows.
+The audit module records write/read events and exposes a platform-only list API at `GET /audit-logs`.
+
+Audit log reads support these optional query parameters:
+
+- `actorProfileId`
+- `action`
+- `targetType`
+- `targetId`
+- `organizationId`
+- `fromDate`
+- `toDate`
+- `limit`
+- `offset`
+
+The route requires `audit.read`. Because the ACL check has no resource scope, only platform roles such as `developer` and `superAdmin` can read it.
 
 Databricks read audit records use `action=data.read` and `targetType=dataQuery`. They store dataset/table/page metadata, sort metadata, and filter presence flags, but avoid raw SQL and sensitive filter values such as patient IDs.
 

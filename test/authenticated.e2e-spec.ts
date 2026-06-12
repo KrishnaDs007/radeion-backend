@@ -11,6 +11,15 @@ type UsersResponseBody = {
   }>;
 };
 
+type AuditLogsResponseBody = {
+  data: Array<{
+    action: string;
+  }>;
+  page: {
+    total: number;
+  };
+};
+
 describe('Authenticated routes (e2e)', () => {
   let app: INestApplication<App> | undefined;
   const originalEnv = { ...process.env };
@@ -20,6 +29,10 @@ describe('Authenticated routes (e2e)', () => {
   const prismaService = {
     profile: {
       findMany: jest.fn(),
+    },
+    auditLog: {
+      findMany: jest.fn(),
+      count: jest.fn(),
     },
     $queryRaw: jest.fn(),
   };
@@ -75,6 +88,13 @@ describe('Authenticated routes (e2e)', () => {
         roleAssignments: [],
       },
     ]);
+    prismaService.auditLog.findMany.mockResolvedValue([
+      {
+        id: 'audit-log-1',
+        action: 'organization.created',
+      },
+    ]);
+    prismaService.auditLog.count.mockResolvedValue(1);
   });
 
   function getHttpServer() {
@@ -125,6 +145,43 @@ describe('Authenticated routes (e2e)', () => {
     );
   });
 
+  it('allows a developer user to read audit logs', async () => {
+    authContextService.getUserContextFromToken.mockResolvedValue({
+      profileId: 'profile-1',
+      authUserId: 'auth-user-1',
+      email: 'developer@example.com',
+      status: 'ACTIVE',
+      roles: [
+        {
+          name: 'developer',
+          scopeType: 'global',
+        },
+      ],
+    });
+
+    const response = await request(getHttpServer())
+      .get('/audit-logs?action=organization.created&limit=25')
+      .set('Authorization', 'Bearer developer-token')
+      .expect(200);
+
+    expect(prismaService.auditLog.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          action: 'organization.created',
+        }) as Record<string, unknown>,
+        take: 25,
+      }),
+    );
+    const body = response.body as AuditLogsResponseBody;
+    expect(body.data).toHaveLength(1);
+    expect(body.data[0]).toEqual(
+      expect.objectContaining({
+        action: 'organization.created',
+      }),
+    );
+    expect(body.page.total).toBe(1);
+  });
+
   it('rejects authenticated users without the required permission', async () => {
     authContextService.getUserContextFromToken.mockResolvedValue({
       profileId: 'profile-2',
@@ -142,6 +199,11 @@ describe('Authenticated routes (e2e)', () => {
 
     await request(getHttpServer())
       .get('/roles')
+      .set('Authorization', 'Bearer provider-token')
+      .expect(403);
+
+    await request(getHttpServer())
+      .get('/audit-logs')
       .set('Authorization', 'Bearer provider-token')
       .expect(403);
   });

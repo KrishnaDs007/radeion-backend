@@ -248,7 +248,23 @@ curl -X PATCH "$API_BASE_URL/users/<profileId>/disable" \
   -H "Content-Type: application/json" \
   -d '{
     "reason": "No longer with client"
-  }'
+}'
+```
+
+## Audit Logs
+
+Platform admins can read audit logs with filters and page metadata:
+
+```bash
+curl "$API_BASE_URL/audit-logs?action=organization.created&limit=50" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
+Filter by actor, organization, target, or time range:
+
+```bash
+curl "$API_BASE_URL/audit-logs?organizationId=<organizationId>&fromDate=2026-06-01T00:00:00.000Z&toDate=2026-06-12T23:59:59.999Z" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 
 ## Reference Data

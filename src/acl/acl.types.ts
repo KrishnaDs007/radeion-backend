@@ -6,6 +6,7 @@ export type AclAction =
   | 'user.disable'
   | 'role.read'
   | 'role.assign'
+  | 'audit.read'
   | 'organization.read'
   | 'organization.create'
   | 'organization.approve'
