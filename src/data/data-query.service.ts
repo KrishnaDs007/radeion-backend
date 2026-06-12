@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuditService } from '../audit/audit.service';
 import type { UserContext } from '../auth/auth.types';
 import { DatabricksService } from '../databricks/databricks.service';
 import type { DatabricksStatementResponse } from '../databricks/databricks.types';
-import { DataQueryDto } from './dto/data-query.dto';
+import { DataQueryDto, type DataQuerySortField } from './dto/data-query.dto';
 
 type DataSet = 'claims' | 'providers' | 'patientMetrics';
 
@@ -194,6 +194,7 @@ export class DataQueryService {
         returnedRowCount: page.returnedRowCount,
         includedResultChunks: page.includedResultChunks,
         resultChunkCount: page.resultChunkCount,
+        sort: this.getSortMetadata(query),
         filters: this.getFilterPresence(query),
       },
     });
@@ -215,10 +216,11 @@ export class DataQueryService {
     ];
     const whereClause =
       conditions.length > 0 ? ` WHERE ${conditions.join(' AND ')}` : '';
+    const orderByClause = this.buildOrderByClause(query, config.columns);
     const limit = query.limit ?? 100;
     const offset = query.offset ?? 0;
 
-    return `SELECT * FROM ${config.tableName}${whereClause} LIMIT ${limit} OFFSET ${offset}`;
+    return `SELECT * FROM ${config.tableName}${whereClause}${orderByClause} LIMIT ${limit} OFFSET ${offset}`;
   }
 
   private resolveDataSetConfig(config: DataSetConfig): ResolvedDataSetConfig {
@@ -325,6 +327,37 @@ export class DataQueryService {
     return conditions;
   }
 
+  private buildOrderByClause(
+    query: DataQueryDto,
+    columns: ResolvedDataSetColumns,
+  ): string {
+    if (!query.sortBy) {
+      return '';
+    }
+
+    const columnName = this.getSortColumn(query.sortBy, columns);
+    const direction = (query.sortDirection ?? 'asc').toUpperCase();
+
+    return ` ORDER BY ${columnName} ${direction}`;
+  }
+
+  private getSortColumn(
+    sortBy: DataQuerySortField,
+    columns: ResolvedDataSetColumns,
+  ): string {
+    if (sortBy === 'date') {
+      if (!columns.date) {
+        throw new BadRequestException(
+          'Date sorting is not supported for this dataset',
+        );
+      }
+
+      return columns.date;
+    }
+
+    return columns[sortBy];
+  }
+
   private equalsCondition(columnName: string, value?: string): string | null {
     return value ? `${columnName} = '${this.escapeSqlLiteral(value)}'` : null;
   }
@@ -390,6 +423,13 @@ export class DataQueryService {
       patientId: Boolean(query.patientId),
       fromDate: Boolean(query.fromDate),
       toDate: Boolean(query.toDate),
+    };
+  }
+
+  private getSortMetadata(query: DataQueryDto) {
+    return {
+      sortBy: query.sortBy ?? null,
+      sortDirection: query.sortBy ? (query.sortDirection ?? 'asc') : null,
     };
   }
 }

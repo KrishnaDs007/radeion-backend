@@ -698,6 +698,19 @@
           }
         },
         {
+          "name": "Claims Sorted",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/claims?organizationId={{organizationId}}&sortBy=date&sortDirection=desc&limit=50"
+          }
+        },
+        {
           "name": "Providers",
           "request": {
             "method": "GET",

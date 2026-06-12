@@ -64,11 +64,13 @@ The Databricks module is consumed by the data controllers through a query servic
 - `patientId`
 - `fromDate`
 - `toDate`
+- `sortBy`
+- `sortDirection`
 - `limit`
 - `offset`
 - `includeResultChunks`
 
-The data routes return the raw Databricks statement payload under `data` and API pagination metadata under `page`. `limit` and `offset` control SQL-level pagination. `includeResultChunks=true` asks the backend to hydrate additional Databricks result chunks up to `DATABRICKS_MAX_RESULT_CHUNKS`; `page.hasMoreResultChunks` tells the client when Databricks still reported another internal chunk.
+The data routes return the raw Databricks statement payload under `data` and API pagination metadata under `page`. `limit` and `offset` control SQL-level pagination. `sortBy` accepts `organizationId`, `practiceId`, `providerId`, `patientId`, or `date`; `sortDirection` accepts `asc` or `desc` and defaults to `asc`. Sorting maps those public field names to configured, validated Databricks columns before adding `ORDER BY`. `includeResultChunks=true` asks the backend to hydrate additional Databricks result chunks up to `DATABRICKS_MAX_RESULT_CHUNKS`; `page.hasMoreResultChunks` tells the client when Databricks still reported another internal chunk.
 
 Databricks table names are configured with:
 
@@ -88,7 +90,7 @@ For non-platform roles, the data query service adds SQL filters from the authent
 
 The audit module is service-only. It is now called by approval, invite, practice, provider, and Databricks read flows.
 
-Databricks read audit records use `action=data.read` and `targetType=dataQuery`. They store dataset/table/page metadata and filter presence flags, but avoid raw SQL and sensitive filter values such as patient IDs.
+Databricks read audit records use `action=data.read` and `targetType=dataQuery`. They store dataset/table/page metadata, sort metadata, and filter presence flags, but avoid raw SQL and sensitive filter values such as patient IDs.
 
 ## Configuration Health
 

@@ -62,6 +62,7 @@ Data and integrations:
 - Audit log service foundation added.
 - Audit calls added for current admin mutations.
 - Audit calls added for successful Databricks read queries with non-sensitive metadata.
+- Databricks read sorting added with mapped `sortBy` and `sortDirection` query controls.
 
 Developer experience:
 
@@ -70,6 +71,7 @@ Developer experience:
 - API request examples added in `docs/api-examples.md`.
 - Postman collection added in `docs/postman/radeion-backend.postman_collection.json`.
 - Postman collection updated for nested reference, care coordinator, role assignment, and user lifecycle routes.
+- Postman Databricks examples updated with sorted read coverage.
 - Local learning guide created in gitignored `learning-notes/`.
 
 Quality and operations:
@@ -150,10 +152,13 @@ Auth and onboarding:
 
 Data and integrations:
 
+- Add admin audit-log read APIs with platform-only access.
+- Add saved data-query presets once frontend reporting workflows are known.
 - Fill production Databricks table/column environment values when final schemas are available.
 
 Quality and operations:
 
+- Add CI coverage for generated API documentation examples.
 - Push current local commits and create a GitHub PR when ready.
 
 Future route depth:

@@ -339,6 +339,13 @@ curl "$API_BASE_URL/patient-metrics?providerId=<providerId>&fromDate=2026-01-01&
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 
+Sort reads with public field names that map to configured Databricks columns:
+
+```bash
+curl "$API_BASE_URL/claims?organizationId=<organizationId>&sortBy=date&sortDirection=desc&limit=50" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
 Ask the backend to fetch Databricks result chunks and return page metadata:
 
 ```bash

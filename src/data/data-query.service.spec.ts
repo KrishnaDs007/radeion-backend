@@ -88,6 +88,62 @@ describe('DataQueryService', () => {
     );
   });
 
+  it('adds mapped order by clauses when sorting data reads', () => {
+    const user: UserContext = {
+      profileId: 'profile-1',
+      authUserId: 'auth-user-1',
+      status: 'ACTIVE',
+      roles: [{ name: 'developer', scopeType: 'global' }],
+    };
+
+    expect(
+      service.buildStatement(
+        {
+          tableName: 'claims',
+          columns: {
+            organizationId: 'org_id',
+            practiceId: 'practice_ref',
+            providerId: 'provider_ref',
+            patientId: 'member_ref',
+            date: 'service_dt',
+          },
+        },
+        {
+          sortBy: 'date',
+          sortDirection: 'desc',
+        },
+        user,
+      ),
+    ).toBe('SELECT * FROM claims ORDER BY service_dt DESC LIMIT 100 OFFSET 0');
+  });
+
+  it('rejects date sorting for datasets without date columns', () => {
+    const user: UserContext = {
+      profileId: 'profile-1',
+      authUserId: 'auth-user-1',
+      status: 'ACTIVE',
+      roles: [{ name: 'developer', scopeType: 'global' }],
+    };
+
+    expect(() =>
+      service.buildStatement(
+        {
+          tableName: 'providers',
+          columns: {
+            organizationId: 'organization_id',
+            practiceId: 'practice_id',
+            providerId: 'provider_id',
+            patientId: 'patient_id',
+          },
+        },
+        {
+          sortBy: 'date',
+        },
+        user,
+      ),
+    ).toThrow('Date sorting is not supported for this dataset');
+  });
+
   it('blocks users with no useful data scope', () => {
     const user: UserContext = {
       profileId: 'profile-1',
@@ -147,6 +203,8 @@ describe('DataQueryService', () => {
         organizationId: 'organization-1',
         patientId: 'patient-1',
         fromDate: '2026-01-01',
+        sortBy: 'date',
+        sortDirection: 'desc',
       },
       user,
     );
@@ -154,7 +212,7 @@ describe('DataQueryService', () => {
     expect(databricksService.executeStatement).toHaveBeenCalledWith(
       expect.objectContaining({
         statement:
-          "SELECT * FROM prod.catalog.claims_view WHERE org_ref = 'organization-1' AND member_ref = 'patient-1' AND service_dt >= DATE '2026-01-01' LIMIT 100 OFFSET 0",
+          "SELECT * FROM prod.catalog.claims_view WHERE org_ref = 'organization-1' AND member_ref = 'patient-1' AND service_dt >= DATE '2026-01-01' ORDER BY service_dt DESC LIMIT 100 OFFSET 0",
       }),
     );
     expect(auditService.record).toHaveBeenCalledWith(
@@ -167,6 +225,10 @@ describe('DataQueryService', () => {
         metadata: expect.objectContaining({
           dataSet: 'claims',
           tableName: 'prod.catalog.claims_view',
+          sort: {
+            sortBy: 'date',
+            sortDirection: 'desc',
+          },
           filters: {
             organizationId: true,
             practiceId: false,
