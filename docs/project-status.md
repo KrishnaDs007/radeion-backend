@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-06-11
+Last updated: 2026-06-12
 
 ## Completed
 
@@ -78,6 +78,7 @@ Quality and operations:
 - Dockerfile, Docker Compose Redis runtime, and deployment guide added.
 - Runtime environment validation added for required secrets, cache mode, URLs, and numeric config.
 - Production Docker Compose deployment config added with API health check.
+- CI authenticated e2e setup fixed so dummy environment values load before `AppModule`.
 
 ## Current API Shape
 
@@ -146,7 +147,6 @@ Data and integrations:
 
 Quality and operations:
 
-- Fix CI authenticated e2e setup so dummy environment values load before `AppModule`.
 - Push current local commits and create a GitHub PR when ready.
 
 Future route depth:
