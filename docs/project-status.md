@@ -79,6 +79,7 @@ Quality and operations:
 - Runtime environment validation added for required secrets, cache mode, URLs, and numeric config.
 - Production Docker Compose deployment config added with API health check.
 - CI authenticated e2e setup fixed so dummy environment values load before `AppModule`.
+- CI workflow now provides dummy required app environment values for validation, build, tests, and e2e.
 
 ## Current API Shape
 

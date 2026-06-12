@@ -15,6 +15,14 @@ jobs:
     env:
       DATABASE_URL: postgresql://ci:ci@localhost:5432/radeion_ci
       DIRECT_URL: postgresql://ci:ci@localhost:5432/radeion_ci
+      SUPABASE_URL: https://example.supabase.co
+      SUPABASE_PUBLISHABLE_KEY: ci-publishable-key
+      SUPABASE_SECRET_KEY: ci-secret-key
+      DATABRICKS_HOST: https://example.cloud.databricks.com
+      DATABRICKS_TOKEN: ci-databricks-token
+      DATABRICKS_HTTP_PATH: /sql/1.0/warehouses/ci-warehouse
+      CACHE_DRIVER: memory
+      EMAIL_DRIVER: disabled
 
     steps:
       - name: Checkout
