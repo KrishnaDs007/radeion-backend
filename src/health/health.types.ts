@@ -19,9 +19,25 @@ export type ConfigurationStatus = {
     token: boolean;
     httpPath: boolean;
     warehouseId: boolean;
+    tables: {
+      claims: boolean;
+      providers: boolean;
+      patientMetrics: boolean;
+    };
+    columnMappings: {
+      claims: boolean;
+      providers: boolean;
+      patientMetrics: boolean;
+    };
   };
   cache: {
     driver: string;
+  };
+  email: {
+    driver: string;
+    from: boolean;
+    resendApiKey: boolean;
+    inviteAcceptUrl: boolean;
   };
 };
 

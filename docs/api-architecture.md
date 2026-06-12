@@ -88,6 +88,19 @@ For non-platform roles, the data query service adds SQL filters from the authent
 
 The audit module is service-only. It is now called by approval, invite, practice, and provider write flows.
 
+## Configuration Health
+
+`GET /health/config` returns configuration presence and selected non-secret mode values without exposing secrets.
+
+It reports:
+
+- Supabase key presence
+- database URL presence
+- Databricks host/token/path presence
+- Databricks table and column mapping presence
+- cache driver
+- email driver and invite email setting presence
+
 ## Invite Acceptance Flow
 
 Invite creation stores only a hashed invite token. The raw `inviteToken` is returned once from `POST /invites` so the UI or a fallback admin workflow can send it to the invited user.

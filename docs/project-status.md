@@ -74,6 +74,7 @@ Developer experience:
 Quality and operations:
 
 - GitHub Actions CI added for Prisma validation, typecheck, lint, build, tests, and dependency audit.
+- Health config now reports email and Databricks table/column mapping presence without exposing secrets.
 - Public-route e2e smoke tests added and wired into CI.
 - Authenticated-route e2e tests added with mocked auth context and Prisma.
 - CI action pins updated to Node 24-compatible GitHub action runtimes.
