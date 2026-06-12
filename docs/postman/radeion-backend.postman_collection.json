@@ -28,6 +28,14 @@
     {
       "key": "providerId",
       "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "roleAssignmentId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "careCoordinatorAssignmentId",
+      "value": "00000000-0000-0000-0000-000000000000"
     }
   ],
   "item": [
@@ -364,6 +372,27 @@
           }
         },
         {
+          "name": "Reactivate User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Access restored\"\n}"
+            },
+            "url": "{{baseUrl}}/users/{{profileId}}/reactivate"
+          }
+        },
+        {
           "name": "List Roles",
           "request": {
             "method": "GET",
@@ -374,6 +403,19 @@
               }
             ],
             "url": "{{baseUrl}}/roles"
+          }
+        },
+        {
+          "name": "List Role Assignments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/roles/assignments"
           }
         },
         {
@@ -396,12 +438,98 @@
             },
             "url": "{{baseUrl}}/roles/assignments"
           }
+        },
+        {
+          "name": "Revoke Role Assignment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Role no longer applies\"\n}"
+            },
+            "url": "{{baseUrl}}/roles/assignments/{{roleAssignmentId}}/revoke"
+          }
         }
       ]
     },
     {
       "name": "Reference Data",
       "item": [
+        {
+          "name": "List Practices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/reference/practices"
+          }
+        },
+        {
+          "name": "Get Practice",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/reference/practices/{{practiceId}}"
+          }
+        },
+        {
+          "name": "List Practice Providers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/reference/practices/{{practiceId}}/providers"
+          }
+        },
+        {
+          "name": "List Providers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/reference/providers"
+          }
+        },
+        {
+          "name": "Get Provider",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/reference/providers/{{providerId}}"
+          }
+        },
         {
           "name": "Create Practice",
           "request": {
@@ -443,6 +571,27 @@
             },
             "url": "{{baseUrl}}/reference/providers"
           }
+        },
+        {
+          "name": "Update Provider",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dr. Example Updated\",\n  \"status\": \"active\"\n}"
+            },
+            "url": "{{baseUrl}}/reference/providers/{{providerId}}"
+          }
         }
       ]
     },
@@ -460,6 +609,32 @@
               }
             ],
             "url": "{{baseUrl}}/care-coordinators/assignments"
+          }
+        },
+        {
+          "name": "List Practice Assignments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/care-coordinators/practices/{{practiceId}}/assignments"
+          }
+        },
+        {
+          "name": "List Provider Assignments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/care-coordinators/providers/{{providerId}}/assignments"
           }
         },
         {
@@ -481,6 +656,27 @@
               "raw": "{\n  \"profileId\": \"{{profileId}}\",\n  \"organizationId\": \"{{organizationId}}\",\n  \"practiceId\": \"{{practiceId}}\",\n  \"providerId\": \"{{providerId}}\"\n}"
             },
             "url": "{{baseUrl}}/care-coordinators/assignments"
+          }
+        },
+        {
+          "name": "Revoke Assignment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Coverage changed\"\n}"
+            },
+            "url": "{{baseUrl}}/care-coordinators/assignments/{{careCoordinatorAssignmentId}}/revoke"
           }
         }
       ]

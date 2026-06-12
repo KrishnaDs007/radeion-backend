@@ -66,6 +66,7 @@ Developer experience:
 
 - API request examples added in `docs/api-examples.md`.
 - Postman collection added in `docs/postman/radeion-backend.postman_collection.json`.
+- Postman collection updated for nested reference, care coordinator, role assignment, and user lifecycle routes.
 - Local learning guide created in gitignored `learning-notes/`.
 
 Quality and operations:
