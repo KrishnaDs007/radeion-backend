@@ -25,6 +25,47 @@ curl "$API_BASE_URL/health/database"
 curl "$API_BASE_URL/auth/methods"
 ```
 
+`GET /health/config` returns presence booleans and safe mode values only. It does not expose secret values:
+
+```json
+{
+  "supabase": {
+    "url": true,
+    "publishableKey": true,
+    "secretKey": true
+  },
+  "database": {
+    "databaseUrl": true,
+    "directUrl": true
+  },
+  "databricks": {
+    "host": true,
+    "token": true,
+    "httpPath": true,
+    "warehouseId": false,
+    "tables": {
+      "claims": true,
+      "providers": true,
+      "patientMetrics": true
+    },
+    "columnMappings": {
+      "claims": true,
+      "providers": true,
+      "patientMetrics": true
+    }
+  },
+  "cache": {
+    "driver": "memory"
+  },
+  "email": {
+    "driver": "disabled",
+    "from": false,
+    "resendApiKey": false,
+    "inviteAcceptUrl": true
+  }
+}
+```
+
 ## Public Access Requests
 
 Create an organization access request:
