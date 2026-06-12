@@ -64,6 +64,7 @@ Data and integrations:
 
 Developer experience:
 
+- README updated to reflect the current backend scope, validation workflow, and runtime capabilities.
 - API request examples added in `docs/api-examples.md`.
 - Postman collection added in `docs/postman/radeion-backend.postman_collection.json`.
 - Postman collection updated for nested reference, care coordinator, role assignment, and user lifecycle routes.
