@@ -1,4 +1,4 @@
-# Supabase Setup
+# Environment And Supabase Setup
 
 This project uses Supabase Auth for authentication and Supabase Postgres as the application database.
 
@@ -6,7 +6,7 @@ This project uses Supabase Auth for authentication and Supabase Postgres as the 
 
 Create a local `.env` file from `.env.example`.
 
-Required values:
+Required Supabase and database values:
 
 - `SUPABASE_URL`
 - `SUPABASE_PUBLISHABLE_KEY`
@@ -15,6 +15,8 @@ Required values:
 - `DIRECT_URL`
 
 Do not commit `.env`.
+
+The backend validates required configuration during application boot. Missing required Supabase, database, or Databricks values will stop the app with a clear startup error.
 
 ## Auth Settings
 
@@ -59,11 +61,73 @@ Use fake or development data only until healthcare compliance requirements are c
 
 ## Databricks Environment
 
-Databricks values are read from `.env`:
+Required Databricks values are read from `.env`:
 
 - `DATABRICKS_HOST`
 - `DATABRICKS_TOKEN`
 - `DATABRICKS_HTTP_PATH`
-- `DATABRICKS_WAREHOUSE_ID` optional
+
+Optional Databricks runtime tuning:
+
+- `DATABRICKS_WAREHOUSE_ID`
+- `DATABRICKS_POLL_MAX_ATTEMPTS`
+- `DATABRICKS_POLL_INTERVAL_MS`
+- `DATABRICKS_MAX_RESULT_CHUNKS`
 
 If `DATABRICKS_WAREHOUSE_ID` is omitted, the backend attempts to parse it from `DATABRICKS_HTTP_PATH`, such as `/sql/1.0/warehouses/<warehouse-id>`.
+
+Databricks table and column mappings are also configured through `.env`.
+
+Table variables:
+
+- `DATABRICKS_CLAIMS_TABLE`
+- `DATABRICKS_PROVIDERS_TABLE`
+- `DATABRICKS_PATIENT_METRICS_TABLE`
+
+Column mapping variables follow each dataset name:
+
+- `*_ORGANIZATION_ID_COLUMN`
+- `*_PRACTICE_ID_COLUMN`
+- `*_PROVIDER_ID_COLUMN`
+- `*_PATIENT_ID_COLUMN`
+- `*_DATE_COLUMN` for datasets that support date filtering
+
+Use `.env.example` as the exact source of truth for names. Production values should match the final Databricks schemas.
+
+## Cache Environment
+
+Local development defaults to in-memory cache:
+
+```text
+CACHE_DRIVER=memory
+REDIS_URL=
+```
+
+To use Redis, set:
+
+```text
+CACHE_DRIVER=redis
+REDIS_URL=redis://...
+```
+
+When `CACHE_DRIVER=redis`, `REDIS_URL` is required.
+
+## Email Environment
+
+Local invite email delivery is disabled by default:
+
+```text
+EMAIL_DRIVER=disabled
+```
+
+To send invite emails with Resend, configure:
+
+```text
+EMAIL_DRIVER=resend
+EMAIL_FROM=...
+RESEND_API_KEY=...
+RESEND_API_URL=https://api.resend.com/emails
+INVITE_ACCEPT_URL=...
+```
+
+The invite API still returns the one-time `inviteToken`; email delivery reports `sent`, `skipped`, or `failed` in the invite creation response.
