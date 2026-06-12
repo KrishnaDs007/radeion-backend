@@ -86,7 +86,9 @@ Databricks statement execution now polls `PENDING` and `RUNNING` statements unti
 
 For non-platform roles, the data query service adds SQL filters from the authenticated user's role assignments before request filters are added. `developer` and `superAdmin` are platform roles and can query without role-scope SQL constraints.
 
-The audit module is service-only. It is now called by approval, invite, practice, and provider write flows.
+The audit module is service-only. It is now called by approval, invite, practice, provider, and Databricks read flows.
+
+Databricks read audit records use `action=data.read` and `targetType=dataQuery`. They store dataset/table/page metadata and filter presence flags, but avoid raw SQL and sensitive filter values such as patient IDs.
 
 ## Configuration Health
 

@@ -6,11 +6,17 @@ describe('DataQueryService', () => {
   const databricksService = {
     executeStatement: jest.fn(),
   };
+  const auditService = {
+    record: jest.fn(),
+  };
   const service = new DataQueryService(
     new ConfigService(),
     databricksService as unknown as ConstructorParameters<
       typeof DataQueryService
     >[1],
+    auditService as unknown as ConstructorParameters<
+      typeof DataQueryService
+    >[2],
   );
 
   afterEach(() => {
@@ -118,6 +124,9 @@ describe('DataQueryService', () => {
       databricksService as unknown as ConstructorParameters<
         typeof DataQueryService
       >[1],
+      auditService as unknown as ConstructorParameters<
+        typeof DataQueryService
+      >[2],
     );
     const user: UserContext = {
       profileId: 'profile-1',
@@ -126,6 +135,7 @@ describe('DataQueryService', () => {
       roles: [{ name: 'developer', scopeType: 'global' }],
     };
     databricksService.executeStatement.mockResolvedValueOnce({
+      statement_id: 'statement-1',
       status: { state: 'SUCCEEDED' },
       result: {
         data_array: [],
@@ -145,6 +155,34 @@ describe('DataQueryService', () => {
       expect.objectContaining({
         statement:
           "SELECT * FROM prod.catalog.claims_view WHERE org_ref = 'organization-1' AND member_ref = 'patient-1' AND service_dt >= DATE '2026-01-01' LIMIT 100 OFFSET 0",
+      }),
+    );
+    expect(auditService.record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actorProfileId: 'profile-1',
+        action: 'data.read',
+        targetType: 'dataQuery',
+        targetId: 'statement-1',
+        organizationId: 'organization-1',
+        metadata: expect.objectContaining({
+          dataSet: 'claims',
+          tableName: 'prod.catalog.claims_view',
+          filters: {
+            organizationId: true,
+            practiceId: false,
+            providerId: false,
+            patientId: true,
+            fromDate: true,
+            toDate: false,
+          },
+        }) as Record<string, unknown>,
+      }),
+    );
+    expect(auditService.record).toHaveBeenLastCalledWith(
+      expect.not.objectContaining({
+        metadata: expect.objectContaining({
+          patientId: 'patient-1',
+        }) as Record<string, unknown>,
       }),
     );
   });
@@ -190,6 +228,16 @@ describe('DataQueryService', () => {
       onWaitTimeout: 'CONTINUE',
       fetchAllResultChunks: false,
     });
+    expect(auditService.record).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'data.read',
+        metadata: expect.objectContaining({
+          returnedRowCount: 2,
+          limit: 2,
+          offset: 4,
+        }) as Record<string, unknown>,
+      }),
+    );
   });
 
   it('requests and counts Databricks result chunks when included', async () => {

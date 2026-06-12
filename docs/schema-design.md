@@ -327,9 +327,8 @@ Initial audit scope:
 - invite creation
 - practice/provider admin changes
 
-Sensitive Databricks read auditing can be added later.
+Sensitive Databricks read auditing is started with `data.read` audit records. The first version stores dataset/table/page metadata and filter-presence flags while avoiding raw SQL and sensitive filter values such as patient IDs.
 
 ## Cache Direction
 
 V1 starts with in-memory caching. The cache implementation should be wrapped behind a service so Redis can be added later without rewriting route handlers or Databricks services.
-

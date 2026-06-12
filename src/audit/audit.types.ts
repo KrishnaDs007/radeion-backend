@@ -16,7 +16,8 @@ export type AuditAction =
   | 'careCoordinator.assigned'
   | 'careCoordinator.revoked'
   | 'practice.changed'
-  | 'provider.changed';
+  | 'provider.changed'
+  | 'data.read';
 
 export type AuditTargetType =
   | 'user'
@@ -25,7 +26,8 @@ export type AuditTargetType =
   | 'invite'
   | 'careCoordinatorAssignment'
   | 'practice'
-  | 'provider';
+  | 'provider'
+  | 'dataQuery';
 
 export type CreateAuditLogInput = {
   actorProfileId?: string;

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AuditService } from '../audit/audit.service';
 import type { UserContext } from '../auth/auth.types';
 import { DatabricksService } from '../databricks/databricks.service';
 import type { DatabricksStatementResponse } from '../databricks/databricks.types';
@@ -139,6 +140,7 @@ export class DataQueryService {
   constructor(
     private readonly configService: ConfigService,
     private readonly databricksService: DatabricksService,
+    private readonly auditService: AuditService,
   ) {}
 
   async listClaims(
@@ -176,10 +178,29 @@ export class DataQueryService {
       onWaitTimeout: 'CONTINUE',
       fetchAllResultChunks: query.includeResultChunks ?? false,
     });
+    const page = this.buildPageMetadata(query, data);
+
+    await this.auditService.record({
+      actorProfileId: user.profileId,
+      action: 'data.read',
+      targetType: 'dataQuery',
+      targetId: data.statement_id,
+      organizationId: query.organizationId,
+      metadata: {
+        dataSet,
+        tableName: resolvedConfig.tableName,
+        limit: page.limit,
+        offset: page.offset,
+        returnedRowCount: page.returnedRowCount,
+        includedResultChunks: page.includedResultChunks,
+        resultChunkCount: page.resultChunkCount,
+        filters: this.getFilterPresence(query),
+      },
+    });
 
     return {
       data,
-      page: this.buildPageMetadata(query, data),
+      page,
     };
   }
 
@@ -359,5 +380,16 @@ export class DataQueryService {
     const rows = result?.data_array;
 
     return Array.isArray(rows) ? rows.length : 0;
+  }
+
+  private getFilterPresence(query: DataQueryDto): Record<string, boolean> {
+    return {
+      organizationId: Boolean(query.organizationId),
+      practiceId: Boolean(query.practiceId),
+      providerId: Boolean(query.providerId),
+      patientId: Boolean(query.patientId),
+      fromDate: Boolean(query.fromDate),
+      toDate: Boolean(query.toDate),
+    };
   }
 }

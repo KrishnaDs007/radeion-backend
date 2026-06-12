@@ -61,6 +61,7 @@ Data and integrations:
 - Databricks statement-result cache added with 60 second TTL.
 - Audit log service foundation added.
 - Audit calls added for current admin mutations.
+- Audit calls added for successful Databricks read queries with non-sensitive metadata.
 
 Developer experience:
 
