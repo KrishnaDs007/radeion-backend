@@ -15,6 +15,8 @@ Current route groups:
 - `GET /auth/methods` public auth configuration
 - `POST /access-requests/users` public user access request
 - `POST /access-requests/organizations` public organization access request
+- `POST /access-requests/users/:id/retry` public user access request retry
+- `POST /access-requests/organizations/:id/retry` public organization access request retry
 - `POST /access-requests/users/:id/approve` protected user approval
 - `POST /access-requests/organizations/:id/approve` protected organization approval
 - `POST /access-requests/users/:id/reject` protected user rejection
@@ -129,6 +131,17 @@ It reports:
 - email driver and invite email setting presence
 
 ## Invite Acceptance Flow
+
+## Access Request Retry Flow
+
+Public retry endpoints let the future onboarding UI reopen existing user or organization requests after a rejected, declined, or failed state. They reset review fields and move the request back to `pending`.
+
+Retry requests require the same email as the original request:
+
+- user retries compare `email`
+- organization retries compare `requestedByEmail`
+
+Pending and approved requests cannot be retried.
 
 Invite creation stores only a hashed invite token. The raw `inviteToken` is returned once from `POST /invites` so the UI or a fallback admin workflow can send it to the invited user.
 

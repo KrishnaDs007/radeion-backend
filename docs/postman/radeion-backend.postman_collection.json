@@ -114,6 +114,40 @@
           }
         },
         {
+          "name": "Retry Organization Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"organizationName\": \"Example Health ACO Updated\",\n  \"requestedByEmail\": \"admin@example.org\",\n  \"type\": \"aco\",\n  \"contactEmail\": \"admin@example.org\"\n}"
+            },
+            "url": "{{baseUrl}}/access-requests/organizations/{{organizationRequestId}}/retry"
+          }
+        },
+        {
+          "name": "Retry User Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"provider@example.org\",\n  \"organizationId\": \"{{organizationId}}\",\n  \"requestedRoles\": [\"provider\"],\n  \"requestedScope\": {\n    \"type\": \"organization\",\n    \"organizationId\": \"{{organizationId}}\"\n  }\n}"
+            },
+            "url": "{{baseUrl}}/access-requests/users/{{userRequestId}}/retry"
+          }
+        },
+        {
           "name": "Approve Organization Request",
           "request": {
             "method": "POST",

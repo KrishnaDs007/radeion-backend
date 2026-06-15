@@ -100,6 +100,35 @@ curl -X POST "$API_BASE_URL/access-requests/users" \
       "type": "organization",
       "organizationId": "00000000-0000-0000-0000-000000000000"
     }
+}'
+```
+
+Retry a rejected, declined, or failed organization request:
+
+```bash
+curl -X POST "$API_BASE_URL/access-requests/organizations/<requestId>/retry" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "organizationName": "Example Health ACO Updated",
+    "requestedByEmail": "admin@example.org",
+    "type": "aco",
+    "contactEmail": "admin@example.org"
+  }'
+```
+
+Retry a rejected, declined, or failed user request:
+
+```bash
+curl -X POST "$API_BASE_URL/access-requests/users/<requestId>/retry" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "provider@example.org",
+    "organizationId": "00000000-0000-0000-0000-000000000000",
+    "requestedRoles": ["provider"],
+    "requestedScope": {
+      "type": "organization",
+      "organizationId": "00000000-0000-0000-0000-000000000000"
+    }
   }'
 ```
 

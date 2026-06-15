@@ -38,6 +38,12 @@ const REQUESTED_SCOPE_MAP: Record<string, ScopeType> = {
   provider: ScopeType.PROVIDER,
 };
 
+const RETRYABLE_REQUEST_STATUSES = new Set<RequestStatus>([
+  RequestStatus.REJECTED,
+  RequestStatus.DECLINED,
+  RequestStatus.FAILED,
+]);
+
 @Injectable()
 export class AccessRequestsService {
   constructor(
@@ -80,6 +86,95 @@ export class AccessRequestsService {
         requestedByEmail: true,
         status: true,
         createdAt: true,
+      },
+    });
+  }
+
+  async retryUserRequest(id: string, input: CreateUserAccessRequestDto) {
+    const request = await this.prismaService.userApprovalRequest.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        status: true,
+      },
+    });
+
+    if (!request) {
+      throw new NotFoundException('User approval request not found');
+    }
+
+    this.ensureRetryableRequest(request.status, 'User request');
+
+    if (request.email !== input.email.toLowerCase()) {
+      throw new BadRequestException('Retry email must match original request');
+    }
+
+    return this.prismaService.userApprovalRequest.update({
+      where: { id },
+      data: {
+        authUserId: input.authUserId,
+        organizationId: input.organizationId,
+        requestedRoles: input.requestedRoles,
+        requestedScope: input.requestedScope as Prisma.InputJsonValue,
+        status: RequestStatus.PENDING,
+        reviewedById: null,
+        reviewedAt: null,
+        reviewNotes: null,
+      },
+      select: {
+        id: true,
+        email: true,
+        organizationId: true,
+        requestedRoles: true,
+        requestedScope: true,
+        status: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async retryOrganizationRequest(
+    id: string,
+    input: CreateOrganizationAccessRequestDto,
+  ) {
+    const request =
+      await this.prismaService.organizationApprovalRequest.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          requestedByEmail: true,
+          status: true,
+        },
+      });
+
+    if (!request) {
+      throw new NotFoundException('Organization approval request not found');
+    }
+
+    this.ensureRetryableRequest(request.status, 'Organization request');
+
+    if (request.requestedByEmail !== input.requestedByEmail.toLowerCase()) {
+      throw new BadRequestException('Retry email must match original request');
+    }
+
+    return this.prismaService.organizationApprovalRequest.update({
+      where: { id },
+      data: {
+        organizationName: input.organizationName,
+        requestedByAuthUserId: input.requestedByAuthUserId,
+        requestedPayload: this.buildOrganizationPayload(input),
+        status: RequestStatus.PENDING,
+        reviewedById: null,
+        reviewedAt: null,
+        reviewNotes: null,
+      },
+      select: {
+        id: true,
+        organizationName: true,
+        requestedByEmail: true,
+        status: true,
+        updatedAt: true,
       },
     });
   }
@@ -382,6 +477,12 @@ export class AccessRequestsService {
     return Object.fromEntries(
       Object.entries(payload).filter(([, value]) => value !== undefined),
     );
+  }
+
+  private ensureRetryableRequest(status: RequestStatus, label: string) {
+    if (!RETRYABLE_REQUEST_STATUSES.has(status)) {
+      throw new BadRequestException(`${label} cannot be retried`);
+    }
   }
 
   private getPayloadString(

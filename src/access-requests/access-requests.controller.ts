@@ -32,6 +32,28 @@ export class AccessRequestsController {
     };
   }
 
+  @Public()
+  @Post('users/:id/retry')
+  async retryUserRequest(
+    @Param('id') id: string,
+    @Body() body: CreateUserAccessRequestDto,
+  ) {
+    return {
+      data: await this.accessRequestsService.retryUserRequest(id, body),
+    };
+  }
+
+  @Public()
+  @Post('organizations/:id/retry')
+  async retryOrganizationRequest(
+    @Param('id') id: string,
+    @Body() body: CreateOrganizationAccessRequestDto,
+  ) {
+    return {
+      data: await this.accessRequestsService.retryOrganizationRequest(id, body),
+    };
+  }
+
   @RequirePermission('organization.approve')
   @Post('organizations/:id/approve')
   async approveOrganizationRequest(

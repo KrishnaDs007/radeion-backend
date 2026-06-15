@@ -19,6 +19,8 @@ const PUBLIC_ROUTES = new Set([
   'GET /auth/methods',
   'POST /access-requests/users',
   'POST /access-requests/organizations',
+  'POST /access-requests/users/:param/retry',
+  'POST /access-requests/organizations/:param/retry',
   'POST /invites/accept',
 ]);
 

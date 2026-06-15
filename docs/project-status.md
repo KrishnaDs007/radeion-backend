@@ -31,6 +31,7 @@ Auth and ACL:
 Access and onboarding:
 
 - Public user and organization access request APIs added.
+- Public retry APIs added for rejected, declined, or failed access requests.
 - Protected user and organization approval/rejection APIs added.
 - Protected invite list, create, and revoke APIs added.
 - Public invite accept API added.
@@ -106,6 +107,8 @@ Public:
 - `GET /auth/methods`
 - `POST /access-requests/users`
 - `POST /access-requests/organizations`
+- `POST /access-requests/users/:id/retry`
+- `POST /access-requests/organizations/:id/retry`
 - `POST /invites/accept`
 
 Protected:
@@ -161,7 +164,7 @@ Protected:
 
 Auth and onboarding:
 
-- Build frontend signup stepper and failed/declined retry UX.
+- Build frontend signup stepper and connect failed/declined retry UX to the retry APIs.
 - Add frontend password setup/recovery flow for invites and Supabase recovery.
 
 Data and integrations:
