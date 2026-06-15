@@ -34,6 +34,24 @@ export class CareCoordinatorsService {
     });
   }
 
+  async listOrganizationAssignments(
+    organizationId: string,
+    actor: UserContext,
+  ) {
+    await this.ensureOrganizationReadable(organizationId, actor);
+
+    return this.prismaService.careCoordinatorAssignment.findMany({
+      where: {
+        revokedAt: null,
+        organizationId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: this.assignmentSelect(),
+    });
+  }
+
   async listPracticeAssignments(practiceId: string, actor: UserContext) {
     await this.ensurePracticeReadable(practiceId, actor);
 
@@ -255,6 +273,24 @@ export class CareCoordinatorsService {
     }
   }
 
+  private async ensureOrganizationReadable(
+    organizationId: string,
+    actor: UserContext,
+  ) {
+    const organization = await this.prismaService.organization.findFirst({
+      where: {
+        AND: [{ id: organizationId }, this.organizationReadWhere(actor)],
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!organization) {
+      throw new NotFoundException('Organization not found');
+    }
+  }
+
   private async ensurePracticeReadable(practiceId: string, actor: UserContext) {
     const practice = await this.prismaService.practice.findFirst({
       where: {
@@ -268,6 +304,18 @@ export class CareCoordinatorsService {
     if (!practice) {
       throw new NotFoundException('Practice not found');
     }
+  }
+
+  private organizationReadWhere(actor: UserContext) {
+    if (hasPlatformAccess(actor)) {
+      return {};
+    }
+
+    return {
+      id: {
+        in: getAccessibleOrganizationIds(actor),
+      },
+    };
   }
 
   private async ensureProviderReadable(providerId: string, actor: UserContext) {

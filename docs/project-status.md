@@ -47,6 +47,7 @@ Admin management:
 - Protected reference detail and practice-provider nested reads added.
 - Protected care coordinator assignment list, create, and revoke APIs added.
 - Protected nested care coordinator assignment reads added for practices and providers.
+- Protected nested care coordinator assignment reads added for organizations.
 - Protected role, user, and organization read endpoints added.
 - Protected platform audit-log read endpoint added with filters and page metadata.
 
@@ -133,6 +134,7 @@ Protected:
 - `PATCH /organizations/:id`
 - `PATCH /organizations/:id/status`
 - `GET /care-coordinators/assignments`
+- `GET /care-coordinators/organizations/:organizationId/assignments`
 - `GET /care-coordinators/practices/:practiceId/assignments`
 - `GET /care-coordinators/providers/:providerId/assignments`
 - `POST /care-coordinators/assignments`
@@ -171,4 +173,4 @@ Quality and operations:
 
 Future route depth:
 
-- Add organization-scoped nested care-coordinator views if frontend organization detail screens need them.
+- Add additional child routes only when a concrete frontend workflow requires them.

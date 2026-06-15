@@ -660,6 +660,19 @@
           }
         },
         {
+          "name": "List Organization Assignments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/care-coordinators/organizations/{{organizationId}}/assignments"
+          }
+        },
+        {
           "name": "List Practice Assignments",
           "request": {
             "method": "GET",

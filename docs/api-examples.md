@@ -385,6 +385,9 @@ curl -X POST "$API_BASE_URL/care-coordinators/assignments" \
 List assignments for one practice or provider:
 
 ```bash
+curl "$API_BASE_URL/care-coordinators/organizations/<organizationId>/assignments" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
 curl "$API_BASE_URL/care-coordinators/practices/<practiceId>/assignments" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 

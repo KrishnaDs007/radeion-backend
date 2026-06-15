@@ -106,6 +106,59 @@ describe('CareCoordinatorsService', () => {
     );
   });
 
+  it('lists organization-specific assignments after checking scoped organization access', async () => {
+    const prismaService = {
+      organization: {
+        findFirst: jest.fn().mockResolvedValue({ id: 'organization-1' }),
+      },
+      careCoordinatorAssignment: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+    };
+    const service = new CareCoordinatorsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof CareCoordinatorsService
+      >[0],
+      {} as ConstructorParameters<typeof CareCoordinatorsService>[1],
+    );
+
+    await service.listOrganizationAssignments('organization-1', {
+      ...actor,
+      roles: [
+        {
+          name: 'clientAdmin',
+          scopeType: 'organization',
+          organizationId: 'organization-1',
+        },
+      ],
+    });
+
+    expect(prismaService.organization.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          AND: [
+            { id: 'organization-1' },
+            {
+              id: {
+                in: ['organization-1'],
+              },
+            },
+          ],
+        },
+      }),
+    );
+    expect(
+      prismaService.careCoordinatorAssignment.findMany,
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          revokedAt: null,
+          organizationId: 'organization-1',
+        },
+      }),
+    );
+  });
+
   it('lists practice-specific assignments after checking scoped practice access', async () => {
     const prismaService = {
       practice: {

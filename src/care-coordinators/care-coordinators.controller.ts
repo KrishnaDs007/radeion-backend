@@ -21,6 +21,20 @@ export class CareCoordinatorsController {
   }
 
   @RequirePermission('organization.read')
+  @Get('organizations/:organizationId/assignments')
+  async listOrganizationAssignments(
+    @Param('organizationId') organizationId: string,
+    @CurrentUser() user: UserContext,
+  ) {
+    return {
+      data: await this.careCoordinatorsService.listOrganizationAssignments(
+        organizationId,
+        user,
+      ),
+    };
+  }
+
+  @RequirePermission('organization.read')
   @Get('practices/:practiceId/assignments')
   async listPracticeAssignments(
     @Param('practiceId') practiceId: string,

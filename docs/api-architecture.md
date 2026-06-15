@@ -50,6 +50,7 @@ Current route groups:
 - `PATCH /organizations/:id` protected organization update
 - `PATCH /organizations/:id/status` protected organization status update
 - `GET /care-coordinators/assignments` protected active care coordinator assignment list
+- `GET /care-coordinators/organizations/:organizationId/assignments` protected organization-specific care coordinator assignment list
 - `GET /care-coordinators/practices/:practiceId/assignments` protected practice-specific care coordinator assignment list
 - `GET /care-coordinators/providers/:providerId/assignments` protected provider-specific care coordinator assignment list
 - `POST /care-coordinators/assignments` protected care coordinator assignment creation
