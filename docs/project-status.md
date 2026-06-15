@@ -93,6 +93,7 @@ Quality and operations:
 - CI authenticated e2e setup fixed so dummy environment values load before `AppModule`.
 - CI workflow now provides dummy required app environment values for validation, build, tests, and e2e.
 - CI docs validation added for Postman JSON, request conventions, and route example coverage.
+- Local progress commits pushed to `origin/codex-progress-updates` for PR preparation.
 
 ## Current API Shape
 
@@ -169,7 +170,7 @@ Data and integrations:
 
 Quality and operations:
 
-- Push current local commits and create a GitHub PR when ready.
+- Create a GitHub PR from `codex-progress-updates` to `master` after GitHub auth or connector permissions are available.
 
 Future route depth:
 
