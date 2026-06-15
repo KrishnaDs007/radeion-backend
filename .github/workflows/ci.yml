@@ -49,6 +49,9 @@ jobs:
       - name: Lint
         run: npm run lint:check
 
+      - name: Validate docs
+        run: npm run docs:validate
+
       - name: Build
         run: npm run build
 

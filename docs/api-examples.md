@@ -19,6 +19,7 @@ Content-Type: application/json
 ## Health
 
 ```bash
+curl "$API_BASE_URL/"
 curl "$API_BASE_URL/health"
 curl "$API_BASE_URL/health/config"
 curl "$API_BASE_URL/health/database"
@@ -114,6 +115,28 @@ curl -X POST "$API_BASE_URL/access-requests/organizations/<requestId>/approve" \
     "name": "Example Health ACO",
     "type": "aco",
     "contactEmail": "admin@example.org"
+}'
+```
+
+Approve a user request:
+
+```bash
+curl -X POST "$API_BASE_URL/access-requests/users/<requestId>/approve" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reviewNotes": "Approved for onboarding"
+  }'
+```
+
+Reject an organization request:
+
+```bash
+curl -X POST "$API_BASE_URL/access-requests/organizations/<requestId>/reject" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reviewNotes": "Organization could not be verified"
   }'
 ```
 
@@ -194,6 +217,18 @@ curl -X POST "$API_BASE_URL/organizations" \
     "website": "https://client.example.org",
     "contactEmail": "ops@client.example.org",
     "startedYear": 2020
+}'
+```
+
+Update an organization:
+
+```bash
+curl -X PATCH "$API_BASE_URL/organizations/<organizationId>" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Example Client Updated",
+    "contactEmail": "updated-ops@client.example.org"
   }'
 ```
 
@@ -298,6 +333,18 @@ curl -X POST "$API_BASE_URL/reference/practices" \
     "organizationId": "00000000-0000-0000-0000-000000000000",
     "name": "Example Practice",
     "source": "manual"
+}'
+```
+
+Update a practice:
+
+```bash
+curl -X PATCH "$API_BASE_URL/reference/practices/<practiceId>" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Example Practice Updated",
+    "status": "active"
   }'
 ```
 

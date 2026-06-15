@@ -89,6 +89,7 @@ Quality and operations:
 - Production Docker Compose deployment config added with API health check.
 - CI authenticated e2e setup fixed so dummy environment values load before `AppModule`.
 - CI workflow now provides dummy required app environment values for validation, build, tests, and e2e.
+- CI docs validation added for Postman JSON, request conventions, and route example coverage.
 
 ## Current API Shape
 
@@ -97,6 +98,7 @@ Public:
 - `GET /`
 - `GET /health`
 - `GET /health/config`
+- `GET /health/database`
 - `GET /auth/methods`
 - `POST /access-requests/users`
 - `POST /access-requests/organizations`
@@ -159,7 +161,6 @@ Data and integrations:
 
 Quality and operations:
 
-- Add CI coverage for generated API documentation examples.
 - Push current local commits and create a GitHub PR when ready.
 
 Future route depth:

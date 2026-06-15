@@ -32,7 +32,7 @@ The current backend foundation includes:
 - Temporary in-memory caching with Redis support
 - Audit logging for current admin mutation flows
 - Docker, Docker Compose Redis, and production Compose scaffolding
-- GitHub Actions validation for Prisma, TypeScript, lint, build, tests, e2e tests, and audit
+- GitHub Actions validation for Prisma, TypeScript, lint, docs, build, tests, e2e tests, and audit
 
 ## Role Direction
 
@@ -95,6 +95,7 @@ Useful checks:
 npm run prisma:validate
 npx tsc --noEmit
 npm run lint:check
+npm run docs:validate
 npm run build
 npm test
 npm run test:e2e
