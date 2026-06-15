@@ -20,6 +20,15 @@ type AuditLogsResponseBody = {
   };
 };
 
+type DataQueryPresetsResponseBody = {
+  data: Array<{
+    name: string;
+  }>;
+  page: {
+    total: number;
+  };
+};
+
 describe('Authenticated routes (e2e)', () => {
   let app: INestApplication<App> | undefined;
   const originalEnv = { ...process.env };
@@ -31,6 +40,10 @@ describe('Authenticated routes (e2e)', () => {
       findMany: jest.fn(),
     },
     auditLog: {
+      findMany: jest.fn(),
+      count: jest.fn(),
+    },
+    dataQueryPreset: {
       findMany: jest.fn(),
       count: jest.fn(),
     },
@@ -95,6 +108,13 @@ describe('Authenticated routes (e2e)', () => {
       },
     ]);
     prismaService.auditLog.count.mockResolvedValue(1);
+    prismaService.dataQueryPreset.findMany.mockResolvedValue([
+      {
+        id: 'preset-1',
+        name: 'Recent claims',
+      },
+    ]);
+    prismaService.dataQueryPreset.count.mockResolvedValue(1);
   });
 
   function getHttpServer() {
@@ -177,6 +197,43 @@ describe('Authenticated routes (e2e)', () => {
     expect(body.data[0]).toEqual(
       expect.objectContaining({
         action: 'organization.created',
+      }),
+    );
+    expect(body.page.total).toBe(1);
+  });
+
+  it('allows an authenticated user to read their data query presets', async () => {
+    authContextService.getUserContextFromToken.mockResolvedValue({
+      profileId: 'profile-1',
+      authUserId: 'auth-user-1',
+      email: 'developer@example.com',
+      status: 'ACTIVE',
+      roles: [
+        {
+          name: 'developer',
+          scopeType: 'global',
+        },
+      ],
+    });
+
+    const response = await request(getHttpServer())
+      .get('/data-query-presets?dataSet=claims&limit=25')
+      .set('Authorization', 'Bearer developer-token')
+      .expect(200);
+
+    expect(prismaService.dataQueryPreset.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          ownerProfileId: 'profile-1',
+          dataSet: 'claims',
+        }) as Record<string, unknown>,
+        take: 25,
+      }),
+    );
+    const body = response.body as DataQueryPresetsResponseBody;
+    expect(body.data[0]).toEqual(
+      expect.objectContaining({
+        name: 'Recent claims',
       }),
     );
     expect(body.page.total).toBe(1);

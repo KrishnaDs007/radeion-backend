@@ -17,6 +17,9 @@ export type AuditAction =
   | 'careCoordinator.revoked'
   | 'practice.changed'
   | 'provider.changed'
+  | 'dataQueryPreset.created'
+  | 'dataQueryPreset.updated'
+  | 'dataQueryPreset.deleted'
   | 'data.read';
 
 export type AuditTargetType =
@@ -27,6 +30,7 @@ export type AuditTargetType =
   | 'careCoordinatorAssignment'
   | 'practice'
   | 'provider'
+  | 'dataQueryPreset'
   | 'dataQuery';
 
 export type CreateAuditLogInput = {

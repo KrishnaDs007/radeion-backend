@@ -440,3 +440,49 @@ The response shape is:
   }
 }
 ```
+
+## Data Query Presets
+
+Save a reusable Databricks query shape:
+
+```bash
+curl -X POST "$API_BASE_URL/data-query-presets" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Recent claims",
+    "dataSet": "claims",
+    "organizationId": "00000000-0000-0000-0000-000000000000",
+    "query": {
+      "organizationId": "00000000-0000-0000-0000-000000000000",
+      "sortBy": "date",
+      "sortDirection": "desc",
+      "limit": 50
+    }
+  }'
+```
+
+List saved presets:
+
+```bash
+curl "$API_BASE_URL/data-query-presets?dataSet=claims&limit=50" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
+Update a preset:
+
+```bash
+curl -X PATCH "$API_BASE_URL/data-query-presets/<presetId>" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Recent claims by date"
+  }'
+```
+
+Delete a preset:
+
+```bash
+curl -X DELETE "$API_BASE_URL/data-query-presets/<presetId>" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```

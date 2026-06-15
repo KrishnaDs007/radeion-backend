@@ -56,6 +56,10 @@ Current route groups:
 - `GET /claims` protected Databricks read API
 - `GET /providers` protected Databricks read API
 - `GET /patient-metrics` protected Databricks read API
+- `GET /data-query-presets` protected personal saved query preset list
+- `POST /data-query-presets` protected personal saved query preset creation
+- `PATCH /data-query-presets/:id` protected personal saved query preset update
+- `DELETE /data-query-presets/:id` protected personal saved query preset deletion
 
 The Databricks module is consumed by the data controllers through a query service. The first read routes support these optional query parameters:
 
@@ -106,6 +110,8 @@ Audit log reads support these optional query parameters:
 The route requires `audit.read`. Because the ACL check has no resource scope, only platform roles such as `developer` and `superAdmin` can read it.
 
 Databricks read audit records use `action=data.read` and `targetType=dataQuery`. They store dataset/table/page metadata, sort metadata, and filter presence flags, but avoid raw SQL and sensitive filter values such as patient IDs.
+
+Data query presets store reusable query shapes for the authenticated user. Presets support `claims`, `providers`, and `patientMetrics` datasets, store the validated query object as JSON, and can optionally be attached to an organization. Users can only list, update, and delete their own presets. Non-platform users can only attach presets to organizations already present in their active role assignments.
 
 ## Configuration Health
 

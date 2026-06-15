@@ -36,6 +36,10 @@
     {
       "key": "careCoordinatorAssignmentId",
       "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "dataQueryPresetId",
+      "value": "00000000-0000-0000-0000-000000000000"
     }
   ],
   "item": [
@@ -708,6 +712,79 @@
               "raw": "{\n  \"reason\": \"Coverage changed\"\n}"
             },
             "url": "{{baseUrl}}/care-coordinators/assignments/{{careCoordinatorAssignmentId}}/revoke"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Data Query Presets",
+      "item": [
+        {
+          "name": "List Presets",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/data-query-presets?dataSet=claims&limit=50"
+          }
+        },
+        {
+          "name": "Create Preset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Recent claims\",\n  \"dataSet\": \"claims\",\n  \"organizationId\": \"{{organizationId}}\",\n  \"query\": {\n    \"organizationId\": \"{{organizationId}}\",\n    \"sortBy\": \"date\",\n    \"sortDirection\": \"desc\",\n    \"limit\": 50\n  }\n}"
+            },
+            "url": "{{baseUrl}}/data-query-presets"
+          }
+        },
+        {
+          "name": "Update Preset",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Recent claims by date\"\n}"
+            },
+            "url": "{{baseUrl}}/data-query-presets/{{dataQueryPresetId}}"
+          }
+        },
+        {
+          "name": "Delete Preset",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/data-query-presets/{{dataQueryPresetId}}"
           }
         }
       ]

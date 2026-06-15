@@ -64,6 +64,7 @@ Data and integrations:
 - Audit calls added for current admin mutations.
 - Audit calls added for successful Databricks read queries with non-sensitive metadata.
 - Databricks read sorting added with mapped `sortBy` and `sortDirection` query controls.
+- Personal saved data-query preset APIs added with ownership and organization-scope checks.
 
 Developer experience:
 
@@ -146,6 +147,10 @@ Protected:
 - `GET /claims`
 - `GET /providers`
 - `GET /patient-metrics`
+- `GET /data-query-presets`
+- `POST /data-query-presets`
+- `PATCH /data-query-presets/:id`
+- `DELETE /data-query-presets/:id`
 
 ## To Do
 
@@ -156,7 +161,6 @@ Auth and onboarding:
 
 Data and integrations:
 
-- Add saved data-query presets once frontend reporting workflows are known.
 - Fill production Databricks table/column environment values when final schemas are available.
 
 Quality and operations:

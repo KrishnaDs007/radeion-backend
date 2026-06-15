@@ -80,6 +80,7 @@ model Profile {
   careCoordinatorAssignments   CareCoordinatorAssignment[]   @relation("CareCoordinatorProfile")
   assignedCareCoordinators     CareCoordinatorAssignment[]   @relation("CareCoordinatorAssigner")
   auditLogs                    AuditLog[]                    @relation("AuditActor")
+  dataQueryPresets             DataQueryPreset[]             @relation("DataQueryPresetOwner")
 
   @@map("profiles")
 }
@@ -107,6 +108,7 @@ model Organization {
   providers        Provider[]
   coordinatorLinks CareCoordinatorAssignment[]
   auditLogs        AuditLog[]
+  dataQueryPresets DataQueryPreset[]
 
   @@index([status])
   @@map("organizations")
@@ -299,4 +301,24 @@ model AuditLog {
   @@index([organizationId])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+model DataQueryPreset {
+  id             String   @id @default(uuid()) @db.Uuid
+  ownerProfileId String   @map("owner_profile_id") @db.Uuid
+  organizationId String?  @map("organization_id") @db.Uuid
+  name           String
+  dataSet        String   @map("data_set")
+  query          Json
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  owner        Profile       @relation("DataQueryPresetOwner", fields: [ownerProfileId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
+
+  @@unique([ownerProfileId, name])
+  @@index([ownerProfileId])
+  @@index([organizationId])
+  @@index([dataSet])
+  @@map("data_query_presets")
 }

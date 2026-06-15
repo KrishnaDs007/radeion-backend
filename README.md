@@ -28,6 +28,7 @@ The current backend foundation includes:
 - Invite creation, revocation, acceptance, and optional invite email delivery
 - Practice/provider reference data APIs, including nested practice/provider reads
 - Databricks read-focused APIs for claims, providers, and patient metrics
+- Personal saved Databricks query presets
 - Configurable Databricks table and column mappings for production schemas
 - Temporary in-memory caching with Redis support
 - Audit logging for current admin mutation flows
