@@ -33,6 +33,8 @@ describe('HealthService', () => {
         EMAIL_FROM: 'Radeion <no-reply@example.com>',
         RESEND_API_KEY: 'resend-key',
         INVITE_ACCEPT_URL: 'https://app.example.com/invites/accept',
+        PASSWORD_RECOVERY_REDIRECT_URL:
+          'https://app.example.com/password/recover',
       }),
       prismaService as never,
     );
@@ -71,6 +73,7 @@ describe('HealthService', () => {
         from: true,
         resendApiKey: true,
         inviteAcceptUrl: true,
+        passwordRecoveryRedirectUrl: true,
       },
     });
   });

@@ -86,6 +86,11 @@ export function validateEnvironment(
 
   validateOptionalUrl(config.RESEND_API_URL, 'RESEND_API_URL', errors);
   validateOptionalUrl(config.INVITE_ACCEPT_URL, 'INVITE_ACCEPT_URL', errors);
+  validateOptionalUrl(
+    config.PASSWORD_RECOVERY_REDIRECT_URL,
+    'PASSWORD_RECOVERY_REDIRECT_URL',
+    errors,
+  );
 
   for (const key of OPTIONAL_INTEGER_KEYS) {
     validateOptionalNonNegativeInteger(config[key], key, errors);

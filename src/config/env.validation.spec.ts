@@ -45,6 +45,8 @@ describe('validateEnvironment', () => {
         RESEND_API_KEY: 'resend-key',
         EMAIL_FROM: 'Radeion <no-reply@example.com>',
         INVITE_ACCEPT_URL: 'https://app.example.com/invites/accept',
+        PASSWORD_RECOVERY_REDIRECT_URL:
+          'https://app.example.com/password/recover',
       }),
     ).toEqual(
       expect.objectContaining({
@@ -52,6 +54,15 @@ describe('validateEnvironment', () => {
         RESEND_API_KEY: 'resend-key',
       }),
     );
+  });
+
+  it('rejects an invalid password recovery redirect URL', () => {
+    expect(() =>
+      validateEnvironment({
+        ...validEnvironment,
+        PASSWORD_RECOVERY_REDIRECT_URL: 'not-a-url',
+      }),
+    ).toThrow('PASSWORD_RECOVERY_REDIRECT_URL must be a valid URL');
   });
 
   it('rejects missing required keys', () => {

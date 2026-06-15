@@ -32,6 +32,7 @@ Access and onboarding:
 
 - Public user and organization access request APIs added.
 - Public retry APIs added for rejected, declined, or failed access requests.
+- Public password recovery request API added for Supabase password reset emails.
 - Protected user and organization approval/rejection APIs added.
 - Protected invite list, create, and revoke APIs added.
 - Public invite accept API added.
@@ -106,6 +107,7 @@ Public:
 - `GET /health/config`
 - `GET /health/database`
 - `GET /auth/methods`
+- `POST /auth/password-recovery`
 - `POST /access-requests/users`
 - `POST /access-requests/organizations`
 - `POST /access-requests/users/:id/retry`
@@ -166,7 +168,7 @@ Protected:
 Auth and onboarding:
 
 - Build frontend signup stepper and connect failed/declined retry UX to the retry APIs.
-- Add frontend password setup/recovery flow for invites and Supabase recovery.
+- Add frontend password setup/recovery flow for invites and Supabase recovery using the backend password recovery request API.
 
 Data and integrations:
 

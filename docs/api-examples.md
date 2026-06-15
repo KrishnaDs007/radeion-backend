@@ -26,6 +26,16 @@ curl "$API_BASE_URL/health/database"
 curl "$API_BASE_URL/auth/methods"
 ```
 
+Request a password recovery email:
+
+```bash
+curl -X POST "$API_BASE_URL/auth/password-recovery" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.org"
+  }'
+```
+
 `GET /health/config` returns presence booleans and safe mode values only. It does not expose secret values:
 
 ```json
@@ -62,7 +72,8 @@ curl "$API_BASE_URL/auth/methods"
     "driver": "disabled",
     "from": false,
     "resendApiKey": false,
-    "inviteAcceptUrl": true
+    "inviteAcceptUrl": true,
+    "passwordRecoveryRedirectUrl": true
   }
 }
 ```

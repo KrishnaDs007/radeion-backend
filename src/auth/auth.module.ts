@@ -5,11 +5,13 @@ import { SupabaseModule } from '../supabase/supabase.module';
 import { AuthContextService } from './auth-context.service';
 import { AuthController } from './auth.controller';
 import { AuthGuard } from './auth.guard';
+import { AuthService } from './auth.service';
 
 @Module({
   imports: [PrismaModule, SupabaseModule],
   controllers: [AuthController],
   providers: [
+    AuthService,
     AuthContextService,
     {
       provide: APP_GUARD,

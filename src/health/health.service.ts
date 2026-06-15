@@ -74,6 +74,9 @@ export class HealthService {
         from: this.hasConfig('EMAIL_FROM'),
         resendApiKey: this.hasConfig('RESEND_API_KEY'),
         inviteAcceptUrl: this.hasConfig('INVITE_ACCEPT_URL'),
+        passwordRecoveryRedirectUrl: this.hasConfig(
+          'PASSWORD_RECOVERY_REDIRECT_URL',
+        ),
       },
     };
   }

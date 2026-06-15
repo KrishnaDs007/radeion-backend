@@ -73,6 +73,23 @@
             "method": "GET",
             "url": "{{baseUrl}}/auth/methods"
           }
+        },
+        {
+          "name": "Request Password Recovery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.org\"\n}"
+            },
+            "url": "{{baseUrl}}/auth/password-recovery"
+          }
         }
       ]
     },

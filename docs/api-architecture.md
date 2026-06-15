@@ -13,6 +13,7 @@ Current route groups:
 - `GET /health/config` public config-presence status without secret values
 - `GET /health/database` public database connectivity status
 - `GET /auth/methods` public auth configuration
+- `POST /auth/password-recovery` public Supabase password recovery email request
 - `POST /access-requests/users` public user access request
 - `POST /access-requests/organizations` public organization access request
 - `POST /access-requests/users/:id/retry` public user access request retry
@@ -131,6 +132,12 @@ It reports:
 - email driver and invite email setting presence
 
 ## Invite Acceptance Flow
+
+## Password Recovery Flow
+
+`POST /auth/password-recovery` accepts an email address and asks Supabase to send a password recovery email. The response is intentionally generic so callers cannot use the endpoint to discover whether an email address has an account.
+
+Recovery redirects are configured server-side with `PASSWORD_RECOVERY_REDIRECT_URL`; public callers do not supply redirect targets.
 
 ## Access Request Retry Flow
 

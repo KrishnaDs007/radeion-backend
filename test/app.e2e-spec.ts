@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
@@ -6,14 +6,19 @@ import { App } from 'supertest/types';
 import { AppController } from '../src/app.controller';
 import { AppService } from '../src/app.service';
 import { AuthController } from '../src/auth/auth.controller';
+import { AuthService } from '../src/auth/auth.service';
 import { HealthController } from '../src/health/health.controller';
 import { HealthService } from '../src/health/health.service';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { SupabaseService } from '../src/supabase/supabase.service';
 
 describe('Public routes (e2e)', () => {
   let app: INestApplication<App>;
   const prismaService = {
     $queryRaw: jest.fn().mockResolvedValue([{ result: 1 }]),
+  };
+  const supabaseService = {
+    requestPasswordRecovery: jest.fn().mockResolvedValue(undefined),
   };
 
   beforeEach(async () => {
@@ -41,16 +46,30 @@ describe('Public routes (e2e)', () => {
             DATABRICKS_CLAIMS_PROVIDER_ID_COLUMN: 'provider_id',
             DATABRICKS_CLAIMS_PATIENT_ID_COLUMN: 'patient_id',
             DATABRICKS_CLAIMS_DATE_COLUMN: 'service_date',
+            PASSWORD_RECOVERY_REDIRECT_URL:
+              'https://app.example.com/password/recover',
           }),
         },
+        AuthService,
         {
           provide: PrismaService,
           useValue: prismaService,
+        },
+        {
+          provide: SupabaseService,
+          useValue: supabaseService,
         },
       ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.useGlobalPipes(
+      new ValidationPipe({
+        forbidNonWhitelisted: true,
+        transform: true,
+        whitelist: true,
+      }),
+    );
     await app.init();
   });
 
@@ -120,6 +139,7 @@ describe('Public routes (e2e)', () => {
           from: false,
           resendApiKey: false,
           inviteAcceptUrl: false,
+          passwordRecoveryRedirectUrl: true,
         },
       }),
     );
@@ -148,6 +168,26 @@ describe('Public routes (e2e)', () => {
         emailVerificationRequired: true,
         approvalRequiredForSignup: true,
         inviteRequiresPasswordSetup: true,
+        passwordRecoveryEnabled: true,
       });
+  });
+
+  it('requests password recovery without requiring authentication', async () => {
+    await request(app.getHttpServer())
+      .post('/auth/password-recovery')
+      .send({
+        email: 'USER@example.org',
+      })
+      .expect(201)
+      .expect({
+        status: 'requested',
+        message:
+          'If an account exists for this email, a password recovery email will be sent.',
+      });
+
+    expect(supabaseService.requestPasswordRecovery).toHaveBeenCalledWith({
+      email: 'user@example.org',
+      redirectTo: 'https://app.example.com/password/recover',
+    });
   });
 });

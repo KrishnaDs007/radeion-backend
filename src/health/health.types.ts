@@ -38,6 +38,7 @@ export type ConfigurationStatus = {
     from: boolean;
     resendApiKey: boolean;
     inviteAcceptUrl: boolean;
+    passwordRecoveryRedirectUrl: boolean;
   };
 };
 

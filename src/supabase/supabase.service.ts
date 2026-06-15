@@ -13,6 +13,11 @@ type SupabaseDatabase = {
   };
 };
 
+type PasswordRecoveryRequest = {
+  email: string;
+  redirectTo?: string;
+};
+
 @Injectable()
 export class SupabaseService {
   readonly adminClient: SupabaseClient<SupabaseDatabase>;
@@ -48,5 +53,19 @@ export class SupabaseService {
     }
 
     return user;
+  }
+
+  async requestPasswordRecovery({
+    email,
+    redirectTo,
+  }: PasswordRecoveryRequest): Promise<void> {
+    const { error } = await this.publicClient.auth.resetPasswordForEmail(
+      email,
+      redirectTo ? { redirectTo } : undefined,
+    );
+
+    if (error) {
+      throw error;
+    }
   }
 }
