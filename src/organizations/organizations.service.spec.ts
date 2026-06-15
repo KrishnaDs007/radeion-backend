@@ -189,6 +189,67 @@ describe('OrganizationsService', () => {
     );
   });
 
+  it('lists providers for a readable organization', async () => {
+    const prismaService = {
+      organization: {
+        findFirst: jest.fn().mockResolvedValue({ id: 'organization-1' }),
+      },
+      provider: {
+        findMany: jest.fn().mockResolvedValue([]),
+      },
+    };
+    const service = new OrganizationsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof OrganizationsService
+      >[0],
+      {} as ConstructorParameters<typeof OrganizationsService>[1],
+    );
+
+    await service.listOrganizationProviders('organization-1', {
+      ...actor,
+      roles: [
+        {
+          name: 'clientAdmin',
+          scopeType: 'organization',
+          organizationId: 'organization-1',
+        },
+      ],
+    });
+
+    expect(prismaService.organization.findFirst).toHaveBeenCalledWith({
+      where: {
+        AND: [
+          {
+            id: 'organization-1',
+          },
+          {
+            id: {
+              in: ['organization-1'],
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+      },
+    });
+    expect(prismaService.provider.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          organizationId: 'organization-1',
+        },
+        include: {
+          practice: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      }),
+    );
+  });
+
   it('creates an organization and records an audit log', async () => {
     const organization = {
       id: 'org-1',

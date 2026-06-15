@@ -75,6 +75,27 @@ export class OrganizationsService {
     });
   }
 
+  async listOrganizationProviders(id: string, actor: UserContext) {
+    await this.ensureOrganizationReadable(id, actor);
+
+    return this.prismaService.provider.findMany({
+      where: {
+        organizationId: id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        practice: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
+
   async listOrganizationUsers(id: string, actor: UserContext) {
     await this.ensureOrganizationReadable(id, actor);
 

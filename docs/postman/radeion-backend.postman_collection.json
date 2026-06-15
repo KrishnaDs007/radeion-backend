@@ -282,6 +282,19 @@
           }
         },
         {
+          "name": "List Organization Providers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/organizations/{{organizationId}}/providers"
+          }
+        },
+        {
           "name": "Create Organization",
           "request": {
             "method": "POST",

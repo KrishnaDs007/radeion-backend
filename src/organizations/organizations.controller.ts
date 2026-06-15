@@ -39,6 +39,16 @@ export class OrganizationsController {
     };
   }
 
+  @Get(':id/providers')
+  async listOrganizationProviders(
+    @Param('id') id: string,
+    @CurrentUser() user: UserContext,
+  ) {
+    return {
+      data: await this.organizationsService.listOrganizationProviders(id, user),
+    };
+  }
+
   @RequirePermission('user.read')
   @Get(':id/users')
   async listOrganizationUsers(

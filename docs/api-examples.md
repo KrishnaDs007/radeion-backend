@@ -201,6 +201,9 @@ curl "$API_BASE_URL/organizations/<organizationId>" \
 curl "$API_BASE_URL/organizations/<organizationId>/practices" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 
+curl "$API_BASE_URL/organizations/<organizationId>/providers" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
 curl "$API_BASE_URL/organizations/<organizationId>/users" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
