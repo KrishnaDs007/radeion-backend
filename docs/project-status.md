@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-06-12
+Last updated: 2026-06-15
 
 ## Completed
 
@@ -95,6 +95,7 @@ Quality and operations:
 - CI workflow now provides dummy required app environment values for validation, build, tests, and e2e.
 - CI docs validation added for Postman JSON, request conventions, and route example coverage.
 - Local progress commits pushed to `origin/codex-progress-updates` for PR preparation.
+- Draft PR creation was attempted from `codex-progress-updates` to `master`, but the GitHub connector returned `403 Resource not accessible by integration` and the local GitHub CLI is not authenticated.
 
 ## Current API Shape
 
