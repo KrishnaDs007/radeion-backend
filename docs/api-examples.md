@@ -23,6 +23,7 @@ curl "$API_BASE_URL/"
 curl "$API_BASE_URL/health"
 curl "$API_BASE_URL/health/config"
 curl "$API_BASE_URL/health/database"
+curl "$API_BASE_URL/health/cache"
 curl "$API_BASE_URL/auth/methods"
 ```
 

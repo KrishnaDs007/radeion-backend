@@ -6,6 +6,11 @@ describe('HealthService', () => {
     const prismaService = {
       $queryRaw: jest.fn(),
     };
+    const cacheService = {
+      get: jest.fn(),
+      set: jest.fn(),
+      delete: jest.fn(),
+    };
     const service = new HealthService(
       new ConfigService({
         SUPABASE_URL: 'https://example.supabase.co',
@@ -37,6 +42,7 @@ describe('HealthService', () => {
           'https://app.example.com/password/recover',
       }),
       prismaService as never,
+      cacheService as never,
     );
 
     expect(service.getConfigurationStatus()).toEqual({
@@ -85,11 +91,66 @@ describe('HealthService', () => {
     const service = new HealthService(
       new ConfigService({}),
       prismaService as never,
+      {} as never,
     );
 
     await expect(service.getDatabaseHealth()).resolves.toEqual({
       connected: true,
     });
     expect(prismaService.$queryRaw).toHaveBeenCalled();
+  });
+
+  it('reports cache health when the cache round trip succeeds', async () => {
+    const cacheService = {
+      set: jest.fn().mockResolvedValue(undefined),
+      get: jest.fn().mockResolvedValue({
+        ok: true,
+      }),
+      delete: jest.fn().mockResolvedValue(undefined),
+    };
+    const service = new HealthService(
+      new ConfigService({
+        CACHE_DRIVER: 'memory',
+      }),
+      {} as never,
+      cacheService as never,
+    );
+
+    await expect(service.getCacheHealth()).resolves.toEqual({
+      connected: true,
+      driver: 'memory',
+    });
+    expect(cacheService.set).toHaveBeenCalledWith(
+      expect.stringMatching(/^health:cache:/),
+      {
+        ok: true,
+      },
+      {
+        ttlSeconds: 10,
+      },
+    );
+    expect(cacheService.delete).toHaveBeenCalledWith(
+      expect.stringMatching(/^health:cache:/),
+    );
+  });
+
+  it('reports cache health as disconnected when the probe fails', async () => {
+    const cacheService = {
+      set: jest.fn().mockRejectedValue(new Error('cache unavailable')),
+      get: jest.fn(),
+      delete: jest.fn(),
+    };
+    const service = new HealthService(
+      new ConfigService({
+        CACHE_DRIVER: 'redis',
+      }),
+      {} as never,
+      cacheService as never,
+    );
+
+    await expect(service.getCacheHealth()).resolves.toEqual({
+      connected: false,
+      driver: 'redis',
+    });
   });
 });

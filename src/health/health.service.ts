@@ -1,17 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { CacheService } from '../cache/cache.service';
 import { PrismaService } from '../prisma/prisma.service';
 import {
+  CacheHealthStatus,
   ConfigurationStatus,
   DatabaseHealthStatus,
   HealthStatus,
 } from './health.types';
+
+const CACHE_HEALTH_TIMEOUT_MS = 2_000;
+const CACHE_HEALTH_TTL_SECONDS = 10;
 
 @Injectable()
 export class HealthService {
   constructor(
     private readonly configService: ConfigService,
     private readonly prismaService: PrismaService,
+    private readonly cacheService: CacheService,
   ) {}
 
   getHealth(): HealthStatus {
@@ -89,6 +95,36 @@ export class HealthService {
     };
   }
 
+  async getCacheHealth(): Promise<CacheHealthStatus> {
+    const driver = this.configService.get<string>('CACHE_DRIVER') ?? 'memory';
+    const probeKey = `health:cache:${Date.now()}`;
+    const probeValue = {
+      ok: true,
+    };
+
+    try {
+      await this.withTimeout(
+        this.cacheService.set(probeKey, probeValue, {
+          ttlSeconds: CACHE_HEALTH_TTL_SECONDS,
+        }),
+      );
+      const cached = await this.withTimeout(
+        this.cacheService.get<typeof probeValue>(probeKey),
+      );
+      await this.withTimeout(this.cacheService.delete(probeKey));
+
+      return {
+        connected: cached?.ok === true,
+        driver,
+      };
+    } catch {
+      return {
+        connected: false,
+        driver,
+      };
+    }
+  }
+
   private hasConfig(key: string): boolean {
     const value = this.configService.get<string>(key);
     return Boolean(value?.trim());
@@ -96,5 +132,23 @@ export class HealthService {
 
   private hasAllConfig(keys: string[]): boolean {
     return keys.every((key) => this.hasConfig(key));
+  }
+
+  private withTimeout<T>(promise: Promise<T>): Promise<T> {
+    let timeout: NodeJS.Timeout | undefined;
+
+    const timeoutPromise = new Promise<T>((_, reject) => {
+      timeout = setTimeout(
+        () => reject(new Error('Cache health check timed out')),
+        CACHE_HEALTH_TIMEOUT_MS,
+      );
+      timeout.unref();
+    });
+
+    return Promise.race([promise, timeoutPromise]).finally(() => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    });
   }
 }

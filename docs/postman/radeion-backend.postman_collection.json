@@ -68,6 +68,13 @@
           }
         },
         {
+          "name": "Cache Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health/cache"
+          }
+        },
+        {
           "name": "Auth Methods",
           "request": {
             "method": "GET",

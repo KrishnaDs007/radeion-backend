@@ -85,6 +85,7 @@ Quality and operations:
 
 - GitHub Actions CI added for Prisma validation, typecheck, lint, build, tests, and dependency audit.
 - Health config now reports email and Databricks table/column mapping presence without exposing secrets.
+- Cache health now reports a runtime cache round trip for memory or Redis cache drivers.
 - Public e2e tests now assert expanded health config shape and secret redaction.
 - Public-route e2e smoke tests added and wired into CI.
 - Authenticated-route e2e tests added with mocked auth context and Prisma.
@@ -107,6 +108,7 @@ Public:
 - `GET /health`
 - `GET /health/config`
 - `GET /health/database`
+- `GET /health/cache`
 - `GET /auth/methods`
 - `POST /auth/password-recovery`
 - `POST /access-requests/users`

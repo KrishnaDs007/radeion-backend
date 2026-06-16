@@ -12,6 +12,7 @@ Current route groups:
 - `GET /health` public health status
 - `GET /health/config` public config-presence status without secret values
 - `GET /health/database` public database connectivity status
+- `GET /health/cache` public cache round-trip status
 - `GET /auth/methods` public auth configuration
 - `POST /auth/password-recovery` public Supabase password recovery email request
 - `POST /access-requests/users` public user access request
@@ -131,6 +132,13 @@ It reports:
 - Databricks table and column mapping presence
 - cache driver
 - email driver and invite email setting presence
+
+`GET /health/cache` performs a short cache round trip through the configured cache driver and returns:
+
+- `connected`
+- `driver`
+
+It can be used to verify either the default in-memory cache or a Redis-backed deployment without touching application data.
 
 ## Invite Acceptance Flow
 

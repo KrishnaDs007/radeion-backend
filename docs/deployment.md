@@ -168,6 +168,8 @@ Use:
 GET /health
 GET /health/config
 GET /health/database
+GET /health/cache
 ```
 
 `/health/config` reports whether required secrets are present without exposing the secret values.
+`/health/cache` performs a small round trip against the configured cache driver, which is useful when validating Redis deployments.

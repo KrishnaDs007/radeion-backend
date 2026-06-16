@@ -45,3 +45,8 @@ export type ConfigurationStatus = {
 export type DatabaseHealthStatus = {
   connected: boolean;
 };
+
+export type CacheHealthStatus = {
+  connected: boolean;
+  driver: string;
+};

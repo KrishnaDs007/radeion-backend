@@ -7,6 +7,7 @@ import { AppController } from '../src/app.controller';
 import { AppService } from '../src/app.service';
 import { AuthController } from '../src/auth/auth.controller';
 import { AuthService } from '../src/auth/auth.service';
+import { CacheService } from '../src/cache/cache.service';
 import { HealthController } from '../src/health/health.controller';
 import { HealthService } from '../src/health/health.service';
 import { InvitesController } from '../src/invites/invites.controller';
@@ -18,6 +19,13 @@ describe('Public routes (e2e)', () => {
   let app: INestApplication<App>;
   const prismaService = {
     $queryRaw: jest.fn().mockResolvedValue([{ result: 1 }]),
+  };
+  const cacheService = {
+    get: jest.fn().mockResolvedValue({
+      ok: true,
+    }),
+    set: jest.fn().mockResolvedValue(undefined),
+    delete: jest.fn().mockResolvedValue(undefined),
   };
   const supabaseService = {
     requestPasswordRecovery: jest.fn().mockResolvedValue(undefined),
@@ -70,6 +78,10 @@ describe('Public routes (e2e)', () => {
         {
           provide: PrismaService,
           useValue: prismaService,
+        },
+        {
+          provide: CacheService,
+          useValue: cacheService,
         },
         {
           provide: SupabaseService,
@@ -177,6 +189,26 @@ describe('Public routes (e2e)', () => {
       });
 
     expect(prismaService.$queryRaw).toHaveBeenCalledTimes(1);
+  });
+
+  it('checks cache health through the configured cache service', async () => {
+    await request(app.getHttpServer()).get('/health/cache').expect(200).expect({
+      connected: true,
+      driver: 'memory',
+    });
+
+    expect(cacheService.set).toHaveBeenCalledWith(
+      expect.stringMatching(/^health:cache:/),
+      {
+        ok: true,
+      },
+      {
+        ttlSeconds: 10,
+      },
+    );
+    expect(cacheService.delete).toHaveBeenCalledWith(
+      expect.stringMatching(/^health:cache:/),
+    );
   });
 
   it('returns supported auth methods', async () => {

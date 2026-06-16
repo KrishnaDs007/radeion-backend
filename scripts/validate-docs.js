@@ -16,6 +16,7 @@ const PUBLIC_ROUTES = new Set([
   'GET /health',
   'GET /health/config',
   'GET /health/database',
+  'GET /health/cache',
   'GET /auth/methods',
   'POST /auth/password-recovery',
   'POST /access-requests/users',

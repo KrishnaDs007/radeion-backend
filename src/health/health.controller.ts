@@ -23,4 +23,10 @@ export class HealthController {
   getDatabaseHealth() {
     return this.healthService.getDatabaseHealth();
   }
+
+  @Public()
+  @Get('cache')
+  getCacheHealth() {
+    return this.healthService.getCacheHealth();
+  }
 }
