@@ -6,10 +6,12 @@ This file tracks backend-only pending work. Frontend screens are intentionally e
 
 There are no currently defined backend API endpoints waiting to be implemented from the active project tracker.
 
-The backend already exposes the support APIs needed by the current frontend-facing onboarding TODOs:
+The backend already exposes the support APIs needed by the current onboarding and admin review flows:
 
 - `POST /access-requests/users`
 - `POST /access-requests/organizations`
+- `GET /access-requests/users`
+- `GET /access-requests/organizations`
 - `POST /access-requests/users/:id/retry`
 - `POST /access-requests/organizations/:id/retry`
 - `POST /auth/password-recovery`
@@ -41,7 +43,7 @@ These are not active TODOs. Add them only when a concrete product workflow needs
 - Additional child routes under organizations, practices, providers, users, or roles.
 - Databricks write/sync APIs for practice/provider reference data.
 - Bulk import/export APIs for admin operations.
-- Admin-facing access request list/detail APIs beyond the current approval and retry flows.
+- Admin-facing access request detail APIs or richer filtering/export workflows beyond the current list, approval, and retry flows.
 - Operational diagnostics beyond `/health/config`, `/health/database`, and `/health/cache`.
 
 ## Documentation Status

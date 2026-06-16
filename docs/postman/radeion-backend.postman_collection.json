@@ -18,6 +18,14 @@
       "value": "00000000-0000-0000-0000-000000000000"
     },
     {
+      "key": "organizationRequestId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "userRequestId",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
       "key": "profileId",
       "value": "00000000-0000-0000-0000-000000000000"
     },
@@ -138,6 +146,32 @@
           }
         },
         {
+          "name": "List Organization Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/access-requests/organizations?status=pending&email=admin@example.org&limit=25&offset=0"
+          }
+        },
+        {
+          "name": "List User Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/access-requests/users?status=pending&organizationId={{organizationId}}&limit=25&offset=0"
+          }
+        },
+        {
           "name": "Retry Organization Request",
           "request": {
             "method": "POST",
@@ -190,6 +224,48 @@
               "raw": "{\n  \"name\": \"Example Health ACO\",\n  \"type\": \"aco\",\n  \"contactEmail\": \"admin@example.org\"\n}"
             },
             "url": "{{baseUrl}}/access-requests/organizations/{{organizationRequestId}}/approve"
+          }
+        },
+        {
+          "name": "Reject Organization Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reviewNotes\": \"Organization could not be verified\"\n}"
+            },
+            "url": "{{baseUrl}}/access-requests/organizations/{{organizationRequestId}}/reject"
+          }
+        },
+        {
+          "name": "Approve User Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reviewNotes\": \"Approved for onboarding\"\n}"
+            },
+            "url": "{{baseUrl}}/access-requests/users/{{userRequestId}}/approve"
           }
         },
         {

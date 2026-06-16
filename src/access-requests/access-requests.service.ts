@@ -18,6 +18,7 @@ import { ApproveOrganizationRequestDto } from './dto/approve-organization-reques
 import { ApproveUserRequestDto } from './dto/approve-user-request.dto';
 import { CreateOrganizationAccessRequestDto } from './dto/create-organization-access-request.dto';
 import { CreateUserAccessRequestDto } from './dto/create-user-access-request.dto';
+import { ListAccessRequestsDto } from './dto/list-access-requests.dto';
 import { RejectAccessRequestDto } from './dto/reject-access-request.dto';
 
 const REQUESTED_ROLE_MAP: Record<string, RoleName> = {
@@ -43,6 +44,27 @@ const RETRYABLE_REQUEST_STATUSES = new Set<RequestStatus>([
   RequestStatus.DECLINED,
   RequestStatus.FAILED,
 ]);
+
+const DEFAULT_ACCESS_REQUEST_LIMIT = 50;
+
+const REQUEST_STATUS_MAP: Record<
+  NonNullable<ListAccessRequestsDto['status']>,
+  RequestStatus
+> = {
+  pending: RequestStatus.PENDING,
+  approved: RequestStatus.APPROVED,
+  rejected: RequestStatus.REJECTED,
+  declined: RequestStatus.DECLINED,
+  failed: RequestStatus.FAILED,
+};
+
+type AccessRequestPage = {
+  limit: number;
+  offset: number;
+  total: number;
+  nextOffset: number | null;
+  hasNextPage: boolean;
+};
 
 @Injectable()
 export class AccessRequestsService {
@@ -88,6 +110,97 @@ export class AccessRequestsService {
         createdAt: true,
       },
     });
+  }
+
+  async listUserRequests(query: ListAccessRequestsDto) {
+    const limit = Number(query.limit ?? DEFAULT_ACCESS_REQUEST_LIMIT);
+    const offset = Number(query.offset ?? 0);
+    const where = this.buildUserRequestWhere(query);
+    const [data, total] = await Promise.all([
+      this.prismaService.userApprovalRequest.findMany({
+        where,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip: offset,
+        take: limit,
+        select: {
+          id: true,
+          authUserId: true,
+          email: true,
+          organizationId: true,
+          requestedRoles: true,
+          requestedScope: true,
+          status: true,
+          reviewedAt: true,
+          reviewNotes: true,
+          createdAt: true,
+          updatedAt: true,
+          organization: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          reviewedBy: {
+            select: {
+              id: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      }),
+      this.prismaService.userApprovalRequest.count({ where }),
+    ]);
+
+    return {
+      data,
+      page: this.buildPage(limit, offset, total),
+    };
+  }
+
+  async listOrganizationRequests(query: ListAccessRequestsDto) {
+    const limit = Number(query.limit ?? DEFAULT_ACCESS_REQUEST_LIMIT);
+    const offset = Number(query.offset ?? 0);
+    const where = this.buildOrganizationRequestWhere(query);
+    const [data, total] = await Promise.all([
+      this.prismaService.organizationApprovalRequest.findMany({
+        where,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        skip: offset,
+        take: limit,
+        select: {
+          id: true,
+          organizationName: true,
+          requestedByEmail: true,
+          requestedByAuthUserId: true,
+          requestedPayload: true,
+          status: true,
+          reviewedAt: true,
+          reviewNotes: true,
+          createdAt: true,
+          updatedAt: true,
+          reviewedBy: {
+            select: {
+              id: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      }),
+      this.prismaService.organizationApprovalRequest.count({ where }),
+    ]);
+
+    return {
+      data,
+      page: this.buildPage(limit, offset, total),
+    };
   }
 
   async retryUserRequest(id: string, input: CreateUserAccessRequestDto) {
@@ -483,6 +596,52 @@ export class AccessRequestsService {
     if (!RETRYABLE_REQUEST_STATUSES.has(status)) {
       throw new BadRequestException(`${label} cannot be retried`);
     }
+  }
+
+  private buildUserRequestWhere(
+    query: ListAccessRequestsDto,
+  ): Prisma.UserApprovalRequestWhereInput {
+    return {
+      status: query.status ? REQUEST_STATUS_MAP[query.status] : undefined,
+      email: query.email
+        ? {
+            contains: query.email.toLowerCase(),
+            mode: 'insensitive',
+          }
+        : undefined,
+      organizationId: query.organizationId,
+    };
+  }
+
+  private buildOrganizationRequestWhere(
+    query: ListAccessRequestsDto,
+  ): Prisma.OrganizationApprovalRequestWhereInput {
+    return {
+      status: query.status ? REQUEST_STATUS_MAP[query.status] : undefined,
+      requestedByEmail: query.email
+        ? {
+            contains: query.email.toLowerCase(),
+            mode: 'insensitive',
+          }
+        : undefined,
+    };
+  }
+
+  private buildPage(
+    limit: number,
+    offset: number,
+    total: number,
+  ): AccessRequestPage {
+    const nextOffset = offset + limit;
+    const hasNextPage = nextOffset < total;
+
+    return {
+      limit,
+      offset,
+      total,
+      nextOffset: hasNextPage ? nextOffset : null,
+      hasNextPage,
+    };
   }
 
   private getPayloadString(

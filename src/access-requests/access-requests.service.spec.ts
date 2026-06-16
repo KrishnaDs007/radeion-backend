@@ -3,6 +3,144 @@ import { BadRequestException } from '@nestjs/common';
 import { RequestStatus } from '@prisma/client';
 
 describe('AccessRequestsService', () => {
+  it('lists user access requests with filters and pagination metadata', async () => {
+    const requests = [
+      {
+        id: 'request-1',
+        email: 'user@example.com',
+        status: RequestStatus.PENDING,
+      },
+    ];
+    const prismaService = {
+      userApprovalRequest: {
+        findMany: jest.fn().mockResolvedValue(requests),
+        count: jest.fn().mockResolvedValue(1),
+      },
+    };
+    const service = new AccessRequestsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof AccessRequestsService
+      >[0],
+      {} as ConstructorParameters<typeof AccessRequestsService>[1],
+    );
+
+    await expect(
+      service.listUserRequests({
+        status: 'pending',
+        email: 'USER@EXAMPLE.COM',
+        organizationId: 'organization-1',
+        limit: 25,
+        offset: 10,
+      }),
+    ).resolves.toEqual({
+      data: requests,
+      page: {
+        limit: 25,
+        offset: 10,
+        total: 1,
+        nextOffset: null,
+        hasNextPage: false,
+      },
+    });
+
+    expect(prismaService.userApprovalRequest.findMany).toHaveBeenCalledWith({
+      where: {
+        status: RequestStatus.PENDING,
+        email: {
+          contains: 'user@example.com',
+          mode: 'insensitive',
+        },
+        organizationId: 'organization-1',
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: 10,
+      take: 25,
+      select: expect.any(Object) as Record<string, unknown>,
+    });
+    expect(prismaService.userApprovalRequest.count).toHaveBeenCalledWith({
+      where: {
+        status: RequestStatus.PENDING,
+        email: {
+          contains: 'user@example.com',
+          mode: 'insensitive',
+        },
+        organizationId: 'organization-1',
+      },
+    });
+  });
+
+  it('lists organization access requests with filters and pagination metadata', async () => {
+    const requests = [
+      {
+        id: 'request-1',
+        organizationName: 'Example Health',
+        requestedByEmail: 'admin@example.com',
+        status: RequestStatus.REJECTED,
+      },
+    ];
+    const prismaService = {
+      organizationApprovalRequest: {
+        findMany: jest.fn().mockResolvedValue(requests),
+        count: jest.fn().mockResolvedValue(3),
+      },
+    };
+    const service = new AccessRequestsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof AccessRequestsService
+      >[0],
+      {} as ConstructorParameters<typeof AccessRequestsService>[1],
+    );
+
+    await expect(
+      service.listOrganizationRequests({
+        status: 'rejected',
+        email: 'ADMIN@EXAMPLE.COM',
+        limit: 2,
+        offset: 0,
+      }),
+    ).resolves.toEqual({
+      data: requests,
+      page: {
+        limit: 2,
+        offset: 0,
+        total: 3,
+        nextOffset: 2,
+        hasNextPage: true,
+      },
+    });
+
+    expect(
+      prismaService.organizationApprovalRequest.findMany,
+    ).toHaveBeenCalledWith({
+      where: {
+        status: RequestStatus.REJECTED,
+        requestedByEmail: {
+          contains: 'admin@example.com',
+          mode: 'insensitive',
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: 0,
+      take: 2,
+      select: expect.any(Object) as Record<string, unknown>,
+    });
+    expect(
+      prismaService.organizationApprovalRequest.count,
+    ).toHaveBeenCalledWith({
+      where: {
+        status: RequestStatus.REJECTED,
+        requestedByEmail: {
+          contains: 'admin@example.com',
+          mode: 'insensitive',
+        },
+      },
+    });
+  });
+
   it('creates a pending user access request', async () => {
     const userRequest = {
       id: 'request-1',

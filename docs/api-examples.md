@@ -115,6 +115,20 @@ curl -X POST "$API_BASE_URL/access-requests/users" \
 }'
 ```
 
+List user access requests:
+
+```bash
+curl "$API_BASE_URL/access-requests/users?status=pending&organizationId=00000000-0000-0000-0000-000000000000&limit=25&offset=0" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
+List organization access requests:
+
+```bash
+curl "$API_BASE_URL/access-requests/organizations?status=pending&email=admin@example.org&limit=25&offset=0" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
 Retry a rejected, declined, or failed organization request:
 
 ```bash

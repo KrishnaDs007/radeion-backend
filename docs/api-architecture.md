@@ -17,6 +17,8 @@ Current route groups:
 - `POST /auth/password-recovery` public Supabase password recovery email request
 - `POST /access-requests/users` public user access request
 - `POST /access-requests/organizations` public organization access request
+- `GET /access-requests/users` protected user access request list
+- `GET /access-requests/organizations` protected organization access request list
 - `POST /access-requests/users/:id/retry` public user access request retry
 - `POST /access-requests/organizations/:id/retry` public organization access request retry
 - `POST /access-requests/users/:id/approve` protected user approval
@@ -167,6 +169,28 @@ Retry requests require the same email as the original request:
 - organization retries compare `requestedByEmail`
 
 Pending and approved requests cannot be retried.
+
+## Access Request Review Queues
+
+Admins can list access requests before approving or rejecting them:
+
+- `GET /access-requests/users`
+- `GET /access-requests/organizations`
+
+Both routes support these optional query parameters:
+
+- `status`
+- `email`
+- `limit`
+- `offset`
+
+`GET /access-requests/users` also supports:
+
+- `organizationId`
+
+Both list routes return a `data` array and `page` metadata with `limit`, `offset`, `total`, `nextOffset`, and `hasNextPage`.
+
+The list routes require `user.approve` or `organization.approve`, which means they are effectively limited to platform roles in the current ACL implementation because the checks are not resource-scoped.
 
 Invite creation stores only a hashed invite token. The raw `inviteToken` is returned once from `POST /invites` so the UI or a fallback admin workflow can send it to the invited user.
 

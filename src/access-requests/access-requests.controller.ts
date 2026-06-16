@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import type { UserContext } from '../auth/auth.types';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Public } from '../common/decorators/public.decorator';
@@ -8,6 +8,7 @@ import { ApproveOrganizationRequestDto } from './dto/approve-organization-reques
 import { ApproveUserRequestDto } from './dto/approve-user-request.dto';
 import { CreateOrganizationAccessRequestDto } from './dto/create-organization-access-request.dto';
 import { CreateUserAccessRequestDto } from './dto/create-user-access-request.dto';
+import { ListAccessRequestsDto } from './dto/list-access-requests.dto';
 import { RejectAccessRequestDto } from './dto/reject-access-request.dto';
 
 @Controller('access-requests')
@@ -30,6 +31,18 @@ export class AccessRequestsController {
     return {
       data: await this.accessRequestsService.createOrganizationRequest(body),
     };
+  }
+
+  @RequirePermission('user.approve')
+  @Get('users')
+  async listUserRequests(@Query() query: ListAccessRequestsDto) {
+    return await this.accessRequestsService.listUserRequests(query);
+  }
+
+  @RequirePermission('organization.approve')
+  @Get('organizations')
+  async listOrganizationRequests(@Query() query: ListAccessRequestsDto) {
+    return await this.accessRequestsService.listOrganizationRequests(query);
   }
 
   @Public()
