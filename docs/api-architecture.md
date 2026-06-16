@@ -19,6 +19,8 @@ Current route groups:
 - `POST /access-requests/organizations` public organization access request
 - `GET /access-requests/users` protected user access request list
 - `GET /access-requests/organizations` protected organization access request list
+- `GET /access-requests/users/:id` protected user access request detail
+- `GET /access-requests/organizations/:id` protected organization access request detail
 - `POST /access-requests/users/:id/retry` public user access request retry
 - `POST /access-requests/organizations/:id/retry` public organization access request retry
 - `POST /access-requests/users/:id/approve` protected user approval
@@ -176,6 +178,8 @@ Admins can list access requests before approving or rejecting them:
 
 - `GET /access-requests/users`
 - `GET /access-requests/organizations`
+- `GET /access-requests/users/:id`
+- `GET /access-requests/organizations/:id`
 
 Both routes support these optional query parameters:
 
@@ -189,6 +193,8 @@ Both routes support these optional query parameters:
 - `organizationId`
 
 Both list routes return a `data` array and `page` metadata with `limit`, `offset`, `total`, `nextOffset`, and `hasNextPage`.
+
+The detail routes return one request record with the same nested reviewer and organization fields used in the list responses.
 
 The list routes require `user.approve` or `organization.approve`, which means they are effectively limited to platform roles in the current ACL implementation because the checks are not resource-scoped.
 

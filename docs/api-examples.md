@@ -129,6 +129,20 @@ curl "$API_BASE_URL/access-requests/organizations?status=pending&email=admin@exa
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 
+Get one user access request:
+
+```bash
+curl "$API_BASE_URL/access-requests/users/<requestId>" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
+Get one organization access request:
+
+```bash
+curl "$API_BASE_URL/access-requests/organizations/<requestId>" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
 Retry a rejected, declined, or failed organization request:
 
 ```bash

@@ -159,6 +159,19 @@
           }
         },
         {
+          "name": "Get Organization Request",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/access-requests/organizations/{{organizationRequestId}}"
+          }
+        },
+        {
           "name": "List User Requests",
           "request": {
             "method": "GET",
@@ -169,6 +182,19 @@
               }
             ],
             "url": "{{baseUrl}}/access-requests/users?status=pending&organizationId={{organizationId}}&limit=25&offset=0"
+          }
+        },
+        {
+          "name": "Get User Request",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/access-requests/users/{{userRequestId}}"
           }
         },
         {

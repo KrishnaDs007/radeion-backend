@@ -12,6 +12,8 @@ The backend already exposes the support APIs needed by the current onboarding an
 - `POST /access-requests/organizations`
 - `GET /access-requests/users`
 - `GET /access-requests/organizations`
+- `GET /access-requests/users/:id`
+- `GET /access-requests/organizations/:id`
 - `POST /access-requests/users/:id/retry`
 - `POST /access-requests/organizations/:id/retry`
 - `POST /auth/password-recovery`
@@ -43,7 +45,7 @@ These are not active TODOs. Add them only when a concrete product workflow needs
 - Additional child routes under organizations, practices, providers, users, or roles.
 - Databricks write/sync APIs for practice/provider reference data.
 - Bulk import/export APIs for admin operations.
-- Admin-facing access request detail APIs or richer filtering/export workflows beyond the current list, approval, and retry flows.
+- Admin-facing access request exports or richer filtering workflows beyond the current list, detail, approval, and retry flows.
 - Operational diagnostics beyond `/health/config`, `/health/database`, and `/health/cache`.
 
 ## Documentation Status

@@ -39,10 +39,26 @@ export class AccessRequestsController {
     return await this.accessRequestsService.listUserRequests(query);
   }
 
+  @RequirePermission('user.approve')
+  @Get('users/:id')
+  async getUserRequest(@Param('id') id: string) {
+    return {
+      data: await this.accessRequestsService.getUserRequest(id),
+    };
+  }
+
   @RequirePermission('organization.approve')
   @Get('organizations')
   async listOrganizationRequests(@Query() query: ListAccessRequestsDto) {
     return await this.accessRequestsService.listOrganizationRequests(query);
+  }
+
+  @RequirePermission('organization.approve')
+  @Get('organizations/:id')
+  async getOrganizationRequest(@Param('id') id: string) {
+    return {
+      data: await this.accessRequestsService.getOrganizationRequest(id),
+    };
   }
 
   @Public()

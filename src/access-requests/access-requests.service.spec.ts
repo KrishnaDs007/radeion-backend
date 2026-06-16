@@ -1,8 +1,98 @@
 import { AccessRequestsService } from './access-requests.service';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { RequestStatus } from '@prisma/client';
 
 describe('AccessRequestsService', () => {
+  it('returns one user access request by id', async () => {
+    const request = {
+      id: 'request-1',
+      email: 'user@example.com',
+      status: RequestStatus.PENDING,
+    };
+    const prismaService = {
+      userApprovalRequest: {
+        findUnique: jest.fn().mockResolvedValue(request),
+      },
+    };
+    const service = new AccessRequestsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof AccessRequestsService
+      >[0],
+      {} as ConstructorParameters<typeof AccessRequestsService>[1],
+    );
+
+    await expect(service.getUserRequest('request-1')).resolves.toEqual(request);
+    expect(prismaService.userApprovalRequest.findUnique).toHaveBeenCalledWith({
+      where: { id: 'request-1' },
+      select: expect.any(Object) as Record<string, unknown>,
+    });
+  });
+
+  it('rejects missing user access request details', async () => {
+    const prismaService = {
+      userApprovalRequest: {
+        findUnique: jest.fn().mockResolvedValue(null),
+      },
+    };
+    const service = new AccessRequestsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof AccessRequestsService
+      >[0],
+      {} as ConstructorParameters<typeof AccessRequestsService>[1],
+    );
+
+    await expect(service.getUserRequest('request-1')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+
+  it('returns one organization access request by id', async () => {
+    const request = {
+      id: 'request-1',
+      organizationName: 'Example Health',
+      status: RequestStatus.PENDING,
+    };
+    const prismaService = {
+      organizationApprovalRequest: {
+        findUnique: jest.fn().mockResolvedValue(request),
+      },
+    };
+    const service = new AccessRequestsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof AccessRequestsService
+      >[0],
+      {} as ConstructorParameters<typeof AccessRequestsService>[1],
+    );
+
+    await expect(service.getOrganizationRequest('request-1')).resolves.toEqual(
+      request,
+    );
+    expect(
+      prismaService.organizationApprovalRequest.findUnique,
+    ).toHaveBeenCalledWith({
+      where: { id: 'request-1' },
+      select: expect.any(Object) as Record<string, unknown>,
+    });
+  });
+
+  it('rejects missing organization access request details', async () => {
+    const prismaService = {
+      organizationApprovalRequest: {
+        findUnique: jest.fn().mockResolvedValue(null),
+      },
+    };
+    const service = new AccessRequestsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof AccessRequestsService
+      >[0],
+      {} as ConstructorParameters<typeof AccessRequestsService>[1],
+    );
+
+    await expect(
+      service.getOrganizationRequest('request-1'),
+    ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
   it('lists user access requests with filters and pagination metadata', async () => {
     const requests = [
       {

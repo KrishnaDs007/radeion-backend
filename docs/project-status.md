@@ -32,6 +32,7 @@ Access and onboarding:
 
 - Public user and organization access request APIs added.
 - Protected admin user and organization access request list APIs added.
+- Protected admin user and organization access request detail APIs added.
 - Public retry APIs added for rejected, declined, or failed access requests.
 - Public password recovery request API added for Supabase password reset emails.
 - Protected user and organization approval/rejection APIs added.
@@ -124,6 +125,8 @@ Protected:
 
 - `GET /access-requests/users`
 - `GET /access-requests/organizations`
+- `GET /access-requests/users/:id`
+- `GET /access-requests/organizations/:id`
 - `POST /access-requests/users/:id/approve`
 - `POST /access-requests/users/:id/reject`
 - `POST /access-requests/organizations/:id/approve`
@@ -198,7 +201,7 @@ Backend/external items still open:
 
 - Fill production Databricks table and column environment values after final schemas are available.
 - Create a GitHub PR after GitHub auth or connector permissions are available.
-- Add future access request detail routes, extra filters, or additional child routes only when a concrete product workflow defines them.
+- Add richer access request filtering/export workflows or additional child routes only when a concrete product workflow defines them.
 - Confirm Supabase Auth email delivery after the project URL, SMTP/email settings, and `PASSWORD_RECOVERY_REDIRECT_URL` are valid.
 
 See `docs/pending-backend-work.md` for the backend-only backlog and future API candidates.

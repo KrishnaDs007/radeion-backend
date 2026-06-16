@@ -124,33 +124,7 @@ export class AccessRequestsService {
         },
         skip: offset,
         take: limit,
-        select: {
-          id: true,
-          authUserId: true,
-          email: true,
-          organizationId: true,
-          requestedRoles: true,
-          requestedScope: true,
-          status: true,
-          reviewedAt: true,
-          reviewNotes: true,
-          createdAt: true,
-          updatedAt: true,
-          organization: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          reviewedBy: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
-            },
-          },
-        },
+        select: this.userRequestSelect(),
       }),
       this.prismaService.userApprovalRequest.count({ where }),
     ]);
@@ -159,6 +133,19 @@ export class AccessRequestsService {
       data,
       page: this.buildPage(limit, offset, total),
     };
+  }
+
+  async getUserRequest(id: string) {
+    const request = await this.prismaService.userApprovalRequest.findUnique({
+      where: { id },
+      select: this.userRequestSelect(),
+    });
+
+    if (!request) {
+      throw new NotFoundException('User approval request not found');
+    }
+
+    return request;
   }
 
   async listOrganizationRequests(query: ListAccessRequestsDto) {
@@ -173,26 +160,7 @@ export class AccessRequestsService {
         },
         skip: offset,
         take: limit,
-        select: {
-          id: true,
-          organizationName: true,
-          requestedByEmail: true,
-          requestedByAuthUserId: true,
-          requestedPayload: true,
-          status: true,
-          reviewedAt: true,
-          reviewNotes: true,
-          createdAt: true,
-          updatedAt: true,
-          reviewedBy: {
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
-            },
-          },
-        },
+        select: this.organizationRequestSelect(),
       }),
       this.prismaService.organizationApprovalRequest.count({ where }),
     ]);
@@ -201,6 +169,20 @@ export class AccessRequestsService {
       data,
       page: this.buildPage(limit, offset, total),
     };
+  }
+
+  async getOrganizationRequest(id: string) {
+    const request =
+      await this.prismaService.organizationApprovalRequest.findUnique({
+        where: { id },
+        select: this.organizationRequestSelect(),
+      });
+
+    if (!request) {
+      throw new NotFoundException('Organization approval request not found');
+    }
+
+    return request;
   }
 
   async retryUserRequest(id: string, input: CreateUserAccessRequestDto) {
@@ -641,6 +623,59 @@ export class AccessRequestsService {
       total,
       nextOffset: hasNextPage ? nextOffset : null,
       hasNextPage,
+    };
+  }
+
+  private userRequestSelect() {
+    return {
+      id: true,
+      authUserId: true,
+      email: true,
+      organizationId: true,
+      requestedRoles: true,
+      requestedScope: true,
+      status: true,
+      reviewedAt: true,
+      reviewNotes: true,
+      createdAt: true,
+      updatedAt: true,
+      organization: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      reviewedBy: {
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+    };
+  }
+
+  private organizationRequestSelect() {
+    return {
+      id: true,
+      organizationName: true,
+      requestedByEmail: true,
+      requestedByAuthUserId: true,
+      requestedPayload: true,
+      status: true,
+      reviewedAt: true,
+      reviewNotes: true,
+      createdAt: true,
+      updatedAt: true,
+      reviewedBy: {
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
     };
   }
 
