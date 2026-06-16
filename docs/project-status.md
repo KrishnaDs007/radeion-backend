@@ -76,6 +76,7 @@ Developer experience:
 - README updated to reflect the current backend scope, validation workflow, and runtime capabilities.
 - Environment/Supabase setup doc updated for Databricks mappings, cache, email, and runtime validation.
 - API request examples added in `docs/api-examples.md`.
+- Backend-only pending work and future API candidates documented in `docs/pending-backend-work.md`.
 - Postman collection added in `docs/postman/radeion-backend.postman_collection.json`.
 - Postman collection updated for nested reference, care coordinator, role assignment, and user lifecycle routes.
 - Postman Databricks examples updated with sorted read coverage.
@@ -185,3 +186,16 @@ Quality and operations:
 Future route depth:
 
 - Add additional child routes only when a concrete frontend workflow requires them.
+
+## Backend-Only Pending Work
+
+No currently defined backend API endpoints remain pending from the active tracker.
+
+Backend/external items still open:
+
+- Fill production Databricks table and column environment values after final schemas are available.
+- Create a GitHub PR after GitHub auth or connector permissions are available.
+- Add future child routes only when a concrete product workflow defines them.
+- Confirm Supabase Auth email delivery after the project URL, SMTP/email settings, and `PASSWORD_RECOVERY_REDIRECT_URL` are valid.
+
+See `docs/pending-backend-work.md` for the backend-only backlog and future API candidates.

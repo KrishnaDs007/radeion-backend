@@ -80,7 +80,7 @@ This repository now has the first backend foundation in place:
 - Deployment guide and Docker runtime scaffolding
 - CI configured with dummy non-secret app environment values for validation
 
-See `docs/project-status.md` for the detailed progress tracker and `docs/deployment.md` for the first deployment guide.
+See `docs/project-status.md` for the detailed progress tracker, `docs/pending-backend-work.md` for backend-only pending work, and `docs/deployment.md` for the first deployment guide.
 
 ## Local Development
 

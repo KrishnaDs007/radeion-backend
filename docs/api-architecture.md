@@ -241,7 +241,7 @@ The guard calls the central ACL service:
 can({ user, action, scope })
 ```
 
-The ACL service currently has the base shape only. It allows platform roles such as `developer` and `superAdmin`, and it contains the first scoped-access comparison logic. Role loading from the database will be added in the next implementation step.
+The ACL service allows platform roles such as `developer` and `superAdmin`, and it applies scoped-access comparison logic for non-platform roles. Protected requests load active role assignments from the database before ACL checks run.
 
 ## User Context Loading
 
