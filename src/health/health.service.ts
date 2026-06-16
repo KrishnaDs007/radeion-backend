@@ -88,11 +88,17 @@ export class HealthService {
   }
 
   async getDatabaseHealth(): Promise<DatabaseHealthStatus> {
-    await this.prismaService.$queryRaw`SELECT 1`;
+    try {
+      await this.prismaService.$queryRaw`SELECT 1`;
 
-    return {
-      connected: true,
-    };
+      return {
+        connected: true,
+      };
+    } catch {
+      return {
+        connected: false,
+      };
+    }
   }
 
   async getCacheHealth(): Promise<CacheHealthStatus> {

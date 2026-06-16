@@ -100,6 +100,21 @@ describe('HealthService', () => {
     expect(prismaService.$queryRaw).toHaveBeenCalled();
   });
 
+  it('reports database health as disconnected when Prisma query fails', async () => {
+    const prismaService = {
+      $queryRaw: jest.fn().mockRejectedValue(new Error('database unavailable')),
+    };
+    const service = new HealthService(
+      new ConfigService({}),
+      prismaService as never,
+      {} as never,
+    );
+
+    await expect(service.getDatabaseHealth()).resolves.toEqual({
+      connected: false,
+    });
+  });
+
   it('reports cache health when the cache round trip succeeds', async () => {
     const cacheService = {
       set: jest.fn().mockResolvedValue(undefined),
