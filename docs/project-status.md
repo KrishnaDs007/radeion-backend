@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-06-15
+Last updated: 2026-06-16
 
 ## Completed
 
@@ -35,6 +35,7 @@ Access and onboarding:
 - Public password recovery request API added for Supabase password reset emails.
 - Protected user and organization approval/rejection APIs added.
 - Protected invite list, create, and revoke APIs added.
+- Public invite preview API added for validating invite links before Supabase session setup.
 - Public invite accept API added.
 - Optional Resend invite email delivery added with local disabled mode.
 
@@ -112,6 +113,7 @@ Public:
 - `POST /access-requests/organizations`
 - `POST /access-requests/users/:id/retry`
 - `POST /access-requests/organizations/:id/retry`
+- `POST /invites/preview`
 - `POST /invites/accept`
 
 Protected:
@@ -168,7 +170,7 @@ Protected:
 Auth and onboarding:
 
 - Build frontend signup stepper and connect failed/declined retry UX to the retry APIs.
-- Add frontend password setup/recovery flow for invites and Supabase recovery using the backend password recovery request API.
+- Add frontend password setup/recovery flow for invites and Supabase recovery using the backend invite preview and password recovery request APIs.
 
 Data and integrations:
 

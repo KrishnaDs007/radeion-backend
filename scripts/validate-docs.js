@@ -22,6 +22,7 @@ const PUBLIC_ROUTES = new Set([
   'POST /access-requests/organizations',
   'POST /access-requests/users/:param/retry',
   'POST /access-requests/organizations/:param/retry',
+  'POST /invites/preview',
   'POST /invites/accept',
 ]);
 
@@ -83,7 +84,10 @@ function readJson(filePath, errors) {
 }
 
 function validatePostmanShape(collection, errors) {
-  if (collection.info?.schema !== 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json') {
+  if (
+    collection.info?.schema !==
+    'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+  ) {
     errors.push('Postman collection must use schema v2.1.0');
   }
 
@@ -139,12 +143,19 @@ function validatePostmanRequests(requests, errors) {
       errors.push(`Postman request ${nameKey} is missing a URL`);
     }
 
-    if (!PUBLIC_ROUTES.has(request.routeKey) && !hasHeader(request, 'Authorization')) {
-      errors.push(`Protected Postman request ${nameKey} is missing Authorization header`);
+    if (
+      !PUBLIC_ROUTES.has(request.routeKey) &&
+      !hasHeader(request, 'Authorization')
+    ) {
+      errors.push(
+        `Protected Postman request ${nameKey} is missing Authorization header`,
+      );
     }
 
     if (request.body?.mode === 'raw' && !hasHeader(request, 'Content-Type')) {
-      errors.push(`Raw-body Postman request ${nameKey} is missing Content-Type header`);
+      errors.push(
+        `Raw-body Postman request ${nameKey} is missing Content-Type header`,
+      );
     }
   }
 }
@@ -156,20 +167,22 @@ function hasHeader(request, headerName) {
 }
 
 function extractCurrentApiRoutes(status) {
-  const currentShape = status.match(/## Current API Shape[\s\S]*?(?=\n## To Do|\n## )/);
+  const currentShape = status.match(
+    /## Current API Shape[\s\S]*?(?=\n## To Do|\n## )/,
+  );
 
   if (!currentShape) {
     return [];
   }
 
-  return Array.from(currentShape[0].matchAll(/- `(GET|POST|PATCH|DELETE) ([^`]+)`/g)).map(
-    ([, method, routePath]) => normalizeRoute(method, routePath),
-  );
+  return Array.from(
+    currentShape[0].matchAll(/- `(GET|POST|PATCH|DELETE) ([^`]+)`/g),
+  ).map(([, method, routePath]) => normalizeRoute(method, routePath));
 }
 
 function extractExampleRoutes(examples) {
   const routes = new Set();
-  const curlBlocks = examples.match(/```bash\n([\s\S]*?)```/g) ?? [];
+  const curlBlocks = examples.match(/```bash\r?\n([\s\S]*?)```/g) ?? [];
 
   for (const block of curlBlocks) {
     const methodMatch = block.match(/curl\s+-X\s+(GET|POST|PATCH|DELETE)/);

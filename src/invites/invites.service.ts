@@ -19,6 +19,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { AcceptInviteDto } from './dto/accept-invite.dto';
 import { CreateInviteDto } from './dto/create-invite.dto';
+import { PreviewInviteDto } from './dto/preview-invite.dto';
 
 const INVITE_TOKEN_BYTES = 32;
 
@@ -139,6 +140,45 @@ export class InvitesService {
     return revokedInvite;
   }
 
+  async previewInvite(input: PreviewInviteDto) {
+    const invite = await this.prismaService.invite.findUnique({
+      where: {
+        tokenHash: this.hashInviteToken(input.inviteToken),
+      },
+      select: {
+        id: true,
+        email: true,
+        organizationId: true,
+        status: true,
+        expiresAt: true,
+        acceptedAt: true,
+      },
+    });
+
+    if (!invite) {
+      throw new NotFoundException('Invite not found');
+    }
+
+    if (invite.status === InviteStatus.PENDING && this.isExpired(invite)) {
+      const expiredInvite = await this.prismaService.invite.update({
+        where: { id: invite.id },
+        data: { status: InviteStatus.EXPIRED },
+        select: {
+          id: true,
+          email: true,
+          organizationId: true,
+          status: true,
+          expiresAt: true,
+          acceptedAt: true,
+        },
+      });
+
+      return this.toInvitePreview(expiredInvite);
+    }
+
+    return this.toInvitePreview(invite);
+  }
+
   async acceptInvite(input: AcceptInviteDto) {
     const authUser = await this.supabaseService.getUserFromToken(
       input.accessToken,
@@ -163,7 +203,7 @@ export class InvitesService {
       throw new BadRequestException('Invite is not pending');
     }
 
-    if (invite.expiresAt && invite.expiresAt < new Date()) {
+    if (this.isExpired(invite)) {
       await this.prismaService.invite.update({
         where: { id: invite.id },
         data: { status: InviteStatus.EXPIRED },
@@ -268,6 +308,26 @@ export class InvitesService {
 
   private createInviteToken(): string {
     return randomBytes(INVITE_TOKEN_BYTES).toString('base64url');
+  }
+
+  private isExpired(invite: { expiresAt: Date | null }) {
+    return Boolean(invite.expiresAt && invite.expiresAt < new Date());
+  }
+
+  private toInvitePreview(invite: {
+    email: string;
+    organizationId: string | null;
+    status: InviteStatus;
+    expiresAt: Date | null;
+    acceptedAt: Date | null;
+  }) {
+    return {
+      email: invite.email,
+      organizationId: invite.organizationId,
+      status: invite.status,
+      expiresAt: invite.expiresAt,
+      acceptedAt: invite.acceptedAt,
+    };
   }
 
   private hashInviteToken(inviteToken: string): string {

@@ -5,6 +5,7 @@ import { Public } from '../common/decorators/public.decorator';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
 import { AcceptInviteDto } from './dto/accept-invite.dto';
 import { CreateInviteDto } from './dto/create-invite.dto';
+import { PreviewInviteDto } from './dto/preview-invite.dto';
 import { InvitesService } from './invites.service';
 
 @Controller('invites')
@@ -27,6 +28,14 @@ export class InvitesController {
   ) {
     return {
       data: await this.invitesService.createInvite(body, user),
+    };
+  }
+
+  @Public()
+  @Post('preview')
+  async previewInvite(@Body() body: PreviewInviteDto) {
+    return {
+      data: await this.invitesService.previewInvite(body),
     };
   }
 

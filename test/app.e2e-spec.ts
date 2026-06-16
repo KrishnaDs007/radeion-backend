@@ -9,6 +9,8 @@ import { AuthController } from '../src/auth/auth.controller';
 import { AuthService } from '../src/auth/auth.service';
 import { HealthController } from '../src/health/health.controller';
 import { HealthService } from '../src/health/health.service';
+import { InvitesController } from '../src/invites/invites.controller';
+import { InvitesService } from '../src/invites/invites.service';
 import { PrismaService } from '../src/prisma/prisma.service';
 import { SupabaseService } from '../src/supabase/supabase.service';
 
@@ -20,10 +22,24 @@ describe('Public routes (e2e)', () => {
   const supabaseService = {
     requestPasswordRecovery: jest.fn().mockResolvedValue(undefined),
   };
+  const invitesService = {
+    previewInvite: jest.fn().mockResolvedValue({
+      email: 'user@example.org',
+      organizationId: 'organization-1',
+      status: 'PENDING',
+      expiresAt: null,
+      acceptedAt: null,
+    }),
+  };
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      controllers: [AppController, AuthController, HealthController],
+      controllers: [
+        AppController,
+        AuthController,
+        HealthController,
+        InvitesController,
+      ],
       providers: [
         AppService,
         HealthService,
@@ -58,6 +74,10 @@ describe('Public routes (e2e)', () => {
         {
           provide: SupabaseService,
           useValue: supabaseService,
+        },
+        {
+          provide: InvitesService,
+          useValue: invitesService,
         },
       ],
     }).compile();
@@ -188,6 +208,28 @@ describe('Public routes (e2e)', () => {
     expect(supabaseService.requestPasswordRecovery).toHaveBeenCalledWith({
       email: 'user@example.org',
       redirectTo: 'https://app.example.com/password/recover',
+    });
+  });
+
+  it('previews an invite without requiring authentication', async () => {
+    await request(app.getHttpServer())
+      .post('/invites/preview')
+      .send({
+        inviteToken: 'valid-invite-token-value-with-enough-length',
+      })
+      .expect(201)
+      .expect({
+        data: {
+          email: 'user@example.org',
+          organizationId: 'organization-1',
+          status: 'PENDING',
+          expiresAt: null,
+          acceptedAt: null,
+        },
+      });
+
+    expect(invitesService.previewInvite).toHaveBeenCalledWith({
+      inviteToken: 'valid-invite-token-value-with-enough-length',
     });
   });
 });

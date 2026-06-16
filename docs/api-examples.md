@@ -212,6 +212,16 @@ curl -X POST "$API_BASE_URL/invites" \
 
 The response returns `inviteToken` once and includes `emailDelivery.status`. Local development skips email delivery unless `EMAIL_DRIVER=resend` is configured. After the invitee signs in or sets a password through Supabase, accept the invite:
 
+Preview an invite link before the invitee has a Supabase session:
+
+```bash
+curl -X POST "$API_BASE_URL/invites/preview" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "inviteToken": "replace-with-invite-token"
+  }'
+```
+
 ```bash
 curl -X POST "$API_BASE_URL/invites/accept" \
   -H "Content-Type: application/json" \

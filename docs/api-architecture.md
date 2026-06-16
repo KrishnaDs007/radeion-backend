@@ -24,6 +24,7 @@ Current route groups:
 - `POST /access-requests/organizations/:id/reject` protected organization rejection
 - `GET /invites` protected invite list
 - `POST /invites` protected invite creation
+- `POST /invites/preview` public limited invite lookup before Supabase session setup
 - `POST /invites/accept` public invite acceptance after Supabase password/session setup
 - `POST /invites/:id/revoke` protected invite revocation
 - `GET /reference/practices` protected practice reference list
@@ -132,6 +133,15 @@ It reports:
 - email driver and invite email setting presence
 
 ## Invite Acceptance Flow
+
+Invite preview lets the future onboarding UI verify an invite link before the invitee has a Supabase session:
+
+- `POST /invites/preview`
+- body: `inviteToken`
+
+The response intentionally returns only limited public fields: email, organization id, status, expiration time, and accepted time. It does not expose token hashes, assigned roles, assigned scopes, inviter details, or audit metadata.
+
+If a pending invite is already past `expiresAt`, preview marks it `expired` before returning the response.
 
 ## Password Recovery Flow
 

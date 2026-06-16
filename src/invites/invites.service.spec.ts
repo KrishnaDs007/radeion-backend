@@ -1,4 +1,5 @@
 import { InvitesService } from './invites.service';
+import { InviteStatus } from '@prisma/client';
 
 describe('InvitesService', () => {
   it('creates an invite and records an audit log', async () => {
@@ -77,6 +78,97 @@ describe('InvitesService', () => {
         targetId: 'invite-1',
       }),
     );
+  });
+
+  it('previews a pending invite with limited public fields', async () => {
+    const expiresAt = new Date(Date.now() + 60_000);
+    const invite = {
+      id: 'invite-1',
+      email: 'user@example.com',
+      organizationId: 'organization-1',
+      status: InviteStatus.PENDING,
+      expiresAt,
+      acceptedAt: null,
+    };
+    const prismaService = {
+      invite: {
+        findUnique: jest.fn().mockResolvedValue(invite),
+      },
+    };
+    const service = new InvitesService(
+      prismaService as unknown as ConstructorParameters<
+        typeof InvitesService
+      >[0],
+      {} as ConstructorParameters<typeof InvitesService>[1],
+      {} as ConstructorParameters<typeof InvitesService>[2],
+      {} as ConstructorParameters<typeof InvitesService>[3],
+    );
+
+    await expect(
+      service.previewInvite({
+        inviteToken: 'valid-invite-token-value-with-enough-length',
+      }),
+    ).resolves.toEqual({
+      email: 'user@example.com',
+      organizationId: 'organization-1',
+      status: InviteStatus.PENDING,
+      expiresAt,
+      acceptedAt: null,
+    });
+
+    const preview = await service.previewInvite({
+      inviteToken: 'valid-invite-token-value-with-enough-length',
+    });
+    expect(preview).not.toHaveProperty('tokenHash');
+    expect(preview).not.toHaveProperty('assignedRoles');
+    expect(preview).not.toHaveProperty('assignedScope');
+  });
+
+  it('marks expired pending invites as expired during preview', async () => {
+    const expiresAt = new Date(Date.now() - 60_000);
+    const expiredInvite = {
+      id: 'invite-1',
+      email: 'user@example.com',
+      organizationId: null,
+      status: InviteStatus.EXPIRED,
+      expiresAt,
+      acceptedAt: null,
+    };
+    const prismaService = {
+      invite: {
+        findUnique: jest.fn().mockResolvedValue({
+          ...expiredInvite,
+          status: InviteStatus.PENDING,
+        }),
+        update: jest.fn().mockResolvedValue(expiredInvite),
+      },
+    };
+    const service = new InvitesService(
+      prismaService as unknown as ConstructorParameters<
+        typeof InvitesService
+      >[0],
+      {} as ConstructorParameters<typeof InvitesService>[1],
+      {} as ConstructorParameters<typeof InvitesService>[2],
+      {} as ConstructorParameters<typeof InvitesService>[3],
+    );
+
+    await expect(
+      service.previewInvite({
+        inviteToken: 'valid-invite-token-value-with-enough-length',
+      }),
+    ).resolves.toEqual({
+      email: 'user@example.com',
+      organizationId: null,
+      status: InviteStatus.EXPIRED,
+      expiresAt,
+      acceptedAt: null,
+    });
+
+    expect(prismaService.invite.update).toHaveBeenCalledWith({
+      where: { id: 'invite-1' },
+      data: { status: InviteStatus.EXPIRED },
+      select: expect.any(Object) as Record<string, unknown>,
+    });
   });
 
   it('accepts an invite and activates a profile', async () => {

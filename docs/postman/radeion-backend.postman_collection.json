@@ -246,6 +246,23 @@
           }
         },
         {
+          "name": "Preview Invite",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"inviteToken\": \"replace-with-invite-token\"\n}"
+            },
+            "url": "{{baseUrl}}/invites/preview"
+          }
+        },
+        {
           "name": "Accept Invite",
           "request": {
             "method": "POST",
