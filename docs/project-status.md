@@ -1,8 +1,10 @@
 # Project Status
 
-Last updated: 2026-06-16
+Last updated: 2026-06-17
 
 ## Completed
+
+This status file tracks backend progress only.
 
 Foundation:
 
@@ -177,24 +179,23 @@ Protected:
 - `PATCH /data-query-presets/:id`
 - `DELETE /data-query-presets/:id`
 
-## To Do
+## Pending Backend Work
 
-Auth and onboarding:
+There are no currently defined backend API endpoints left unimplemented from the active tracker.
 
-- Build frontend signup stepper and connect failed/declined retry UX to the retry APIs.
-- Add frontend password setup/recovery flow for invites and Supabase recovery using the backend invite preview and password recovery request APIs.
+Current backend items still pending:
 
-Data and integrations:
+- Fill production Databricks table and column environment values after final schemas are available.
+- Confirm Supabase Auth email delivery after the project URL, SMTP/email settings, and `PASSWORD_RECOVERY_REDIRECT_URL` are valid.
+- Create a GitHub PR after GitHub auth or connector permissions are available.
 
-- Fill production Databricks table/column environment values when final schemas are available.
+Future backend candidates, only when a concrete workflow needs them:
 
-Quality and operations:
-
-- Create a GitHub PR from `codex-progress-updates` to `master` after GitHub auth or connector permissions are available.
-
-Future route depth:
-
-- Add additional child routes only when a concrete frontend workflow requires them.
+- Access request export workflows.
+- Databricks write or sync APIs for practice and provider reference data.
+- Bulk import or export APIs for admin operations.
+- Additional diagnostics beyond the current health coverage.
+- Additional child routes under organizations, practices, providers, users, or roles.
 
 ## Backend-Only Pending Work
 

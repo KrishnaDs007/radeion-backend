@@ -39,6 +39,12 @@ Supabase recovery email delivery:
 - Waiting for a reachable Supabase project URL, valid Supabase Auth email settings, and an allowed `PASSWORD_RECOVERY_REDIRECT_URL`.
 - Backend support already exists through `POST /auth/password-recovery`.
 
+## Current Pending Backend Points
+
+- Fill production Databricks table and column environment values after final schemas are available.
+- Confirm Supabase Auth email delivery after the project URL, SMTP/email settings, and `PASSWORD_RECOVERY_REDIRECT_URL` are valid.
+- Create a GitHub PR after GitHub auth or connector permissions are available.
+
 ## Future API Candidates
 
 These are not active TODOs. Add them only when a concrete product workflow needs them:
