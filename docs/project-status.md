@@ -36,6 +36,7 @@ Access and onboarding:
 - Protected admin user and organization access request list APIs added.
 - Protected admin user and organization access request detail APIs added.
 - Access request review queue filters added for reviewer and created-date ranges.
+- CSV exports added for admin user and organization access request review queues.
 - Public retry APIs added for rejected, declined, or failed access requests.
 - Public password recovery request API added for Supabase password reset emails.
 - Protected user and organization approval/rejection APIs added.
@@ -130,6 +131,8 @@ Protected:
 
 - `GET /access-requests/users`
 - `GET /access-requests/organizations`
+- `GET /access-requests/users/export`
+- `GET /access-requests/organizations/export`
 - `GET /access-requests/users/:id`
 - `GET /access-requests/organizations/:id`
 - `POST /access-requests/users/:id/approve`
@@ -191,7 +194,6 @@ Current backend items still pending:
 
 Future backend candidates, only when a concrete workflow needs them:
 
-- Access request export workflows.
 - Databricks write or sync APIs for practice and provider reference data.
 - Bulk import or export APIs for admin operations.
 - Additional diagnostics beyond the current health coverage.
@@ -205,7 +207,7 @@ Backend/external items still open:
 
 - Fill production Databricks table and column environment values after final schemas are available.
 - Create a GitHub PR after GitHub auth or connector permissions are available.
-- Add access request export workflows or additional child routes only when a concrete product workflow defines them.
+- Add additional child routes only when a concrete product workflow defines them.
 - Confirm Supabase Auth email delivery after the project URL, SMTP/email settings, and `PASSWORD_RECOVERY_REDIRECT_URL` are valid.
 
 See `docs/pending-backend-work.md` for the backend-only backlog and future API candidates.

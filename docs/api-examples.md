@@ -147,6 +147,20 @@ curl "$API_BASE_URL/access-requests/organizations?status=pending&email=admin@exa
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 
+Export filtered user access requests as CSV:
+
+```bash
+curl "$API_BASE_URL/access-requests/users/export?status=pending&organizationId=00000000-0000-0000-0000-000000000000&limit=200" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
+Export filtered organization access requests as CSV:
+
+```bash
+curl "$API_BASE_URL/access-requests/organizations/export?status=pending&email=admin@example.org&limit=200" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+```
+
 Get one user access request:
 
 ```bash

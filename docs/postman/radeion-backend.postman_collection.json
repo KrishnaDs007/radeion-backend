@@ -179,6 +179,19 @@
           }
         },
         {
+          "name": "Export Organization Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/access-requests/organizations/export?status=pending&email=admin@example.org&limit=200"
+          }
+        },
+        {
           "name": "List User Requests",
           "request": {
             "method": "GET",
@@ -202,6 +215,19 @@
               }
             ],
             "url": "{{baseUrl}}/access-requests/users/{{userRequestId}}"
+          }
+        },
+        {
+          "name": "Export User Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/access-requests/users/export?status=pending&organizationId={{organizationId}}&limit=200"
           }
         },
         {

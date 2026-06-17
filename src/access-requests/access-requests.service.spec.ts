@@ -257,6 +257,132 @@ describe('AccessRequestsService', () => {
     });
   });
 
+  it('exports filtered user access requests as CSV', async () => {
+    const requests = [
+      {
+        id: 'request-1',
+        email: 'user@example.com',
+        organizationId: 'organization-1',
+        requestedRoles: ['provider'],
+        requestedScope: {
+          type: 'organization',
+          organizationId: 'organization-1',
+        },
+        status: RequestStatus.PENDING,
+        reviewedAt: null,
+        reviewNotes: 'Needs "manual" review',
+        createdAt: new Date('2026-06-17T10:00:00.000Z'),
+        updatedAt: new Date('2026-06-17T10:05:00.000Z'),
+        organization: {
+          id: 'organization-1',
+          name: 'Example Health',
+        },
+        reviewedBy: null,
+      },
+    ];
+    const prismaService = {
+      userApprovalRequest: {
+        findMany: jest.fn().mockResolvedValue(requests),
+      },
+    };
+    const service = new AccessRequestsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof AccessRequestsService
+      >[0],
+      {} as ConstructorParameters<typeof AccessRequestsService>[1],
+    );
+
+    await expect(
+      service.exportUserRequests({
+        status: 'pending',
+        email: 'USER@EXAMPLE.COM',
+        limit: 10,
+      }),
+    ).resolves.toBe(
+      [
+        '"id","email","organizationId","organizationName","status","requestedRoles","requestedScope","reviewedByEmail","reviewedAt","reviewNotes","createdAt","updatedAt"',
+        '"request-1","user@example.com","organization-1","Example Health","PENDING","[""provider""]","{""type"":""organization"",""organizationId"":""organization-1""}","","","Needs ""manual"" review","2026-06-17T10:00:00.000Z","2026-06-17T10:05:00.000Z"',
+      ].join('\n'),
+    );
+
+    expect(prismaService.userApprovalRequest.findMany).toHaveBeenCalledWith({
+      where: expect.objectContaining({
+        status: RequestStatus.PENDING,
+        email: {
+          contains: 'user@example.com',
+          mode: 'insensitive',
+        },
+      }) as Record<string, unknown>,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 10,
+      select: expect.any(Object) as Record<string, unknown>,
+    });
+  });
+
+  it('exports filtered organization access requests as CSV', async () => {
+    const requests = [
+      {
+        id: 'request-1',
+        organizationName: 'Example Health',
+        requestedByEmail: 'admin@example.com',
+        requestedByAuthUserId: null,
+        requestedPayload: {
+          type: 'aco',
+          contactEmail: 'admin@example.com',
+        },
+        status: RequestStatus.REJECTED,
+        reviewedAt: new Date('2026-06-17T11:00:00.000Z'),
+        reviewNotes: 'Verification failed',
+        createdAt: new Date('2026-06-16T10:00:00.000Z'),
+        updatedAt: new Date('2026-06-17T11:00:00.000Z'),
+        reviewedBy: {
+          id: 'reviewer-1',
+          email: 'reviewer@example.com',
+          firstName: 'Review',
+          lastName: 'Admin',
+        },
+      },
+    ];
+    const prismaService = {
+      organizationApprovalRequest: {
+        findMany: jest.fn().mockResolvedValue(requests),
+      },
+    };
+    const service = new AccessRequestsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof AccessRequestsService
+      >[0],
+      {} as ConstructorParameters<typeof AccessRequestsService>[1],
+    );
+
+    await expect(
+      service.exportOrganizationRequests({
+        status: 'rejected',
+        limit: 5,
+      }),
+    ).resolves.toBe(
+      [
+        '"id","organizationName","requestedByEmail","status","requestedPayload","reviewedByEmail","reviewedAt","reviewNotes","createdAt","updatedAt"',
+        '"request-1","Example Health","admin@example.com","REJECTED","{""type"":""aco"",""contactEmail"":""admin@example.com""}","reviewer@example.com","2026-06-17T11:00:00.000Z","Verification failed","2026-06-16T10:00:00.000Z","2026-06-17T11:00:00.000Z"',
+      ].join('\n'),
+    );
+
+    expect(
+      prismaService.organizationApprovalRequest.findMany,
+    ).toHaveBeenCalledWith({
+      where: expect.objectContaining({
+        status: RequestStatus.REJECTED,
+      }) as Record<string, unknown>,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 5,
+      select: expect.any(Object) as Record<string, unknown>,
+    });
+  });
+
   it('creates a pending user access request', async () => {
     const userRequest = {
       id: 'request-1',

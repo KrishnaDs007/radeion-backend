@@ -46,6 +46,7 @@ const RETRYABLE_REQUEST_STATUSES = new Set<RequestStatus>([
 ]);
 
 const DEFAULT_ACCESS_REQUEST_LIMIT = 50;
+const DEFAULT_ACCESS_REQUEST_EXPORT_LIMIT = 1_000;
 
 const REQUEST_STATUS_MAP: Record<
   NonNullable<ListAccessRequestsDto['status']>,
@@ -64,6 +65,11 @@ type AccessRequestPage = {
   total: number;
   nextOffset: number | null;
   hasNextPage: boolean;
+};
+
+type CsvColumn<T> = {
+  header: string;
+  value: (record: T) => unknown;
 };
 
 @Injectable()
@@ -148,6 +154,69 @@ export class AccessRequestsService {
     return request;
   }
 
+  async exportUserRequests(query: ListAccessRequestsDto) {
+    const limit = Number(query.limit ?? DEFAULT_ACCESS_REQUEST_EXPORT_LIMIT);
+    const data = await this.prismaService.userApprovalRequest.findMany({
+      where: this.buildUserRequestWhere(query),
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+      select: this.userRequestSelect(),
+    });
+
+    return this.toCsv(data, [
+      {
+        header: 'id',
+        value: (request) => request.id,
+      },
+      {
+        header: 'email',
+        value: (request) => request.email,
+      },
+      {
+        header: 'organizationId',
+        value: (request) => request.organizationId,
+      },
+      {
+        header: 'organizationName',
+        value: (request) => request.organization?.name,
+      },
+      {
+        header: 'status',
+        value: (request) => request.status,
+      },
+      {
+        header: 'requestedRoles',
+        value: (request) => request.requestedRoles,
+      },
+      {
+        header: 'requestedScope',
+        value: (request) => request.requestedScope,
+      },
+      {
+        header: 'reviewedByEmail',
+        value: (request) => request.reviewedBy?.email,
+      },
+      {
+        header: 'reviewedAt',
+        value: (request) => request.reviewedAt,
+      },
+      {
+        header: 'reviewNotes',
+        value: (request) => request.reviewNotes,
+      },
+      {
+        header: 'createdAt',
+        value: (request) => request.createdAt,
+      },
+      {
+        header: 'updatedAt',
+        value: (request) => request.updatedAt,
+      },
+    ]);
+  }
+
   async listOrganizationRequests(query: ListAccessRequestsDto) {
     const limit = Number(query.limit ?? DEFAULT_ACCESS_REQUEST_LIMIT);
     const offset = Number(query.offset ?? 0);
@@ -183,6 +252,61 @@ export class AccessRequestsService {
     }
 
     return request;
+  }
+
+  async exportOrganizationRequests(query: ListAccessRequestsDto) {
+    const limit = Number(query.limit ?? DEFAULT_ACCESS_REQUEST_EXPORT_LIMIT);
+    const data = await this.prismaService.organizationApprovalRequest.findMany({
+      where: this.buildOrganizationRequestWhere(query),
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+      select: this.organizationRequestSelect(),
+    });
+
+    return this.toCsv(data, [
+      {
+        header: 'id',
+        value: (request) => request.id,
+      },
+      {
+        header: 'organizationName',
+        value: (request) => request.organizationName,
+      },
+      {
+        header: 'requestedByEmail',
+        value: (request) => request.requestedByEmail,
+      },
+      {
+        header: 'status',
+        value: (request) => request.status,
+      },
+      {
+        header: 'requestedPayload',
+        value: (request) => request.requestedPayload,
+      },
+      {
+        header: 'reviewedByEmail',
+        value: (request) => request.reviewedBy?.email,
+      },
+      {
+        header: 'reviewedAt',
+        value: (request) => request.reviewedAt,
+      },
+      {
+        header: 'reviewNotes',
+        value: (request) => request.reviewNotes,
+      },
+      {
+        header: 'createdAt',
+        value: (request) => request.createdAt,
+      },
+      {
+        header: 'updatedAt',
+        value: (request) => request.updatedAt,
+      },
+    ]);
   }
 
   async retryUserRequest(id: string, input: CreateUserAccessRequestDto) {
@@ -693,6 +817,48 @@ export class AccessRequestsService {
         },
       },
     };
+  }
+
+  private toCsv<T>(records: T[], columns: CsvColumn<T>[]): string {
+    const headerRow = columns.map((column) => this.escapeCsv(column.header));
+    const dataRows = records.map((record) =>
+      columns
+        .map((column) =>
+          this.escapeCsv(this.serializeCsvValue(column.value(record))),
+        )
+        .join(','),
+    );
+
+    return [headerRow.join(','), ...dataRows].join('\n');
+  }
+
+  private serializeCsvValue(value: unknown): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    if (typeof value === 'object') {
+      return JSON.stringify(value);
+    }
+
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean' ||
+      typeof value === 'bigint'
+    ) {
+      return value.toString();
+    }
+
+    return '';
+  }
+
+  private escapeCsv(value: string): string {
+    return `"${value.replace(/"/g, '""')}"`;
   }
 
   private getPayloadString(

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Header,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import type { UserContext } from '../auth/auth.types';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Public } from '../common/decorators/public.decorator';
@@ -40,6 +48,17 @@ export class AccessRequestsController {
   }
 
   @RequirePermission('user.approve')
+  @Get('users/export')
+  @Header('Content-Type', 'text/csv; charset=utf-8')
+  @Header(
+    'Content-Disposition',
+    'attachment; filename="user-access-requests.csv"',
+  )
+  async exportUserRequests(@Query() query: ListAccessRequestsDto) {
+    return await this.accessRequestsService.exportUserRequests(query);
+  }
+
+  @RequirePermission('user.approve')
   @Get('users/:id')
   async getUserRequest(@Param('id') id: string) {
     return {
@@ -51,6 +70,17 @@ export class AccessRequestsController {
   @Get('organizations')
   async listOrganizationRequests(@Query() query: ListAccessRequestsDto) {
     return await this.accessRequestsService.listOrganizationRequests(query);
+  }
+
+  @RequirePermission('organization.approve')
+  @Get('organizations/export')
+  @Header('Content-Type', 'text/csv; charset=utf-8')
+  @Header(
+    'Content-Disposition',
+    'attachment; filename="organization-access-requests.csv"',
+  )
+  async exportOrganizationRequests(@Query() query: ListAccessRequestsDto) {
+    return await this.accessRequestsService.exportOrganizationRequests(query);
   }
 
   @RequirePermission('organization.approve')
