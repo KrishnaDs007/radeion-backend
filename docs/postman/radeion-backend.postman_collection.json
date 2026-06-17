@@ -162,7 +162,7 @@
                 "value": "Bearer {{supabaseAccessToken}}"
               }
             ],
-            "url": "{{baseUrl}}/access-requests/organizations?status=pending&email=admin@example.org&limit=25&offset=0"
+            "url": "{{baseUrl}}/access-requests/organizations?status=pending&email=admin@example.org&reviewedById={{profileId}}&fromDate=2026-06-01T00:00:00.000Z&toDate=2026-06-30T23:59:59.000Z&limit=25&offset=0"
           }
         },
         {
@@ -188,7 +188,7 @@
                 "value": "Bearer {{supabaseAccessToken}}"
               }
             ],
-            "url": "{{baseUrl}}/access-requests/users?status=pending&organizationId={{organizationId}}&limit=25&offset=0"
+            "url": "{{baseUrl}}/access-requests/users?status=pending&organizationId={{organizationId}}&reviewedById={{profileId}}&fromDate=2026-06-01T00:00:00.000Z&toDate=2026-06-30T23:59:59.000Z&limit=25&offset=0"
           }
         },
         {

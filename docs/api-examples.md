@@ -136,14 +136,14 @@ curl -X POST "$API_BASE_URL/access-requests/users" \
 List user access requests:
 
 ```bash
-curl "$API_BASE_URL/access-requests/users?status=pending&organizationId=00000000-0000-0000-0000-000000000000&limit=25&offset=0" \
+curl "$API_BASE_URL/access-requests/users?status=pending&organizationId=00000000-0000-0000-0000-000000000000&reviewedById=11111111-1111-1111-1111-111111111111&fromDate=2026-06-01T00:00:00.000Z&toDate=2026-06-30T23:59:59.000Z&limit=25&offset=0" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 
 List organization access requests:
 
 ```bash
-curl "$API_BASE_URL/access-requests/organizations?status=pending&email=admin@example.org&limit=25&offset=0" \
+curl "$API_BASE_URL/access-requests/organizations?status=pending&email=admin@example.org&reviewedById=11111111-1111-1111-1111-111111111111&fromDate=2026-06-01T00:00:00.000Z&toDate=2026-06-30T23:59:59.000Z&limit=25&offset=0" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 

@@ -197,6 +197,9 @@ Both routes support these optional query parameters:
 
 - `status`
 - `email`
+- `reviewedById`
+- `fromDate`
+- `toDate`
 - `limit`
 - `offset`
 

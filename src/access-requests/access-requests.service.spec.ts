@@ -119,6 +119,9 @@ describe('AccessRequestsService', () => {
         status: 'pending',
         email: 'USER@EXAMPLE.COM',
         organizationId: 'organization-1',
+        reviewedById: 'reviewer-1',
+        fromDate: '2026-06-01T00:00:00.000Z',
+        toDate: '2026-06-30T23:59:59.000Z',
         limit: 25,
         offset: 10,
       }),
@@ -141,6 +144,11 @@ describe('AccessRequestsService', () => {
           mode: 'insensitive',
         },
         organizationId: 'organization-1',
+        reviewedById: 'reviewer-1',
+        createdAt: {
+          gte: new Date('2026-06-01T00:00:00.000Z'),
+          lte: new Date('2026-06-30T23:59:59.000Z'),
+        },
       },
       orderBy: {
         createdAt: 'desc',
@@ -157,6 +165,11 @@ describe('AccessRequestsService', () => {
           mode: 'insensitive',
         },
         organizationId: 'organization-1',
+        reviewedById: 'reviewer-1',
+        createdAt: {
+          gte: new Date('2026-06-01T00:00:00.000Z'),
+          lte: new Date('2026-06-30T23:59:59.000Z'),
+        },
       },
     });
   });
@@ -187,6 +200,9 @@ describe('AccessRequestsService', () => {
       service.listOrganizationRequests({
         status: 'rejected',
         email: 'ADMIN@EXAMPLE.COM',
+        reviewedById: 'reviewer-2',
+        fromDate: '2026-05-01T00:00:00.000Z',
+        toDate: '2026-05-31T23:59:59.000Z',
         limit: 2,
         offset: 0,
       }),
@@ -210,6 +226,11 @@ describe('AccessRequestsService', () => {
           contains: 'admin@example.com',
           mode: 'insensitive',
         },
+        reviewedById: 'reviewer-2',
+        createdAt: {
+          gte: new Date('2026-05-01T00:00:00.000Z'),
+          lte: new Date('2026-05-31T23:59:59.000Z'),
+        },
       },
       orderBy: {
         createdAt: 'desc',
@@ -226,6 +247,11 @@ describe('AccessRequestsService', () => {
         requestedByEmail: {
           contains: 'admin@example.com',
           mode: 'insensitive',
+        },
+        reviewedById: 'reviewer-2',
+        createdAt: {
+          gte: new Date('2026-05-01T00:00:00.000Z'),
+          lte: new Date('2026-05-31T23:59:59.000Z'),
         },
       },
     });

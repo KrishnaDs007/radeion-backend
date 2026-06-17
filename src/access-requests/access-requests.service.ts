@@ -592,6 +592,14 @@ export class AccessRequestsService {
           }
         : undefined,
       organizationId: query.organizationId,
+      reviewedById: query.reviewedById,
+      createdAt:
+        query.fromDate || query.toDate
+          ? {
+              gte: query.fromDate ? new Date(query.fromDate) : undefined,
+              lte: query.toDate ? new Date(query.toDate) : undefined,
+            }
+          : undefined,
     };
   }
 
@@ -606,6 +614,14 @@ export class AccessRequestsService {
             mode: 'insensitive',
           }
         : undefined,
+      reviewedById: query.reviewedById,
+      createdAt:
+        query.fromDate || query.toDate
+          ? {
+              gte: query.fromDate ? new Date(query.fromDate) : undefined,
+              lte: query.toDate ? new Date(query.toDate) : undefined,
+            }
+          : undefined,
     };
   }
 
