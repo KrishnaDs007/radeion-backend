@@ -29,4 +29,10 @@ export class HealthController {
   getCacheHealth() {
     return this.healthService.getCacheHealth();
   }
+
+  @Public()
+  @Get('email')
+  getEmailHealth() {
+    return this.healthService.getEmailHealth();
+  }
 }

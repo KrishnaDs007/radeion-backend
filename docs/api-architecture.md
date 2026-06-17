@@ -13,6 +13,7 @@ Current route groups:
 - `GET /health/config` public config-presence status without secret values
 - `GET /health/database` public database connectivity status
 - `GET /health/cache` public cache round-trip status
+- `GET /health/email` public email-delivery readiness and password-recovery config status
 - `GET /auth/methods` public auth configuration
 - `POST /auth/password-recovery` public Supabase password recovery email request
 - `POST /access-requests/users` public user access request
@@ -143,6 +144,17 @@ It reports:
 - `driver`
 
 It can be used to verify either the default in-memory cache or a Redis-backed deployment without touching application data.
+
+`GET /health/email` reports non-secret email delivery readiness:
+
+- `driver`
+- `inviteDelivery.configured`
+- `inviteDelivery.ready`
+- `inviteDelivery.requires`
+- `passwordRecovery.configured`
+- `passwordRecovery.redirectUrl`
+
+It does not test third-party inbox delivery or expose API keys. For `EMAIL_DRIVER=resend`, `inviteDelivery.requires` lists any missing required variables such as `EMAIL_FROM` or `RESEND_API_KEY`.
 
 ## Invite Acceptance Flow
 

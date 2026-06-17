@@ -83,6 +83,13 @@
           }
         },
         {
+          "name": "Email Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health/email"
+          }
+        },
+        {
           "name": "Auth Methods",
           "request": {
             "method": "GET",

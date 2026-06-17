@@ -66,7 +66,7 @@ Validation checks:
 - `PORT` and Databricks numeric tuning values are non-negative integers when set
 - Databricks table and column mappings are safe SQL identifiers or identifier paths
 
-This does not test live connectivity. Use `/health/database` for database connectivity and Databricks read routes for Databricks execution checks.
+This does not test live connectivity. Use `/health/database` for database connectivity, `/health/email` for non-secret email readiness, and Databricks read routes for Databricks execution checks.
 
 ## Local Docker With Redis
 
@@ -169,7 +169,9 @@ GET /health
 GET /health/config
 GET /health/database
 GET /health/cache
+GET /health/email
 ```
 
 `/health/config` reports whether required secrets are present without exposing the secret values.
 `/health/cache` performs a small round trip against the configured cache driver, which is useful when validating Redis deployments.
+`/health/email` reports whether invite email delivery is configured and which non-secret requirements are still missing.

@@ -24,6 +24,7 @@ curl "$API_BASE_URL/health"
 curl "$API_BASE_URL/health/config"
 curl "$API_BASE_URL/health/database"
 curl "$API_BASE_URL/health/cache"
+curl "$API_BASE_URL/health/email"
 curl "$API_BASE_URL/auth/methods"
 ```
 
@@ -75,6 +76,23 @@ curl -X POST "$API_BASE_URL/auth/password-recovery" \
     "resendApiKey": false,
     "inviteAcceptUrl": true,
     "passwordRecoveryRedirectUrl": true
+  }
+}
+```
+
+`GET /health/email` helps diagnose invite email and password-recovery setup without exposing secrets:
+
+```json
+{
+  "driver": "disabled",
+  "inviteDelivery": {
+    "configured": false,
+    "ready": false,
+    "requires": []
+  },
+  "passwordRecovery": {
+    "configured": true,
+    "redirectUrl": true
   }
 }
 ```

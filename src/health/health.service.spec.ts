@@ -168,4 +168,80 @@ describe('HealthService', () => {
       driver: 'redis',
     });
   });
+
+  it('reports email health for disabled local delivery', () => {
+    const service = new HealthService(
+      new ConfigService({
+        EMAIL_DRIVER: 'disabled',
+        SUPABASE_URL: 'https://example.supabase.co',
+      }),
+      {} as never,
+      {} as never,
+    );
+
+    expect(service.getEmailHealth()).toEqual({
+      driver: 'disabled',
+      inviteDelivery: {
+        configured: false,
+        ready: false,
+        requires: [],
+      },
+      passwordRecovery: {
+        configured: true,
+        redirectUrl: false,
+      },
+    });
+  });
+
+  it('reports missing Resend email requirements', () => {
+    const service = new HealthService(
+      new ConfigService({
+        EMAIL_DRIVER: 'resend',
+        EMAIL_FROM: 'Radeion <no-reply@example.com>',
+        SUPABASE_URL: 'https://example.supabase.co',
+        PASSWORD_RECOVERY_REDIRECT_URL:
+          'https://app.example.com/password/recover',
+      }),
+      {} as never,
+      {} as never,
+    );
+
+    expect(service.getEmailHealth()).toEqual({
+      driver: 'resend',
+      inviteDelivery: {
+        configured: true,
+        ready: false,
+        requires: ['RESEND_API_KEY'],
+      },
+      passwordRecovery: {
+        configured: true,
+        redirectUrl: true,
+      },
+    });
+  });
+
+  it('reports ready Resend email delivery', () => {
+    const service = new HealthService(
+      new ConfigService({
+        EMAIL_DRIVER: 'resend',
+        EMAIL_FROM: 'Radeion <no-reply@example.com>',
+        RESEND_API_KEY: 'resend-key',
+      }),
+      {} as never,
+      {} as never,
+    );
+
+    expect(service.getEmailHealth()).toEqual({
+      driver: 'resend',
+      inviteDelivery: {
+        configured: true,
+        ready: true,
+        requires: [],
+      },
+      passwordRecovery: {
+        configured: true,
+        redirectUrl: false,
+      },
+    });
+  });
 });

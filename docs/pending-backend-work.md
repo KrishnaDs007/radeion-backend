@@ -19,6 +19,7 @@ The backend already exposes the support APIs needed by the current onboarding an
 - `POST /auth/password-recovery`
 - `POST /invites/preview`
 - `POST /invites/accept`
+- `GET /health/email`
 
 ## External Backend Blockers
 
@@ -46,7 +47,7 @@ These are not active TODOs. Add them only when a concrete product workflow needs
 - Databricks write/sync APIs for practice/provider reference data.
 - Bulk import/export APIs for admin operations.
 - Admin-facing access request exports or richer filtering workflows beyond the current list, detail, approval, and retry flows.
-- Operational diagnostics beyond `/health/config`, `/health/database`, and `/health/cache`.
+- Operational diagnostics beyond `/health/config`, `/health/database`, `/health/cache`, and `/health/email`.
 
 ## Documentation Status
 

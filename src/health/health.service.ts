@@ -6,6 +6,7 @@ import {
   CacheHealthStatus,
   ConfigurationStatus,
   DatabaseHealthStatus,
+  EmailHealthStatus,
   HealthStatus,
 } from './health.types';
 
@@ -129,6 +130,30 @@ export class HealthService {
         driver,
       };
     }
+  }
+
+  getEmailHealth(): EmailHealthStatus {
+    const driver = this.configService.get<string>('EMAIL_DRIVER') ?? 'disabled';
+    const inviteRequirements =
+      driver === 'resend' ? ['EMAIL_FROM', 'RESEND_API_KEY'] : [];
+
+    return {
+      driver,
+      inviteDelivery: {
+        configured: driver !== 'disabled',
+        ready:
+          driver === 'disabled'
+            ? false
+            : driver === 'resend'
+              ? this.hasAllConfig(inviteRequirements)
+              : false,
+        requires: inviteRequirements.filter((key) => !this.hasConfig(key)),
+      },
+      passwordRecovery: {
+        configured: this.hasConfig('SUPABASE_URL'),
+        redirectUrl: this.hasConfig('PASSWORD_RECOVERY_REDIRECT_URL'),
+      },
+    };
   }
 
   private hasConfig(key: string): boolean {

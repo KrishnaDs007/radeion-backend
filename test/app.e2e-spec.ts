@@ -211,6 +211,24 @@ describe('Public routes (e2e)', () => {
     );
   });
 
+  it('checks email health without exposing secrets', async () => {
+    await request(app.getHttpServer())
+      .get('/health/email')
+      .expect(200)
+      .expect({
+        driver: 'disabled',
+        inviteDelivery: {
+          configured: false,
+          ready: false,
+          requires: [],
+        },
+        passwordRecovery: {
+          configured: true,
+          redirectUrl: true,
+        },
+      });
+  });
+
   it('returns supported auth methods', async () => {
     await request(app.getHttpServer())
       .get('/auth/methods')

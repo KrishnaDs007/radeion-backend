@@ -50,3 +50,16 @@ export type CacheHealthStatus = {
   connected: boolean;
   driver: string;
 };
+
+export type EmailHealthStatus = {
+  driver: string;
+  inviteDelivery: {
+    configured: boolean;
+    ready: boolean;
+    requires: string[];
+  };
+  passwordRecovery: {
+    configured: boolean;
+    redirectUrl: boolean;
+  };
+};
