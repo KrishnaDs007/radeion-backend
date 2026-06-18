@@ -473,6 +473,19 @@
           }
         },
         {
+          "name": "Export Organizations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/organizations/export"
+          }
+        },
+        {
           "name": "List Organization Practices",
           "request": {
             "method": "GET",
@@ -582,6 +595,19 @@
               }
             ],
             "url": "{{baseUrl}}/users/{{profileId}}"
+          }
+        },
+        {
+          "name": "Export Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/users/export"
           }
         },
         {

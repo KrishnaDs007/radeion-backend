@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Get, Header, Param, Patch } from '@nestjs/common';
 import type { UserContext } from '../auth/auth.types';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
@@ -15,6 +15,13 @@ export class UsersController {
     return {
       data: await this.usersService.listUsers(user),
     };
+  }
+
+  @Get('export')
+  @Header('Content-Type', 'text/csv; charset=utf-8')
+  @Header('Content-Disposition', 'attachment; filename="users.csv"')
+  async exportUsers(@CurrentUser() user: UserContext) {
+    return await this.usersService.exportUsers(user);
   }
 
   @Get(':id')

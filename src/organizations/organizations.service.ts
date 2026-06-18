@@ -42,6 +42,75 @@ export class OrganizationsService {
     });
   }
 
+  async exportOrganizations(actor: UserContext) {
+    const organizations = await this.prismaService.organization.findMany({
+      where: this.organizationReadWhere(actor),
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: this.organizationSelect(),
+    });
+
+    return this.toCsv(organizations, [
+      {
+        header: 'id',
+        value: (organization) => organization.id,
+      },
+      {
+        header: 'name',
+        value: (organization) => organization.name,
+      },
+      {
+        header: 'type',
+        value: (organization) => organization.type,
+      },
+      {
+        header: 'status',
+        value: (organization) => organization.status,
+      },
+      {
+        header: 'contactEmail',
+        value: (organization) => organization.contactEmail,
+      },
+      {
+        header: 'contactNumber',
+        value: (organization) => organization.contactNumber,
+      },
+      {
+        header: 'website',
+        value: (organization) => organization.website,
+      },
+      {
+        header: 'startedYear',
+        value: (organization) => organization.startedYear,
+      },
+      {
+        header: 'createdByEmail',
+        value: (organization) => organization.createdBy?.email,
+      },
+      {
+        header: 'practiceCount',
+        value: (organization) => organization._count.practices,
+      },
+      {
+        header: 'providerCount',
+        value: (organization) => organization._count.providers,
+      },
+      {
+        header: 'roleAssignmentCount',
+        value: (organization) => organization._count.roleAssignments,
+      },
+      {
+        header: 'createdAt',
+        value: (organization) => organization.createdAt,
+      },
+      {
+        header: 'updatedAt',
+        value: (organization) => organization.updatedAt,
+      },
+    ]);
+  }
+
   async getOrganization(id: string, actor: UserContext) {
     const organization = await this.prismaService.organization.findFirst({
       where: this.organizationDetailWhere(id, actor),
@@ -350,4 +419,51 @@ export class OrganizationsService {
       },
     };
   }
+
+  private toCsv<T>(records: T[], columns: CsvColumn<T>[]): string {
+    const headerRow = columns.map((column) => this.escapeCsv(column.header));
+    const dataRows = records.map((record) =>
+      columns
+        .map((column) =>
+          this.escapeCsv(this.serializeCsvValue(column.value(record))),
+        )
+        .join(','),
+    );
+
+    return [headerRow.join(','), ...dataRows].join('\n');
+  }
+
+  private serializeCsvValue(value: unknown): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    if (typeof value === 'object') {
+      return JSON.stringify(value);
+    }
+
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean' ||
+      typeof value === 'bigint'
+    ) {
+      return value.toString();
+    }
+
+    return '';
+  }
+
+  private escapeCsv(value: string): string {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
 }
+
+type CsvColumn<T> = {
+  header: string;
+  value: (record: T) => unknown;
+};

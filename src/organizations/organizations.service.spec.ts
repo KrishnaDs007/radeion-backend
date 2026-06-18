@@ -88,6 +88,76 @@ describe('OrganizationsService', () => {
     );
   });
 
+  it('exports scoped organizations as CSV', async () => {
+    const prismaService = {
+      organization: {
+        findMany: jest.fn().mockResolvedValue([
+          {
+            id: 'organization-1',
+            name: 'Example Health',
+            type: 'client',
+            website: 'https://example.org',
+            contactEmail: 'admin@example.org',
+            contactNumber: '+15555550100',
+            status: OrganizationStatus.ACTIVE,
+            address: '100 Example Street',
+            companyBio: 'Example org',
+            startedYear: 2015,
+            createdAt: new Date('2026-06-18T10:00:00.000Z'),
+            updatedAt: new Date('2026-06-18T10:05:00.000Z'),
+            createdBy: {
+              id: 'profile-1',
+              email: 'creator@example.org',
+            },
+            _count: {
+              practices: 2,
+              providers: 4,
+              roleAssignments: 6,
+            },
+          },
+        ]),
+      },
+    };
+    const service = new OrganizationsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof OrganizationsService
+      >[0],
+      {} as ConstructorParameters<typeof OrganizationsService>[1],
+    );
+
+    await expect(
+      service.exportOrganizations({
+        ...actor,
+        roles: [
+          {
+            name: 'clientAdmin',
+            scopeType: 'organization',
+            organizationId: 'organization-1',
+          },
+        ],
+      }),
+    ).resolves.toBe(
+      [
+        '"id","name","type","status","contactEmail","contactNumber","website","startedYear","createdByEmail","practiceCount","providerCount","roleAssignmentCount","createdAt","updatedAt"',
+        '"organization-1","Example Health","client","ACTIVE","admin@example.org","+15555550100","https://example.org","2015","creator@example.org","2","4","6","2026-06-18T10:00:00.000Z","2026-06-18T10:05:00.000Z"',
+      ].join('\n'),
+    );
+
+    expect(prismaService.organization.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          id: {
+            in: ['organization-1'],
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        select: expect.any(Object) as Record<string, unknown>,
+      }),
+    );
+  });
+
   it('lists practices for a readable organization', async () => {
     const prismaService = {
       organization: {

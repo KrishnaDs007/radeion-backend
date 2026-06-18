@@ -47,6 +47,7 @@ Access and onboarding:
 
 Admin management:
 
+- Protected user and organization CSV export APIs added with existing read scoping.
 - Protected role assignment list, create, and revoke APIs added.
 - Protected user detail, disable, and reactivate APIs added.
 - Protected organization detail, create, update, and status APIs added.
@@ -150,10 +151,12 @@ Protected:
 - `POST /roles/assignments/:id/revoke`
 - `GET /audit-logs`
 - `GET /users`
+- `GET /users/export`
 - `GET /users/:id`
 - `PATCH /users/:id/disable`
 - `PATCH /users/:id/reactivate`
 - `GET /organizations`
+- `GET /organizations/export`
 - `GET /organizations/:id`
 - `GET /organizations/:id/practices`
 - `GET /organizations/:id/providers`
@@ -197,7 +200,7 @@ Current backend items still pending:
 Future backend candidates, only when a concrete workflow needs them:
 
 - Databricks write or sync APIs for practice and provider reference data.
-- Bulk import or export APIs for admin operations.
+- Bulk import APIs or additional export formats for admin operations.
 - Additional diagnostics beyond the current health coverage.
 - Additional child routes under organizations, practices, providers, users, or roles.
 

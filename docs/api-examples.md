@@ -337,6 +337,9 @@ curl -X POST "$API_BASE_URL/invites/<inviteId>/revoke" \
 curl "$API_BASE_URL/organizations" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 
+curl "$API_BASE_URL/organizations/export" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
 curl "$API_BASE_URL/organizations/<organizationId>" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 
@@ -393,6 +396,9 @@ curl -X PATCH "$API_BASE_URL/organizations/<organizationId>/status" \
 
 ```bash
 curl "$API_BASE_URL/users" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+curl "$API_BASE_URL/users/export" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 
 curl "$API_BASE_URL/users/<profileId>" \

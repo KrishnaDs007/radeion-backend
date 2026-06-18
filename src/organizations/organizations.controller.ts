@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Header,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import type { UserContext } from '../auth/auth.types';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
@@ -17,6 +25,13 @@ export class OrganizationsController {
     return {
       data: await this.organizationsService.listOrganizations(user),
     };
+  }
+
+  @Get('export')
+  @Header('Content-Type', 'text/csv; charset=utf-8')
+  @Header('Content-Disposition', 'attachment; filename="organizations.csv"')
+  async exportOrganizations(@CurrentUser() user: UserContext) {
+    return await this.organizationsService.exportOrganizations(user);
   }
 
   @Get(':id')

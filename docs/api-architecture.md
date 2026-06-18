@@ -51,10 +51,12 @@ Current route groups:
 - `POST /roles/assignments/:id/revoke` protected role assignment revocation
 - `GET /audit-logs` protected platform audit log list
 - `GET /users` protected user list
+- `GET /users/export` protected scoped user CSV export
 - `GET /users/:id` protected user detail
 - `PATCH /users/:id/disable` protected user disable
 - `PATCH /users/:id/reactivate` protected user reactivation
 - `GET /organizations` protected organization list
+- `GET /organizations/export` protected scoped organization CSV export
 - `GET /organizations/:id` protected organization detail
 - `GET /organizations/:id/practices` protected organization practice list
 - `GET /organizations/:id/providers` protected organization provider list
@@ -327,6 +329,8 @@ Top-level user, organization, reference, role-assignment, and care-coordinator-a
 - `developer` and `superAdmin` can read across the platform.
 - Other roles read only records tied to their assigned `organizationId`.
 - User reads also include the caller's own profile.
+
+`GET /users/export` and `GET /organizations/export` use the same scoped read rules as their list routes and return flat CSV attachments for admin operations.
 
 ## Why This Structure
 

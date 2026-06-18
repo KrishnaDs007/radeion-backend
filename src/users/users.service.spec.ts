@@ -80,6 +80,72 @@ describe('UsersService', () => {
     );
   });
 
+  it('exports scoped users as CSV', async () => {
+    const prismaService = {
+      profile: {
+        findMany: jest.fn().mockResolvedValue([
+          {
+            id: 'profile-1',
+            authUserId: 'auth-user-1',
+            email: 'user@example.com',
+            firstName: 'Ada',
+            lastName: 'Lovelace',
+            status: UserStatus.ACTIVE,
+            createdAt: new Date('2026-06-18T10:00:00.000Z'),
+            updatedAt: new Date('2026-06-18T10:05:00.000Z'),
+            roleAssignments: [
+              {
+                id: 'assignment-1',
+                scopeType: 'organization',
+                scopeId: null,
+                organizationId: 'organization-1',
+                createdAt: new Date('2026-06-18T10:00:00.000Z'),
+                role: {
+                  name: 'clientAdmin',
+                  displayName: 'Client Admin',
+                },
+              },
+            ],
+          },
+        ]),
+      },
+    };
+    const service = new UsersService(
+      prismaService as unknown as ConstructorParameters<typeof UsersService>[0],
+      {} as ConstructorParameters<typeof UsersService>[1],
+    );
+
+    await expect(
+      service.exportUsers({
+        ...actor,
+        roles: [
+          {
+            name: 'clientAdmin',
+            scopeType: 'organization',
+            organizationId: 'organization-1',
+          },
+        ],
+      }),
+    ).resolves.toBe(
+      [
+        '"id","authUserId","email","firstName","lastName","status","roles","organizationIds","createdAt","updatedAt"',
+        '"profile-1","auth-user-1","user@example.com","Ada","Lovelace","ACTIVE","clientAdmin","organization-1","2026-06-18T10:00:00.000Z","2026-06-18T10:05:00.000Z"',
+      ].join('\n'),
+    );
+
+    expect(prismaService.profile.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({
+          OR: expect.any(Array) as unknown[],
+        }) as Record<string, unknown>,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        select: expect.any(Object) as Record<string, unknown>,
+      }),
+    );
+  });
+
   it('disables a user and records an audit log', async () => {
     const updatedUser = {
       id: 'profile-1',
