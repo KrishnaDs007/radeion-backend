@@ -22,6 +22,7 @@ The backend already exposes the support APIs needed by the current onboarding an
 - `POST /invites/preview`
 - `POST /invites/accept`
 - `GET /health/email`
+- `GET /health/databricks`
 
 ## External Backend Blockers
 
@@ -55,7 +56,7 @@ These are not active TODOs. Add them only when a concrete product workflow needs
 - Databricks write/sync APIs for practice/provider reference data.
 - Bulk import/export APIs for admin operations.
 - Admin-facing access request export format or delivery enhancements beyond the current CSV exports.
-- Operational diagnostics beyond `/health/config`, `/health/database`, `/health/cache`, and `/health/email`.
+- Operational diagnostics beyond `/health/config`, `/health/database`, `/health/cache`, `/health/email`, and `/health/databricks`.
 
 ## Documentation Status
 

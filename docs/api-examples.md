@@ -25,6 +25,7 @@ curl "$API_BASE_URL/health/config"
 curl "$API_BASE_URL/health/database"
 curl "$API_BASE_URL/health/cache"
 curl "$API_BASE_URL/health/email"
+curl "$API_BASE_URL/health/databricks"
 curl "$API_BASE_URL/auth/methods"
 ```
 
@@ -77,6 +78,36 @@ curl -X POST "$API_BASE_URL/auth/password-recovery" \
     "inviteAcceptUrl": true,
     "passwordRecoveryRedirectUrl": true
   }
+}
+```
+
+`GET /health/databricks` helps diagnose Databricks connection and mapping setup without exposing secrets or running a warehouse query:
+
+```json
+{
+  "ready": false,
+  "connection": {
+    "host": true,
+    "token": true,
+    "httpPath": true,
+    "warehouseId": false,
+    "missing": []
+  },
+  "datasets": {
+    "claims": {
+      "ready": true,
+      "table": true,
+      "columns": {
+        "organizationId": true,
+        "practiceId": true,
+        "providerId": true,
+        "patientId": true,
+        "date": true
+      },
+      "missing": []
+    }
+  },
+  "missing": ["DATABRICKS_PROVIDERS_TABLE"]
 }
 ```
 

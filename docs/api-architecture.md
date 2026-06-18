@@ -14,6 +14,7 @@ Current route groups:
 - `GET /health/database` public database connectivity status
 - `GET /health/cache` public cache round-trip status
 - `GET /health/email` public email-delivery readiness and password-recovery config status
+- `GET /health/databricks` public Databricks connection and dataset mapping readiness status
 - `GET /auth/methods` public auth configuration
 - `POST /auth/password-recovery` public Supabase password recovery email request
 - `POST /access-requests/users` public user access request
@@ -157,6 +158,22 @@ It can be used to verify either the default in-memory cache or a Redis-backed de
 - `passwordRecovery.redirectUrl`
 
 It does not test third-party inbox delivery or expose API keys. For `EMAIL_DRIVER=resend`, `inviteDelivery.requires` lists any missing required variables such as `EMAIL_FROM` or `RESEND_API_KEY`.
+
+`GET /health/databricks` reports non-secret Databricks readiness:
+
+- `ready`
+- `connection.host`
+- `connection.token`
+- `connection.httpPath`
+- `connection.warehouseId`
+- `connection.missing`
+- `datasets.<dataset>.ready`
+- `datasets.<dataset>.table`
+- `datasets.<dataset>.columns`
+- `datasets.<dataset>.missing`
+- `missing`
+
+It does not execute a Databricks query or expose token, table, or column values. It only reports whether the required connection, table, and column mapping variables are present. `DATABRICKS_WAREHOUSE_ID` is reported but not required because the backend can derive it from `DATABRICKS_HTTP_PATH`.
 
 ## Invite Acceptance Flow
 

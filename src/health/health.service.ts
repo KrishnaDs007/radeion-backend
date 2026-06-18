@@ -6,12 +6,52 @@ import {
   CacheHealthStatus,
   ConfigurationStatus,
   DatabaseHealthStatus,
+  DatabricksDatasetHealthStatus,
+  DatabricksHealthStatus,
   EmailHealthStatus,
   HealthStatus,
 } from './health.types';
 
 const CACHE_HEALTH_TIMEOUT_MS = 2_000;
 const CACHE_HEALTH_TTL_SECONDS = 10;
+
+const DATABRICKS_CONNECTION_REQUIREMENTS = [
+  'DATABRICKS_HOST',
+  'DATABRICKS_TOKEN',
+  'DATABRICKS_HTTP_PATH',
+] as const;
+
+const DATABRICKS_DATASET_REQUIREMENTS = {
+  claims: {
+    table: 'DATABRICKS_CLAIMS_TABLE',
+    columns: {
+      organizationId: 'DATABRICKS_CLAIMS_ORGANIZATION_ID_COLUMN',
+      practiceId: 'DATABRICKS_CLAIMS_PRACTICE_ID_COLUMN',
+      providerId: 'DATABRICKS_CLAIMS_PROVIDER_ID_COLUMN',
+      patientId: 'DATABRICKS_CLAIMS_PATIENT_ID_COLUMN',
+      date: 'DATABRICKS_CLAIMS_DATE_COLUMN',
+    },
+  },
+  providers: {
+    table: 'DATABRICKS_PROVIDERS_TABLE',
+    columns: {
+      organizationId: 'DATABRICKS_PROVIDERS_ORGANIZATION_ID_COLUMN',
+      practiceId: 'DATABRICKS_PROVIDERS_PRACTICE_ID_COLUMN',
+      providerId: 'DATABRICKS_PROVIDERS_PROVIDER_ID_COLUMN',
+      patientId: 'DATABRICKS_PROVIDERS_PATIENT_ID_COLUMN',
+    },
+  },
+  patientMetrics: {
+    table: 'DATABRICKS_PATIENT_METRICS_TABLE',
+    columns: {
+      organizationId: 'DATABRICKS_PATIENT_METRICS_ORGANIZATION_ID_COLUMN',
+      practiceId: 'DATABRICKS_PATIENT_METRICS_PRACTICE_ID_COLUMN',
+      providerId: 'DATABRICKS_PATIENT_METRICS_PROVIDER_ID_COLUMN',
+      patientId: 'DATABRICKS_PATIENT_METRICS_PATIENT_ID_COLUMN',
+      date: 'DATABRICKS_PATIENT_METRICS_DATE_COLUMN',
+    },
+  },
+} as const;
 
 @Injectable()
 export class HealthService {
@@ -156,6 +196,42 @@ export class HealthService {
     };
   }
 
+  getDatabricksHealth(): DatabricksHealthStatus {
+    const connectionMissing = DATABRICKS_CONNECTION_REQUIREMENTS.filter(
+      (key) => !this.hasConfig(key),
+    );
+    const datasets = {
+      claims: this.getDatabricksDatasetHealth(
+        DATABRICKS_DATASET_REQUIREMENTS.claims,
+      ),
+      providers: this.getDatabricksDatasetHealth(
+        DATABRICKS_DATASET_REQUIREMENTS.providers,
+      ),
+      patientMetrics: this.getDatabricksDatasetHealth(
+        DATABRICKS_DATASET_REQUIREMENTS.patientMetrics,
+      ),
+    };
+    const missing = [
+      ...connectionMissing,
+      ...datasets.claims.missing,
+      ...datasets.providers.missing,
+      ...datasets.patientMetrics.missing,
+    ];
+
+    return {
+      ready: missing.length === 0,
+      connection: {
+        host: this.hasConfig('DATABRICKS_HOST'),
+        token: this.hasConfig('DATABRICKS_TOKEN'),
+        httpPath: this.hasConfig('DATABRICKS_HTTP_PATH'),
+        warehouseId: this.hasConfig('DATABRICKS_WAREHOUSE_ID'),
+        missing: connectionMissing,
+      },
+      datasets,
+      missing,
+    };
+  }
+
   private hasConfig(key: string): boolean {
     const value = this.configService.get<string>(key);
     return Boolean(value?.trim());
@@ -163,6 +239,31 @@ export class HealthService {
 
   private hasAllConfig(keys: string[]): boolean {
     return keys.every((key) => this.hasConfig(key));
+  }
+
+  private getDatabricksDatasetHealth(requirements: {
+    table: string;
+    columns: Record<string, string>;
+  }): DatabricksDatasetHealthStatus {
+    const columns = Object.fromEntries(
+      Object.entries(requirements.columns).map(([name, key]) => [
+        name,
+        this.hasConfig(key),
+      ]),
+    );
+    const missing = [
+      ...(this.hasConfig(requirements.table) ? [] : [requirements.table]),
+      ...Object.values(requirements.columns).filter(
+        (key) => !this.hasConfig(key),
+      ),
+    ];
+
+    return {
+      ready: missing.length === 0,
+      table: this.hasConfig(requirements.table),
+      columns,
+      missing,
+    };
   }
 
   private withTimeout<T>(promise: Promise<T>): Promise<T> {

@@ -35,4 +35,10 @@ export class HealthController {
   getEmailHealth() {
     return this.healthService.getEmailHealth();
   }
+
+  @Public()
+  @Get('databricks')
+  getDatabricksHealth() {
+    return this.healthService.getDatabricksHealth();
+  }
 }

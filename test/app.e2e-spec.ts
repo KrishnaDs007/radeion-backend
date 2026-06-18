@@ -229,6 +229,37 @@ describe('Public routes (e2e)', () => {
       });
   });
 
+  it('checks Databricks health without exposing secrets', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/health/databricks')
+      .expect(200);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        ready: false,
+        connection: {
+          host: true,
+          token: true,
+          httpPath: true,
+          warehouseId: false,
+          missing: [],
+        },
+        datasets: expect.objectContaining({
+          claims: expect.objectContaining({
+            ready: true,
+          }) as Record<string, unknown>,
+          providers: expect.objectContaining({
+            ready: false,
+          }) as Record<string, unknown>,
+        }) as Record<string, unknown>,
+        missing: expect.arrayContaining([
+          'DATABRICKS_PROVIDERS_TABLE',
+        ]) as string[],
+      }),
+    );
+    expect(JSON.stringify(response.body)).not.toContain('databricks-token');
+  });
+
   it('returns supported auth methods', async () => {
     await request(app.getHttpServer())
       .get('/auth/methods')

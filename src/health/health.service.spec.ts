@@ -244,4 +244,135 @@ describe('HealthService', () => {
       },
     });
   });
+
+  it('reports Databricks readiness with missing dataset mappings', () => {
+    const service = new HealthService(
+      new ConfigService({
+        DATABRICKS_HOST: 'https://example.cloud.databricks.com',
+        DATABRICKS_TOKEN: 'databricks-token',
+        DATABRICKS_HTTP_PATH: '/sql/1.0/warehouses/warehouse-id',
+        DATABRICKS_CLAIMS_TABLE: 'claims',
+        DATABRICKS_CLAIMS_ORGANIZATION_ID_COLUMN: 'organization_id',
+        DATABRICKS_CLAIMS_PRACTICE_ID_COLUMN: 'practice_id',
+        DATABRICKS_CLAIMS_PROVIDER_ID_COLUMN: 'provider_id',
+        DATABRICKS_CLAIMS_PATIENT_ID_COLUMN: 'patient_id',
+        DATABRICKS_CLAIMS_DATE_COLUMN: 'service_date',
+      }),
+      {} as never,
+      {} as never,
+    );
+
+    expect(service.getDatabricksHealth()).toEqual({
+      ready: false,
+      connection: {
+        host: true,
+        token: true,
+        httpPath: true,
+        warehouseId: false,
+        missing: [],
+      },
+      datasets: {
+        claims: {
+          ready: true,
+          table: true,
+          columns: {
+            organizationId: true,
+            practiceId: true,
+            providerId: true,
+            patientId: true,
+            date: true,
+          },
+          missing: [],
+        },
+        providers: {
+          ready: false,
+          table: false,
+          columns: {
+            organizationId: false,
+            practiceId: false,
+            providerId: false,
+            patientId: false,
+          },
+          missing: [
+            'DATABRICKS_PROVIDERS_TABLE',
+            'DATABRICKS_PROVIDERS_ORGANIZATION_ID_COLUMN',
+            'DATABRICKS_PROVIDERS_PRACTICE_ID_COLUMN',
+            'DATABRICKS_PROVIDERS_PROVIDER_ID_COLUMN',
+            'DATABRICKS_PROVIDERS_PATIENT_ID_COLUMN',
+          ],
+        },
+        patientMetrics: {
+          ready: false,
+          table: false,
+          columns: {
+            organizationId: false,
+            practiceId: false,
+            providerId: false,
+            patientId: false,
+            date: false,
+          },
+          missing: [
+            'DATABRICKS_PATIENT_METRICS_TABLE',
+            'DATABRICKS_PATIENT_METRICS_ORGANIZATION_ID_COLUMN',
+            'DATABRICKS_PATIENT_METRICS_PRACTICE_ID_COLUMN',
+            'DATABRICKS_PATIENT_METRICS_PROVIDER_ID_COLUMN',
+            'DATABRICKS_PATIENT_METRICS_PATIENT_ID_COLUMN',
+            'DATABRICKS_PATIENT_METRICS_DATE_COLUMN',
+          ],
+        },
+      },
+      missing: [
+        'DATABRICKS_PROVIDERS_TABLE',
+        'DATABRICKS_PROVIDERS_ORGANIZATION_ID_COLUMN',
+        'DATABRICKS_PROVIDERS_PRACTICE_ID_COLUMN',
+        'DATABRICKS_PROVIDERS_PROVIDER_ID_COLUMN',
+        'DATABRICKS_PROVIDERS_PATIENT_ID_COLUMN',
+        'DATABRICKS_PATIENT_METRICS_TABLE',
+        'DATABRICKS_PATIENT_METRICS_ORGANIZATION_ID_COLUMN',
+        'DATABRICKS_PATIENT_METRICS_PRACTICE_ID_COLUMN',
+        'DATABRICKS_PATIENT_METRICS_PROVIDER_ID_COLUMN',
+        'DATABRICKS_PATIENT_METRICS_PATIENT_ID_COLUMN',
+        'DATABRICKS_PATIENT_METRICS_DATE_COLUMN',
+      ],
+    });
+  });
+
+  it('reports Databricks readiness when required config is present', () => {
+    const service = new HealthService(
+      new ConfigService({
+        DATABRICKS_HOST: 'https://example.cloud.databricks.com',
+        DATABRICKS_TOKEN: 'databricks-token',
+        DATABRICKS_HTTP_PATH: '/sql/1.0/warehouses/warehouse-id',
+        DATABRICKS_CLAIMS_TABLE: 'claims',
+        DATABRICKS_CLAIMS_ORGANIZATION_ID_COLUMN: 'organization_id',
+        DATABRICKS_CLAIMS_PRACTICE_ID_COLUMN: 'practice_id',
+        DATABRICKS_CLAIMS_PROVIDER_ID_COLUMN: 'provider_id',
+        DATABRICKS_CLAIMS_PATIENT_ID_COLUMN: 'patient_id',
+        DATABRICKS_CLAIMS_DATE_COLUMN: 'service_date',
+        DATABRICKS_PROVIDERS_TABLE: 'providers',
+        DATABRICKS_PROVIDERS_ORGANIZATION_ID_COLUMN: 'organization_id',
+        DATABRICKS_PROVIDERS_PRACTICE_ID_COLUMN: 'practice_id',
+        DATABRICKS_PROVIDERS_PROVIDER_ID_COLUMN: 'provider_id',
+        DATABRICKS_PROVIDERS_PATIENT_ID_COLUMN: 'patient_id',
+        DATABRICKS_PATIENT_METRICS_TABLE: 'patient_metrics',
+        DATABRICKS_PATIENT_METRICS_ORGANIZATION_ID_COLUMN: 'organization_id',
+        DATABRICKS_PATIENT_METRICS_PRACTICE_ID_COLUMN: 'practice_id',
+        DATABRICKS_PATIENT_METRICS_PROVIDER_ID_COLUMN: 'provider_id',
+        DATABRICKS_PATIENT_METRICS_PATIENT_ID_COLUMN: 'patient_id',
+        DATABRICKS_PATIENT_METRICS_DATE_COLUMN: 'measured_at',
+      }),
+      {} as never,
+      {} as never,
+    );
+
+    expect(service.getDatabricksHealth()).toEqual(
+      expect.objectContaining({
+        ready: true,
+        missing: [],
+      }),
+    );
+    expect(service.getDatabricksHealth().datasets.patientMetrics.ready).toBe(
+      true,
+    );
+  });
 });

@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-06-17
+Last updated: 2026-06-18
 
 ## Completed
 
@@ -94,6 +94,7 @@ Quality and operations:
 - Health config now reports email and Databricks table/column mapping presence without exposing secrets.
 - Cache health now reports a runtime cache round trip for memory or Redis cache drivers.
 - Email health now reports invite-delivery readiness and password-recovery redirect configuration without exposing secrets.
+- Databricks health now reports connection and dataset mapping readiness without exposing secrets.
 - Public e2e tests now assert expanded health config shape and secret redaction.
 - Public-route e2e smoke tests added and wired into CI.
 - Authenticated-route e2e tests added with mocked auth context and Prisma.
@@ -118,6 +119,7 @@ Public:
 - `GET /health/database`
 - `GET /health/cache`
 - `GET /health/email`
+- `GET /health/databricks`
 - `GET /auth/methods`
 - `POST /auth/password-recovery`
 - `POST /access-requests/users`

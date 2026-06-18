@@ -90,6 +90,13 @@
           }
         },
         {
+          "name": "Databricks Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health/databricks"
+          }
+        },
+        {
           "name": "Auth Methods",
           "request": {
             "method": "GET",

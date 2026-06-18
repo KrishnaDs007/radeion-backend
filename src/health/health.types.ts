@@ -63,3 +63,27 @@ export type EmailHealthStatus = {
     redirectUrl: boolean;
   };
 };
+
+export type DatabricksHealthStatus = {
+  ready: boolean;
+  connection: {
+    host: boolean;
+    token: boolean;
+    httpPath: boolean;
+    warehouseId: boolean;
+    missing: string[];
+  };
+  datasets: {
+    claims: DatabricksDatasetHealthStatus;
+    providers: DatabricksDatasetHealthStatus;
+    patientMetrics: DatabricksDatasetHealthStatus;
+  };
+  missing: string[];
+};
+
+export type DatabricksDatasetHealthStatus = {
+  ready: boolean;
+  table: boolean;
+  columns: Record<string, boolean>;
+  missing: string[];
+};
