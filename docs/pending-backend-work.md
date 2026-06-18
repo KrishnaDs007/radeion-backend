@@ -25,6 +25,8 @@ The backend already exposes the support APIs needed by the current onboarding an
 - `GET /health/databricks`
 - `GET /users/export`
 - `GET /organizations/export`
+- `GET /reference/practices/export`
+- `GET /reference/providers/export`
 
 ## External Backend Blockers
 

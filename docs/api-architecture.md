@@ -37,11 +37,13 @@ Current route groups:
 - `POST /invites/accept` public invite acceptance after Supabase password/session setup
 - `POST /invites/:id/revoke` protected invite revocation
 - `GET /reference/practices` protected practice reference list
+- `GET /reference/practices/export` protected scoped practice reference CSV export
 - `GET /reference/practices/:id` protected practice reference detail
 - `GET /reference/practices/:id/providers` protected providers inside one practice
 - `POST /reference/practices` protected practice reference creation
 - `PATCH /reference/practices/:id` protected practice reference update
 - `GET /reference/providers` protected provider reference list
+- `GET /reference/providers/export` protected scoped provider reference CSV export
 - `GET /reference/providers/:id` protected provider reference detail
 - `POST /reference/providers` protected provider reference creation
 - `PATCH /reference/providers/:id` protected provider reference update
@@ -330,7 +332,7 @@ Top-level user, organization, reference, role-assignment, and care-coordinator-a
 - Other roles read only records tied to their assigned `organizationId`.
 - User reads also include the caller's own profile.
 
-`GET /users/export` and `GET /organizations/export` use the same scoped read rules as their list routes and return flat CSV attachments for admin operations.
+`GET /users/export`, `GET /organizations/export`, `GET /reference/practices/export`, and `GET /reference/providers/export` use the same scoped read rules as their list routes and return flat CSV attachments for admin operations.
 
 ## Why This Structure
 

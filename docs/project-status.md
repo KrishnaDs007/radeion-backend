@@ -54,6 +54,7 @@ Admin management:
 - Protected nested organization practice and user read APIs added.
 - Protected nested organization provider read API added.
 - Protected practice and provider reference APIs added.
+- Protected practice and provider reference CSV export APIs added with existing read scoping.
 - Protected reference detail and practice-provider nested reads added.
 - Protected care coordinator assignment list, create, and revoke APIs added.
 - Protected nested care coordinator assignment reads added for practices and providers.
@@ -171,11 +172,13 @@ Protected:
 - `POST /care-coordinators/assignments`
 - `POST /care-coordinators/assignments/:id/revoke`
 - `GET /reference/practices`
+- `GET /reference/practices/export`
 - `GET /reference/practices/:id`
 - `GET /reference/practices/:id/providers`
 - `POST /reference/practices`
 - `PATCH /reference/practices/:id`
 - `GET /reference/providers`
+- `GET /reference/providers/export`
 - `GET /reference/providers/:id`
 - `POST /reference/providers`
 - `PATCH /reference/providers/:id`

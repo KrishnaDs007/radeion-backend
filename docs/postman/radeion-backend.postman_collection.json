@@ -783,6 +783,19 @@
           }
         },
         {
+          "name": "Export Practices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/reference/practices/export"
+          }
+        },
+        {
           "name": "List Practice Providers",
           "request": {
             "method": "GET",
@@ -819,6 +832,19 @@
               }
             ],
             "url": "{{baseUrl}}/reference/providers/{{providerId}}"
+          }
+        },
+        {
+          "name": "Export Providers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/reference/providers/export"
           }
         },
         {

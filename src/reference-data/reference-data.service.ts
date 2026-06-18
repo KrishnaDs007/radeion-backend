@@ -29,6 +29,59 @@ export class ReferenceDataService {
     });
   }
 
+  async exportPractices(actor: UserContext) {
+    const practices = await this.prismaService.practice.findMany({
+      where: this.organizationScopedWhere(actor),
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: this.practiceInclude(),
+    });
+
+    return this.toCsv(practices, [
+      {
+        header: 'id',
+        value: (practice) => practice.id,
+      },
+      {
+        header: 'organizationId',
+        value: (practice) => practice.organizationId,
+      },
+      {
+        header: 'organizationName',
+        value: (practice) => practice.organization.name,
+      },
+      {
+        header: 'name',
+        value: (practice) => practice.name,
+      },
+      {
+        header: 'externalReferenceId',
+        value: (practice) => practice.externalReferenceId,
+      },
+      {
+        header: 'source',
+        value: (practice) => practice.source,
+      },
+      {
+        header: 'status',
+        value: (practice) => practice.status,
+      },
+      {
+        header: 'providerCount',
+        value: (practice) => practice._count.providers,
+      },
+      {
+        header: 'createdAt',
+        value: (practice) => practice.createdAt,
+      },
+      {
+        header: 'updatedAt',
+        value: (practice) => practice.updatedAt,
+      },
+    ]);
+  }
+
   async getPractice(id: string, actor: UserContext) {
     const practice = await this.prismaService.practice.findFirst({
       where: this.scopedRecordWhere(id, actor),
@@ -124,6 +177,67 @@ export class ReferenceDataService {
       },
       include: this.providerInclude(),
     });
+  }
+
+  async exportProviders(actor: UserContext) {
+    const providers = await this.prismaService.provider.findMany({
+      where: this.organizationScopedWhere(actor),
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: this.providerInclude(),
+    });
+
+    return this.toCsv(providers, [
+      {
+        header: 'id',
+        value: (provider) => provider.id,
+      },
+      {
+        header: 'organizationId',
+        value: (provider) => provider.organizationId,
+      },
+      {
+        header: 'organizationName',
+        value: (provider) => provider.organization.name,
+      },
+      {
+        header: 'practiceId',
+        value: (provider) => provider.practiceId,
+      },
+      {
+        header: 'practiceName',
+        value: (provider) => provider.practice?.name,
+      },
+      {
+        header: 'name',
+        value: (provider) => provider.name,
+      },
+      {
+        header: 'npi',
+        value: (provider) => provider.npi,
+      },
+      {
+        header: 'externalReferenceId',
+        value: (provider) => provider.externalReferenceId,
+      },
+      {
+        header: 'source',
+        value: (provider) => provider.source,
+      },
+      {
+        header: 'status',
+        value: (provider) => provider.status,
+      },
+      {
+        header: 'createdAt',
+        value: (provider) => provider.createdAt,
+      },
+      {
+        header: 'updatedAt',
+        value: (provider) => provider.updatedAt,
+      },
+    ]);
   }
 
   async getProvider(id: string, actor: UserContext) {
@@ -273,4 +387,51 @@ export class ReferenceDataService {
       Object.entries(input).filter(([, value]) => value !== undefined),
     ) as Partial<T>;
   }
+
+  private toCsv<T>(records: T[], columns: CsvColumn<T>[]): string {
+    const headerRow = columns.map((column) => this.escapeCsv(column.header));
+    const dataRows = records.map((record) =>
+      columns
+        .map((column) =>
+          this.escapeCsv(this.serializeCsvValue(column.value(record))),
+        )
+        .join(','),
+    );
+
+    return [headerRow.join(','), ...dataRows].join('\n');
+  }
+
+  private serializeCsvValue(value: unknown): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    if (typeof value === 'object') {
+      return JSON.stringify(value);
+    }
+
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean' ||
+      typeof value === 'bigint'
+    ) {
+      return value.toString();
+    }
+
+    return '';
+  }
+
+  private escapeCsv(value: string): string {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
 }
+
+type CsvColumn<T> = {
+  header: string;
+  value: (record: T) => unknown;
+};

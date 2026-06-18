@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Header,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import type { UserContext } from '../auth/auth.types';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { RequirePermission } from '../common/decorators/require-permission.decorator';
@@ -18,6 +26,14 @@ export class ReferenceDataController {
     return {
       data: await this.referenceDataService.listPractices(user),
     };
+  }
+
+  @RequirePermission('organization.read')
+  @Get('practices/export')
+  @Header('Content-Type', 'text/csv; charset=utf-8')
+  @Header('Content-Disposition', 'attachment; filename="practices.csv"')
+  async exportPractices(@CurrentUser() user: UserContext) {
+    return await this.referenceDataService.exportPractices(user);
   }
 
   @RequirePermission('organization.read')
@@ -68,6 +84,14 @@ export class ReferenceDataController {
     return {
       data: await this.referenceDataService.listProviders(user),
     };
+  }
+
+  @RequirePermission('providers.read')
+  @Get('providers/export')
+  @Header('Content-Type', 'text/csv; charset=utf-8')
+  @Header('Content-Disposition', 'attachment; filename="providers.csv"')
+  async exportProviders(@CurrentUser() user: UserContext) {
+    return await this.referenceDataService.exportProviders(user);
   }
 
   @RequirePermission('providers.read')

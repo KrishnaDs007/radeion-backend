@@ -461,6 +461,9 @@ Read practice and provider reference data:
 curl "$API_BASE_URL/reference/practices" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 
+curl "$API_BASE_URL/reference/practices/export" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
 curl "$API_BASE_URL/reference/practices/<practiceId>" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 
@@ -468,6 +471,9 @@ curl "$API_BASE_URL/reference/practices/<practiceId>/providers" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 
 curl "$API_BASE_URL/reference/providers" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+
+curl "$API_BASE_URL/reference/providers/export" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 
 curl "$API_BASE_URL/reference/providers/<providerId>" \
