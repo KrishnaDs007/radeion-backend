@@ -106,6 +106,84 @@ describe('CareCoordinatorsService', () => {
     );
   });
 
+  it('exports scoped assignments as CSV', async () => {
+    const createdAt = new Date('2026-06-18T10:00:00.000Z');
+    const prismaService = {
+      careCoordinatorAssignment: {
+        findMany: jest.fn().mockResolvedValue([
+          {
+            id: 'assignment-1',
+            organizationId: 'organization-1',
+            practiceId: 'practice-1',
+            providerId: 'provider-1',
+            createdAt,
+            revokedAt: null,
+            profile: {
+              id: 'profile-1',
+              email: 'care@example.com',
+              firstName: 'Care',
+              lastName: 'Coordinator',
+            },
+            organization: {
+              id: 'organization-1',
+              name: 'Demo Org',
+            },
+            practice: {
+              id: 'practice-1',
+              name: 'Main Practice',
+            },
+            provider: {
+              id: 'provider-1',
+              name: 'Smith, Jane',
+              npi: '1234567890',
+            },
+            assignedBy: {
+              id: 'actor-1',
+              email: 'admin@example.com',
+            },
+          },
+        ]),
+      },
+    };
+    const service = new CareCoordinatorsService(
+      prismaService as unknown as ConstructorParameters<
+        typeof CareCoordinatorsService
+      >[0],
+      {} as ConstructorParameters<typeof CareCoordinatorsService>[1],
+    );
+
+    await expect(
+      service.exportAssignments({
+        ...actor,
+        roles: [
+          {
+            name: 'clientAdmin',
+            scopeType: 'organization',
+            organizationId: 'organization-1',
+          },
+        ],
+      }),
+    ).resolves.toBe(
+      [
+        'id,organizationId,organizationName,practiceId,practiceName,providerId,providerName,providerNpi,profileId,profileEmail,profileName,assignedByEmail,createdAt,revokedAt',
+        'assignment-1,organization-1,Demo Org,practice-1,Main Practice,provider-1,"Smith, Jane",1234567890,profile-1,care@example.com,Care Coordinator,admin@example.com,2026-06-18T10:00:00.000Z,',
+      ].join('\n'),
+    );
+
+    expect(
+      prismaService.careCoordinatorAssignment.findMany,
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          revokedAt: null,
+          organizationId: {
+            in: ['organization-1'],
+          },
+        },
+      }),
+    );
+  });
+
   it('lists organization-specific assignments after checking scoped organization access', async () => {
     const prismaService = {
       organization: {

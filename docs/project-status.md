@@ -57,6 +57,7 @@ Admin management:
 - Protected practice and provider reference CSV export APIs added with existing read scoping.
 - Protected reference detail and practice-provider nested reads added.
 - Protected care coordinator assignment list, create, and revoke APIs added.
+- Protected care coordinator assignment CSV export API added with existing read scoping.
 - Protected nested care coordinator assignment reads added for practices and providers.
 - Protected nested care coordinator assignment reads added for organizations.
 - Protected role, user, and organization read endpoints added.
@@ -166,6 +167,7 @@ Protected:
 - `PATCH /organizations/:id`
 - `PATCH /organizations/:id/status`
 - `GET /care-coordinators/assignments`
+- `GET /care-coordinators/assignments/export`
 - `GET /care-coordinators/organizations/:organizationId/assignments`
 - `GET /care-coordinators/practices/:practiceId/assignments`
 - `GET /care-coordinators/providers/:providerId/assignments`

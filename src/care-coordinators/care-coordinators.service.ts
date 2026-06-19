@@ -14,6 +14,11 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateCareCoordinatorAssignmentDto } from './dto/create-care-coordinator-assignment.dto';
 import { RevokeCareCoordinatorAssignmentDto } from './dto/revoke-care-coordinator-assignment.dto';
 
+type CsvColumn<T> = {
+  header: string;
+  value: (record: T) => unknown;
+};
+
 @Injectable()
 export class CareCoordinatorsService {
   constructor(
@@ -32,6 +37,64 @@ export class CareCoordinatorsService {
       },
       select: this.assignmentSelect(),
     });
+  }
+
+  async exportAssignments(actor: UserContext) {
+    const assignments =
+      await this.prismaService.careCoordinatorAssignment.findMany({
+        where: {
+          revokedAt: null,
+          ...this.organizationScopedWhere(actor),
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        select: this.assignmentSelect(),
+      });
+
+    return this.toCsv(assignments, [
+      { header: 'id', value: (assignment) => assignment.id },
+      {
+        header: 'organizationId',
+        value: (assignment) => assignment.organizationId,
+      },
+      {
+        header: 'organizationName',
+        value: (assignment) => assignment.organization.name,
+      },
+      { header: 'practiceId', value: (assignment) => assignment.practiceId },
+      {
+        header: 'practiceName',
+        value: (assignment) => assignment.practice?.name,
+      },
+      { header: 'providerId', value: (assignment) => assignment.providerId },
+      {
+        header: 'providerName',
+        value: (assignment) => assignment.provider?.name,
+      },
+      {
+        header: 'providerNpi',
+        value: (assignment) => assignment.provider?.npi,
+      },
+      { header: 'profileId', value: (assignment) => assignment.profile.id },
+      {
+        header: 'profileEmail',
+        value: (assignment) => assignment.profile.email,
+      },
+      {
+        header: 'profileName',
+        value: (assignment) =>
+          [assignment.profile.firstName, assignment.profile.lastName]
+            .filter(Boolean)
+            .join(' '),
+      },
+      {
+        header: 'assignedByEmail',
+        value: (assignment) => assignment.assignedBy?.email,
+      },
+      { header: 'createdAt', value: (assignment) => assignment.createdAt },
+      { header: 'revokedAt', value: (assignment) => assignment.revokedAt },
+    ]);
   }
 
   async listOrganizationAssignments(
@@ -404,5 +467,43 @@ export class CareCoordinatorsService {
         },
       },
     };
+  }
+
+  private toCsv<T>(records: T[], columns: CsvColumn<T>[]): string {
+    const header = columns.map((column) => this.escapeCsv(column.header));
+    const rows = records.map((record) =>
+      columns.map((column) => this.serializeCsvValue(column.value(record))),
+    );
+
+    return [header, ...rows].map((row) => row.join(',')).join('\n');
+  }
+
+  private serializeCsvValue(value: unknown): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+
+    if (value instanceof Date) {
+      return this.escapeCsv(value.toISOString());
+    }
+
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean' ||
+      typeof value === 'bigint'
+    ) {
+      return this.escapeCsv(String(value));
+    }
+
+    return this.escapeCsv(JSON.stringify(value));
+  }
+
+  private escapeCsv(value: string): string {
+    if (!/[",\n\r]/.test(value)) {
+      return value;
+    }
+
+    return `"${value.replace(/"/g, '""')}"`;
   }
 }

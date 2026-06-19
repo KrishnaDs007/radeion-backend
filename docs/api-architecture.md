@@ -67,6 +67,7 @@ Current route groups:
 - `PATCH /organizations/:id` protected organization update
 - `PATCH /organizations/:id/status` protected organization status update
 - `GET /care-coordinators/assignments` protected active care coordinator assignment list
+- `GET /care-coordinators/assignments/export` protected active care coordinator assignment CSV export
 - `GET /care-coordinators/organizations/:organizationId/assignments` protected organization-specific care coordinator assignment list
 - `GET /care-coordinators/practices/:practiceId/assignments` protected practice-specific care coordinator assignment list
 - `GET /care-coordinators/providers/:providerId/assignments` protected provider-specific care coordinator assignment list
@@ -332,7 +333,7 @@ Top-level user, organization, reference, role-assignment, and care-coordinator-a
 - Other roles read only records tied to their assigned `organizationId`.
 - User reads also include the caller's own profile.
 
-`GET /users/export`, `GET /organizations/export`, `GET /reference/practices/export`, and `GET /reference/providers/export` use the same scoped read rules as their list routes and return flat CSV attachments for admin operations.
+`GET /users/export`, `GET /organizations/export`, `GET /reference/practices/export`, `GET /reference/providers/export`, and `GET /care-coordinators/assignments/export` use the same scoped read rules as their list routes and return flat CSV attachments for admin operations.
 
 ## Why This Structure
 

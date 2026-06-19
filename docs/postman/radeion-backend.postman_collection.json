@@ -929,6 +929,19 @@
           }
         },
         {
+          "name": "Export Assignments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{supabaseAccessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/care-coordinators/assignments/export"
+          }
+        },
+        {
           "name": "List Organization Assignments",
           "request": {
             "method": "GET",
